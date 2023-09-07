@@ -14,7 +14,7 @@ export default function IntroBanner() {
         <h1 className="text-4xl font-bold text-gray-800 mb-4">
           {showText && (
             <span className="inline-block">
-              Hi there! I'm Nima,{" "}
+              Hi there! I{"'"}m Nima,{" "}
               <span className="inline-block border-b-2 border-teal-500 typing-animation">
                 a frontend developer, UX designer and accessibility specialist
               </span>
