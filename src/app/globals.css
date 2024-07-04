@@ -7,21 +7,63 @@
     width: 0;
   }
   to {
-    width: 100%;
+    width: 50ch; /* Adjust this value based on the average width of your content */
   }
 }
 
 @keyframes blink {
   50% {
-    border-color: transparent;
+    background-color: transparent;
   }
 }
 
 .typing-animation {
   display: inline-block;
   overflow: hidden;
-  animation: typing 2s steps(20, end) forwards, blink 1s infinite;
-  border-right: 0.15em solid orange;
-  white-space: nowrap;
-  letter-spacing: 0.15em;
+  white-space: pre-wrap; /* Allows text to wrap while preserving whitespace */
+  animation: typing 10s steps(100, end) forwards; /* Adjust the duration and steps as needed */
+  width: 0;
+  font-size: 1.5rem; /* Default font size */
+}
+
+.typing-animation::after {
+  content: "|"; /* Cursor */
+  animation: blink 1s infinite;
+  background-color: orange;
+  display: inline-block;
+}
+
+/* Media queries for different viewport sizes */
+@media (max-width: 768px) {
+  .typing-animation {
+    font-size: 1.2rem; /* Adjust font size for tablets */
+  }
+}
+
+@media (max-width: 480px) {
+  .typing-animation {
+    font-size: 1rem; /* Adjust font size for mobile devices */
+  }
+}
+
+.logo {
+  font-size: 2rem; /* Adjust the size as needed */
+  font-weight: bold;
+  letter-spacing: 2px; /* Slight spacing between letters */
+  text-transform: uppercase; /* Convert text to uppercase */
+  color: #8b4513; /* SaddleBrown color for a wood-like feel */
+  text-shadow: -1px -1px 0 #a0522d, 1px -1px 0 #a0522d, -1px 1px 0 #a0522d,
+    1px 1px 0 #a0522d; /* This gives the 3D effect */
+  transition: transform 0.2s, color 0.2s; /* Smooth transition */
+}
+
+.logo:hover {
+  color: #a0522d; /* Slightly different shade of brown on hover for a subtle effect */
+  transform: scale(1.03); /* Slightly scale up on hover */
+}
+
+@layer components {
+  .card:hover .card-inner {
+    transform: rotateY(180deg);
+  }
 }

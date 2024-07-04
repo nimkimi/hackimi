@@ -7,12 +7,14 @@ export default function Header() {
 
   return (
     <nav className="flex w-full justify-between items-center bg-transparent py-4 px-6">
-      <div className="text-xl font-bold">Nima Hakimi</div>
+      <Link href="/" className="logo">
+        N.HAKIMI
+      </Link>
       <div className="flex space-x-4">
         <Link
           href="#"
           className={`${
-            pathname === "/about" ? "bg-gray-900" : ""
+            pathname === "/about" ? "bg-gray-900 text-white" : ""
           } px-3 py-2 rounded-md text-sm font-medium`}
         >
           About
@@ -20,7 +22,7 @@ export default function Header() {
         <Link
           href="#"
           className={`${
-            pathname === "" ? "bg-gray-900" : ""
+            pathname === "" ? "bg-gray-900 text-white" : ""
           } px-3 py-2 rounded-md text-sm font-medium`}
         >
           Project
@@ -28,7 +30,7 @@ export default function Header() {
         <Link
           href="/contact"
           className={`${
-            pathname === "/contact" ? "bg-gray-900" : ""
+            pathname === "/contact" ? "bg-gray-900 text-white" : ""
           } px-3 py-2 rounded-md text-sm font-medium`}
         >
           Contact
