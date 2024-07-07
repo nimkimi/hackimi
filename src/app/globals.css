@@ -27,7 +27,7 @@
 }
 
 .typing-animation::after {
-  content: "|"; /* Cursor */
+  content: '|'; /* Cursor */
   animation: blink 1s infinite;
   background-color: orange;
   display: inline-block;
@@ -52,9 +52,14 @@
   letter-spacing: 2px; /* Slight spacing between letters */
   text-transform: uppercase; /* Convert text to uppercase */
   color: #8b4513; /* SaddleBrown color for a wood-like feel */
-  text-shadow: -1px -1px 0 #a0522d, 1px -1px 0 #a0522d, -1px 1px 0 #a0522d,
+  text-shadow:
+    -1px -1px 0 #a0522d,
+    1px -1px 0 #a0522d,
+    -1px 1px 0 #a0522d,
     1px 1px 0 #a0522d; /* This gives the 3D effect */
-  transition: transform 0.2s, color 0.2s; /* Smooth transition */
+  transition:
+    transform 0.2s,
+    color 0.2s; /* Smooth transition */
 }
 
 .logo:hover {

@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,md,mdx,css,yaml,yml}\"",
+    "check": "prettier --check \"**/*.{ts,tsx,js,jsx,md,mdx,css,yaml,yml}\"",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -26,6 +28,7 @@
     "zod": "^3.22.2"
   },
   "devDependencies": {
-    "eslint-config-prettier": "^9.1.0"
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.2"
   }
 }

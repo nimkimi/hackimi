@@ -1,7 +1,7 @@
-import { handleMail } from "@/app/contact/emails";
+import { handleMail } from '@/app/contact/emails';
 
 export default function Contact() {
-  const formElementStyles = "flex flex-col gap-1 w-full text-left";
+  const formElementStyles = 'flex flex-col gap-1 w-full text-left';
   return (
     <div className="flex flex-col justify-center items-center gap-4">
       <h1>Contact me!</h1>

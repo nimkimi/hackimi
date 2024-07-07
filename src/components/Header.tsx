@@ -1,6 +1,6 @@
-"use client";
-import { usePathname } from "next/navigation";
-import Link from "next/link";
+'use client';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Header() {
   const pathname = usePathname();
@@ -14,7 +14,7 @@ export default function Header() {
         <Link
           href="#"
           className={`${
-            pathname === "/about" ? "bg-gray-900 text-white" : ""
+            pathname === '/about' ? 'bg-gray-900 text-white' : ''
           } px-3 py-2 rounded-md text-sm font-medium`}
         >
           About
@@ -22,7 +22,7 @@ export default function Header() {
         <Link
           href="#"
           className={`${
-            pathname === "" ? "bg-gray-900 text-white" : ""
+            pathname === '' ? 'bg-gray-900 text-white' : ''
           } px-3 py-2 rounded-md text-sm font-medium`}
         >
           Project
@@ -30,7 +30,7 @@ export default function Header() {
         <Link
           href="/contact"
           className={`${
-            pathname === "/contact" ? "bg-gray-900 text-white" : ""
+            pathname === '/contact' ? 'bg-gray-900 text-white' : ''
           } px-3 py-2 rounded-md text-sm font-medium`}
         >
           Contact
