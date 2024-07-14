@@ -1,3 +1,5 @@
+import { SocketAddress } from 'net';
+
 var nodemailer = require('nodemailer');
 export async function sendMail(
   subject: string,
@@ -15,7 +17,10 @@ export async function sendMail(
   });
 
   var mailOptions = {
-    from: process.env.NODEMAILER_EMAIL,
+    from: {
+      address: process.env.NODEMAILER_EMAIL,
+      name: process.env.NODEMAILER_NAME,
+    },
     to: toEmail,
     subject: subject,
     text: otpText,
