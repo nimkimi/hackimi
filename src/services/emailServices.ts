@@ -1,12 +1,13 @@
 var nodemailer = require('nodemailer');
-//-----------------------------------------------------------------------------
 export async function sendMail(
   subject: string,
   toEmail: string,
   otpText: string
 ) {
   var transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.hostinger.com',
+    port: 465,
+    secure: true, // upg
     auth: {
       user: process.env.NODEMAILER_EMAIL,
       pass: process.env.NODEMAILER_PASSWORD,
