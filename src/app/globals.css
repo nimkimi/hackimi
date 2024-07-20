@@ -1,74 +1,45 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@keyframes typing {
-  from {
-    width: 0;
-  }
-  to {
-    width: 50ch; /* Adjust this value based on the average width of your content */
-  }
+/* global.css */
+:root {
+  /* Light theme colors */
+  --color-bg-light: #f7fafc; /* Light background color */
+  --color-bg-dark: #2d3748; /* Dark background color (fallback) */
+  --color-text: #111827; /* Default text color */
+  --color-text-dark: #f9fafb; /* Dark text color (fallback) */
 }
 
-@keyframes blink {
-  50% {
-    background-color: transparent;
-  }
-}
-
-.typing-animation {
-  display: inline-block;
-  overflow: hidden;
-  white-space: pre-wrap; /* Allows text to wrap while preserving whitespace */
-  animation: typing 10s steps(100, end) forwards; /* Adjust the duration and steps as needed */
-  width: 0;
-  font-size: 1.5rem; /* Default font size */
-}
-
-.typing-animation::after {
-  content: '|'; /* Cursor */
-  animation: blink 1s infinite;
-  background-color: orange;
-  display: inline-block;
-}
-
-/* Media queries for different viewport sizes */
-@media (max-width: 768px) {
-  .typing-animation {
-    font-size: 1.2rem; /* Adjust font size for tablets */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Override for dark theme */
+    --color-bg-light: #2d3748; /* Dark background color */
+    --color-bg-dark: #1a202c; /* Alternative dark background color if needed */
+    --color-text: #f9fafb; /* Dark text color */
+    --color-text-dark: #e2e8f0; /* Alternative dark text color if needed */
   }
 }
 
-@media (max-width: 480px) {
-  .typing-animation {
-    font-size: 1rem; /* Adjust font size for mobile devices */
-  }
-}
-
-.logo {
-  font-size: 2rem; /* Adjust the size as needed */
-  font-weight: bold;
-  letter-spacing: 2px; /* Slight spacing between letters */
-  text-transform: uppercase; /* Convert text to uppercase */
-  color: #8b4513; /* SaddleBrown color for a wood-like feel */
-  text-shadow:
-    -1px -1px 0 #a0522d,
-    1px -1px 0 #a0522d,
-    -1px 1px 0 #a0522d,
-    1px 1px 0 #a0522d; /* This gives the 3D effect */
+body {
+  background-color: var(--color-bg-light);
+  color: var(--color-text);
   transition:
-    transform 0.2s,
-    color 0.2s; /* Smooth transition */
+    background-color 0.3s,
+    color 0.3s;
 }
 
-.logo:hover {
-  color: #a0522d; /* Slightly different shade of brown on hover for a subtle effect */
-  transform: scale(1.03); /* Slightly scale up on hover */
+.dark body {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-dark);
 }
 
-@layer components {
-  .card:hover .card-inner {
-    transform: rotateY(180deg);
-  }
+.container {
+  padding: 1rem;
+  background-color: var(--color-bg-light);
+  color: var(--color-text);
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.dark .container {
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-dark);
 }
