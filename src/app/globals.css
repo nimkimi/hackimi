@@ -1,3 +1,45 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Base tweaks */
+@layer base {
+  html {
+    @apply antialiased;
+  }
+  body {
+    @apply selection:bg-light-accent/20 selection:text-light-primary dark:selection:bg-dark-accent/20 dark:selection:text-dark-primary;
+  }
+  a {
+    @apply underline-offset-4 hover:underline;
+  }
+}
+
+/* Component utilities */
+@layer components {
+  .card {
+    @apply rounded-xl border border-light-accent/20 dark:border-dark-accent/20 bg-white/60 dark:bg-black/20 backdrop-blur;
+  }
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium transition-colors border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-light-accent/40 dark:focus-visible:ring-dark-accent/40;
+  }
+  .btn-outline {
+    @apply border-light-accent dark:border-dark-accent text-inherit;
+  }
+  .btn-outline:hover {
+    @apply bg-light-accent text-white; /* light hover */
+  }
+  .dark .btn-outline:hover {
+    @apply bg-dark-accent text-white; /* dark hover */
+  }
+  .btn-accent {
+    @apply bg-light-accent text-white border-light-accent dark:bg-dark-accent dark:text-white dark:border-dark-accent;
+  }
+  .muted {
+    @apply text-light-secondary dark:text-dark-secondary;
+  }
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+}

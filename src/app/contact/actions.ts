@@ -1,27 +1,29 @@
 'use server';
-import { sendMail } from '@/services/emailServices';
+import { contactSchema } from '@/lib/validation';
+import { sendMail } from '@/lib/email';
 import { redirect } from 'next/navigation';
 
 export async function handleMail(formData: FormData) {
-  const name = formData.get('name') as string;
-  const email = formData.get('email') as string;
-  const subject = formData.get('subject') as string;
-  const message = formData.get('message') as string;
-  const otpText = `Name: ${name}\nEmail: ${email}\nMessage: ${message}`;
+  const raw = Object.fromEntries(formData) as Record<string, string>;
+  const parsed = contactSchema.safeParse(raw);
+  if (!parsed.success) {
+    throw new Error('Invalid form');
+  }
+  const { name, email, subject, message } = parsed.data;
+  const body = `Name: ${name}\nEmail: ${email}\nMessage: ${message}`;
   await sendMail(
     `Svar til ${name}`,
     email,
     `Hei ${name},\n\nTakk for din henvendelse. Jeg vil svare deg så snart som mulig.\n\nMed vennlig hilsen,\nNima Hakimi`
   );
-  await sendMail(subject, 'nima@hackimi.dev', otpText);
+  await sendMail(subject, 'nima@hackimi.dev', body);
 }
 
-// Server action that sends email then redirects with a status
 export async function submitAndRedirect(formData: FormData) {
   try {
     await handleMail(formData);
     redirect('/contact?sent=1');
-  } catch (e) {
+  } catch {
     redirect('/contact?error=1');
   }
 }
