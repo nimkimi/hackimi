@@ -110,7 +110,7 @@ export default function ContactClient({ siteKey }: Props) {
         </span>
         {siteKey ? (
           <div className="self-start">
-            <div className="g-recaptcha cursor-pointer" data-sitekey={siteKey} />
+            <div className="g-recaptcha" data-sitekey={siteKey} />
           </div>
         ) : (
           <div className="text-sm text-red-500">reCAPTCHA is not configured.</div>
