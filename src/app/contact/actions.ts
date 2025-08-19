@@ -2,9 +2,15 @@
 import { contactSchema } from '@/lib/validation';
 import { sendMail } from '@/lib/email';
 import { redirect } from 'next/navigation';
+import { verifyRecaptcha } from '@/lib/captcha';
 
 export async function handleMail(formData: FormData) {
   const raw = Object.fromEntries(formData) as Record<string, string>;
+  const token = raw['g-recaptcha-response'] || raw['recaptchaToken'] || null;
+  const human = await verifyRecaptcha(token);
+  if (!human) {
+    throw new Error('Captcha failed');
+  }
   const parsed = contactSchema.safeParse(raw);
   if (!parsed.success) {
     throw new Error('Invalid form');
@@ -22,8 +28,9 @@ export async function handleMail(formData: FormData) {
 export async function submitAndRedirect(formData: FormData) {
   try {
     await handleMail(formData);
-    redirect('/contact?sent=1');
-  } catch {
+  } catch (error) {
+    console.error(error);
     redirect('/contact?error=1');
   }
+  redirect('/contact?sent=1');
 }

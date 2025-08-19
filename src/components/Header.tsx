@@ -15,8 +15,7 @@ export default function Header() {
     { href: '/contact', label: 'Contact' },
   ];
 
-  const isActive = (path: string) =>
-    pathname === path || pathname?.startsWith(path + '/');
+  const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
   return (
     <nav className="sticky top-0 z-50 safe-top">
@@ -31,25 +30,19 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Desktop nav */}
           <div className="relative hidden md:flex items-center gap-2 rounded-xl p-1">
             {links.map((l) => {
               const base = 'btn';
               const active = 'btn-accent';
               const inactive = 'btn-outline';
               return (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className={`${base} ${isActive(l.href) ? active : inactive}`}
-                >
+                <Link key={l.href} href={l.href} className={`${base} ${isActive(l.href) ? active : inactive}`}>
                   {l.label}
                 </Link>
               );
             })}
           </div>
 
-          {/* Mobile menu button */}
           <button
             type="button"
             aria-label="Open navigation menu"
@@ -62,7 +55,6 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Mobile dropdown */}
         <AnimatePresence>
           {open && (
             <motion.div

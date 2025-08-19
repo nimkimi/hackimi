@@ -1,4 +1,3 @@
-// Server-only email utility built on Nodemailer
 import 'server-only';
 import nodemailer, { Transporter } from 'nodemailer';
 
@@ -18,9 +17,7 @@ function getTransporter(): Transporter {
 
   const host = process.env.NODEMAILER_HOST || 'smtp.hostinger.com';
   const port = Number(process.env.NODEMAILER_PORT || 465);
-  const secure =
-    String(process.env.NODEMAILER_SECURE ?? port === 465).toLowerCase() ===
-    'true';
+  const secure = String(process.env.NODEMAILER_SECURE ?? port === 465).toLowerCase() === 'true';
 
   transporter = nodemailer.createTransport({
     host,
@@ -38,12 +35,7 @@ function getTransporter(): Transporter {
   return transporter;
 }
 
-export async function sendMail(
-  subject: string,
-  toEmail: string,
-  text: string,
-  html?: string
-) {
+export async function sendMail(subject: string, toEmail: string, text: string, html?: string) {
   const t = getTransporter();
   const fromAddress = assertEnv('NODEMAILER_EMAIL');
   const fromName = process.env.NODEMAILER_NAME || 'Portfolio';

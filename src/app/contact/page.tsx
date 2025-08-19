@@ -3,10 +3,9 @@ import { submitAndRedirect } from '@/app/contact/actions';
 import AnimatedSection from '@/components/AnimatedSection';
 import { Mail } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import Script from 'next/script';
 import { Suspense, useEffect, useRef, useState } from 'react';
 import { Toast, type ToastState } from '@/components/ui/Toast';
-
-// Ensure Node.js runtime for this route segment so server actions can use nodemailer
 export const runtime = 'nodejs';
 
 function SubmitButton() {
@@ -19,6 +18,7 @@ function SubmitButton() {
 
 function ContactContent() {
   const formElementStyles = 'flex flex-col gap-1 w-full text-left';
+  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || '';
   const qp = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -27,15 +27,12 @@ function ContactContent() {
   const formRef = useRef<HTMLFormElement | null>(null);
   const [toast, setToast] = useState<ToastState>(null);
 
-  // Optional QA helper: auto-submit when autosubmit=1
   useEffect(() => {
     if (qp.get('autosubmit') === '1') {
       formRef.current?.requestSubmit();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [qp]);
 
-  // Show toast based on query flags, then clear the querystring
   useEffect(() => {
     if (sent) {
       setToast({
@@ -43,7 +40,6 @@ function ContactContent() {
         title: 'Message sent',
         desc: 'Thanks! I’ll get back to you soon.',
       });
-      // Clear the query string to keep the URL clean
       router.replace(pathname, { scroll: false });
     } else if (error) {
       setToast({
@@ -61,6 +57,7 @@ function ContactContent() {
   }, [sent, error, router, pathname]);
   return (
     <AnimatedSection>
+      {siteKey ? <Script src="https://www.google.com/recaptcha/api.js" strategy="lazyOnload" /> : null}
       <div className="max-w-4xl mx-auto text-center">
         <h1 className="text-3xl sm:text-4xl font-bold mb-4 inline-flex items-center gap-3">
           <Mail className="h-7 w-7" /> Contact me
@@ -114,6 +111,13 @@ function ContactContent() {
             required
           />
         </span>
+        {siteKey ? (
+          <div className="self-start">
+            <div className="g-recaptcha" data-sitekey={siteKey} />
+          </div>
+        ) : (
+          <div className="text-sm text-red-500">reCAPTCHA is not configured.</div>
+        )}
         <SubmitButton />
       </form>
 
@@ -124,11 +128,7 @@ function ContactContent() {
 
 export default function ContactPage() {
   return (
-    <Suspense
-      fallback={
-        <div className="max-w-4xl mx-auto p-6 text-center">Loading…</div>
-      }
-    >
+    <Suspense fallback={<div className="max-w-4xl mx-auto p-6 text-center">Loading…</div>}>
       <ContactContent />
     </Suspense>
   );
