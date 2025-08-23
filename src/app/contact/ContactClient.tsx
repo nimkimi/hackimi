@@ -1,7 +1,7 @@
 'use client';
 import { submitAndRedirect } from '@/app/contact/actions';
 import AnimatedSection from '@/components/AnimatedSection';
-import { Toast, type ToastState } from '@/components/ui/Toast';
+import { Toast, type ToastState } from '@/components/Toast';
 import { Mail } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
