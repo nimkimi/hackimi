@@ -1,6 +1,6 @@
 'use client';
 import { AnimatePresence, motion } from 'framer-motion';
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { IconAlertTriangleFilled, IconCircleCheckFilled } from '@tabler/icons-react';
 
 export type ToastState = {
   type: 'success' | 'error';
@@ -8,13 +8,7 @@ export type ToastState = {
   desc: string;
 } | null;
 
-export function Toast({
-  toast,
-  onClose,
-}: {
-  toast: ToastState;
-  onClose: () => void;
-}) {
+export function Toast({ toast, onClose }: { toast: ToastState; onClose: () => void }) {
   return (
     <AnimatePresence>
       {toast && (
@@ -29,9 +23,7 @@ export function Toast({
         >
           <div
             className={`pointer-events-auto relative flex items-start gap-3 rounded-xl px-4 py-3 shadow-2xl ring-1 ring-black/5 dark:ring-white/10 backdrop-blur-xl bg-white/80 dark:bg-black/50 text-sm max-w-[92vw] sm:max-w-sm before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-l-xl ${
-              toast.type === 'success'
-                ? 'before:bg-light-accent dark:before:bg-dark-accent'
-                : 'before:bg-red-500'
+              toast.type === 'success' ? 'before:bg-light-accent dark:before:bg-dark-accent' : 'before:bg-red-500'
             }`}
           >
             <button
@@ -42,20 +34,22 @@ export function Toast({
               ×
             </button>
             {toast.type === 'success' ? (
-              <CheckCircle2 className="mt-0.5 h-5 w-5 text-light-accent dark:text-dark-accent" />
+              <IconCircleCheckFilled
+                size={20}
+                className="shrink-0 text-light-accent dark:text-dark-accent"
+                aria-hidden="true"
+              />
             ) : (
-              <AlertCircle className="mt-0.5 h-5 w-5 text-red-500" />
+              <IconAlertTriangleFilled size={20} className="shrink-0 text-red-500" aria-hidden="true" />
             )}
-            <div className="pr-6">
+            <div className="pr-6 leading-5">
               <p className="font-medium leading-5">{toast.title}</p>
               <p className="mt-0.5 text-[13px] muted leading-5">{toast.desc}</p>
             </div>
             <motion.span
               aria-hidden
               className={`pointer-events-none absolute bottom-0 left-0 h-0.5 rounded-b-xl ${
-                toast.type === 'success'
-                  ? 'bg-light-accent/70 dark:bg-dark-accent/70'
-                  : 'bg-red-500/80'
+                toast.type === 'success' ? 'bg-light-accent/70 dark:bg-dark-accent/70' : 'bg-red-500/80'
               }`}
               initial={{ width: 0 }}
               animate={{ width: '100%' }}

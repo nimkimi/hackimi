@@ -1,8 +1,6 @@
 'use client';
 import { ProjectCard } from '@/components/ProjectCard';
-import projects from '@/data/projects.json';
-
-type Project = (typeof projects)[number];
+import projects from '@/data/projects';
 
 import AnimatedSection from '@/components/AnimatedSection';
 

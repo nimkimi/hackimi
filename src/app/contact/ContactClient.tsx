@@ -2,7 +2,7 @@
 import { submitAndRedirect } from '@/app/contact/actions';
 import AnimatedSection from '@/components/AnimatedSection';
 import { Toast, type ToastState } from '@/components/Toast';
-import { Mail } from 'lucide-react';
+import { IconMail } from '@tabler/icons-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Script from 'next/script';
 import { useEffect, useRef, useState } from 'react';
@@ -56,8 +56,9 @@ export default function ContactClient({ siteKey }: Props) {
     <AnimatedSection>
       {siteKey ? <Script src="https://www.google.com/recaptcha/api.js" strategy="lazyOnload" /> : null}
       <div className="max-w-4xl mx-auto text-center">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-4 inline-flex items-center gap-3">
-          <Mail className="h-7 w-7" /> Contact me
+        <h1 className="text-3xl sm:text-4xl font-bold mb-4 inline-flex items-center gap-3 leading-none">
+          <IconMail size={44} className="shrink-0" aria-hidden="true" />
+          <span>Contact me</span>
         </h1>
       </div>
       <form

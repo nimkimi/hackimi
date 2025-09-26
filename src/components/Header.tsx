@@ -1,7 +1,7 @@
 'use client';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { Sparkles, Menu, X } from 'lucide-react';
+import { IconMenu2, IconX } from '@tabler/icons-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -21,10 +21,7 @@ export default function Header() {
     <nav className="sticky top-0 z-50 safe-top">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="my-3 flex items-center justify-between rounded-2xl bg-white/50 dark:bg-black/30 backdrop-blur-xl ring-1 ring-black/10 dark:ring-white/10 px-4 sm:px-6 py-2 shadow-sm">
-          <Link href="/" className="relative inline-flex items-center gap-2">
-            <span className="rounded-full bg-light-accent/15 dark:bg-dark-accent/20 p-1">
-              <Sparkles className="h-4 w-4 text-light-accent dark:text-dark-accent" />
-            </span>
+          <Link href="/" className="relative inline-flex items-center">
             <span className="text-lg font-extrabold tracking-tight bg-clip-text text-transparent bg-[linear-gradient(110deg,theme(colors.light.primary)_0%,theme(colors.light.accent)_40%,theme(colors.light.primary)_80%)] dark:bg-[linear-gradient(110deg,theme(colors.dark.primary)_0%,theme(colors.dark.accent)_40%,theme(colors.dark.primary)_80%)] bg-[length:200%_100%] hover:animate-[shimmer_2.5s_linear_infinite]">
               N.HAKIMI
             </span>
@@ -51,7 +48,7 @@ export default function Header() {
             onClick={() => setOpen((v) => !v)}
             className="md:hidden btn btn-outline px-3 py-2"
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {open ? <IconX size={20} aria-hidden="true" /> : <IconMenu2 size={20} aria-hidden="true" />}
           </button>
         </div>
 
