@@ -1,6 +1,5 @@
 import { ProjectCard } from '@/components/ProjectCard';
 import projects from '@/data/projects';
-
 import AnimatedSection from '@/components/AnimatedSection';
 import type { Metadata } from 'next';
 
