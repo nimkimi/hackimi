@@ -1,3 +1,5 @@
+import 'server-only';
+
 export type RecaptchaVerifyResult = {
   'success': boolean;
   'challenge_ts'?: string;

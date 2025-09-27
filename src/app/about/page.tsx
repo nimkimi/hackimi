@@ -1,17 +1,15 @@
 import AnimatedSection from '@/components/AnimatedSection';
 import about from '@/data/about';
+import { buildPageMetadata } from '@/lib/metadata';
 import Image from 'next/image';
 import Link from 'next/link';
-import type { Metadata } from 'next';
 import { IconBrandGithub, IconBrandLinkedin } from '@tabler/icons-react';
 
-export const metadata: Metadata = {
+export const metadata = buildPageMetadata({
   title: 'About',
   description: 'Learn about the experience, education, and skills of frontend developer Nima Hakimi based in Oslo.',
-  alternates: {
-    canonical: 'https://hackimi.dev/about',
-  },
-};
+  path: '/about',
+});
 
 export default function AboutPage() {
   return (

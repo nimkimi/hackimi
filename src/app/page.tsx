@@ -1,15 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/lib/metadata';
 import { IconArrowRight, IconBrandGithub, IconMail } from '@tabler/icons-react';
 
-export const metadata: Metadata = {
+export const metadata = buildPageMetadata({
   title: 'Portfolio',
   description: 'Discover the work, skills, and contact information of frontend developer Nima Hakimi.',
-  alternates: {
-    canonical: 'https://hackimi.dev',
-  },
-};
+  path: '/',
+});
 
 export default function Home() {
   return (
