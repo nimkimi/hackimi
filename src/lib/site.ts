@@ -14,7 +14,7 @@ export const SITE_EMPLOYER = {
   name: 'NAV IT',
 };
 export const SITE_SOCIAL_LINKS = {
-  github: 'https://github.com/nima-hakimi',
+  github: 'https://github.com/nimkimi',
   linkedin: 'https://linkedin.com/in/nima-hakimi-387716175',
 };
 export const SITE_OG_IMAGE = `${SITE_URL}/bigSmile.JPEG` as const;

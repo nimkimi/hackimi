@@ -43,12 +43,12 @@ export default function Home() {
         <Link href="/about" className="btn btn-accent">
           About Me
         </Link>
-        <a href="mailto:nima@hackimi.dev" className="btn btn-outline px-4 py-2">
+        <a href="/contact" className="btn btn-outline px-4 py-2">
           <span className="flex items-center gap-2 leading-none">
             <IconMail size={18} className="shrink-0" aria-hidden="true" /> Contact
           </span>
         </a>
-        <a href="https://github.com/nima-hakimi" target="_blank" rel="noreferrer" className="btn btn-outline px-4 py-2">
+        <a href="https://github.com/nimkimi" target="_blank" rel="noreferrer" className="btn btn-outline px-4 py-2">
           <span className="flex items-center gap-2 leading-none">
             <IconBrandGithub size={18} className="shrink-0" aria-hidden="true" /> GitHub
           </span>

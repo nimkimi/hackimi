@@ -156,7 +156,7 @@ const about: AboutData = {
   profiles: [
     {
       platform: 'GitHub',
-      url: 'https://github.com/nima-hakimi',
+      url: 'https://github.com/nimkimi',
     },
     {
       platform: 'LinkedIn',
