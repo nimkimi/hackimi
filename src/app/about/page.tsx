@@ -1,16 +1,23 @@
-'use client';
 import AnimatedSection from '@/components/AnimatedSection';
-import { motion } from 'framer-motion';
 import about from '@/data/about';
 import Image from 'next/image';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { IconBrandGithub, IconBrandLinkedin } from '@tabler/icons-react';
+
+export const metadata: Metadata = {
+  title: 'About',
+  description: 'Learn about the experience, education, and skills of frontend developer Nima Hakimi based in Oslo.',
+  alternates: {
+    canonical: 'https://hackimi.dev/about',
+  },
+};
 
 export default function AboutPage() {
   return (
     <AnimatedSection>
       <article className="space-y-10 max-w-4xl mx-auto">
-        <header className="space-y-2 text-center">
+        <header className="space-y-2 text-center animate-fade-in-up" style={{ animationDelay: '40ms' }}>
           <h1 className="text-3xl sm:text-4xl font-bold">About</h1>
           <p className="muted max-w-2xl mx-auto">A concise overview of my background, experience, and skills.</p>
         </header>
@@ -18,7 +25,10 @@ export default function AboutPage() {
         <section className="space-y-4">
           <h2 className="text-xl font-semibold">Profile</h2>
           <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
-            <div className="w-32 h-32 relative rounded-full overflow-hidden flex-shrink-0">
+            <div
+              className="w-32 h-32 relative rounded-full overflow-hidden flex-shrink-0 animate-fade-in-up"
+              style={{ animationDelay: '60ms' }}
+            >
               <Image
                 src={about.photo}
                 alt={about.name}
@@ -29,31 +39,14 @@ export default function AboutPage() {
               />
             </div>
             <div className="space-y-3">
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5 }}
-              >
+              <div className="animate-fade-in-up" style={{ animationDelay: '120ms' }}>
                 <h3 className="text-lg font-medium">{about.name}</h3>
                 <p className="text-sm text-light-secondary dark:text-dark-secondary">{about.location}</p>
-              </motion.div>
-              <motion.p
-                initial={{ opacity: 0, y: 8 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.1 }}
-                className="leading-relaxed max-w-3xl"
-              >
+              </div>
+              <p className="animate-fade-in-up leading-relaxed max-w-3xl" style={{ animationDelay: '160ms' }}>
                 {about.summary}
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="flex flex-wrap gap-3 pt-2"
-              >
+              </p>
+              <div className="animate-fade-in-up flex flex-wrap gap-3 pt-2" style={{ animationDelay: '200ms' }}>
                 {about.profiles.map((profile) => (
                   <a
                     key={profile.platform}
@@ -70,7 +63,7 @@ export default function AboutPage() {
                     <span className="leading-none">{profile.platform}</span>
                   </a>
                 ))}
-              </motion.div>
+              </div>
             </div>
           </div>
         </section>
@@ -79,13 +72,10 @@ export default function AboutPage() {
           <h2 className="text-xl font-semibold">Experiences</h2>
           <ul className="relative space-y-6 before:absolute before:left-4 before:top-0 before:h-full before:w-px before:bg-light-accent/30 dark:before:bg-dark-accent/30">
             {about.experience.map((exp, i) => (
-              <motion.li
+              <li
                 key={`${exp.company}-${exp.title}`}
-                initial={{ opacity: 0, x: -12 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05, duration: 0.45 }}
-                className="relative ml-10 rounded-lg border border-light-accent/20 dark:border-dark-accent/20 p-4"
+                className="relative ml-10 rounded-lg border border-light-accent/20 dark:border-dark-accent/20 p-4 animate-fade-in-up"
+                style={{ animationDelay: `${i * 80}ms` }}
               >
                 <span className="absolute -left-6 top-4 h-3 w-3 rounded-full bg-light-accent dark:bg-dark-accent shadow" />
                 <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -105,7 +95,7 @@ export default function AboutPage() {
                     </li>
                   ))}
                 </ul>
-              </motion.li>
+              </li>
             ))}
           </ul>
         </section>
@@ -114,13 +104,10 @@ export default function AboutPage() {
           <h2 className="text-xl font-semibold">Education</h2>
           <ul className="space-y-3">
             {about.education.map((edu, i) => (
-              <motion.li
+              <li
                 key={`${edu.institution}-${edu.degree}`}
-                initial={{ opacity: 0, x: -12 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05, duration: 0.45 }}
-                className="rounded-lg border border-light-accent/20 dark:border-dark-accent/20 p-4"
+                className="rounded-lg border border-light-accent/20 dark:border-dark-accent/20 p-4 animate-fade-in-up"
+                style={{ animationDelay: `${i * 70}ms` }}
               >
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <h3 className="font-medium">
@@ -140,12 +127,12 @@ export default function AboutPage() {
                     ))}
                   </ul>
                 )}
-              </motion.li>
+              </li>
             ))}
           </ul>
         </section>
 
-        <section className="space-y-4">
+        <section className="space-y-4 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
           <h2 className="text-xl font-semibold">Skills</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -177,7 +164,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="space-y-4">
+        <section className="space-y-4 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
           <h2 className="text-xl font-semibold">Languages</h2>
           <div className="flex flex-wrap gap-4">
             {about.languages.map((language) => (
@@ -200,7 +187,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="space-y-4">
+        <section className="space-y-4 animate-fade-in-up" style={{ animationDelay: '140ms' }}>
           <h2 className="text-xl font-semibold">Interests</h2>
           <div className="flex flex-wrap gap-2">
             {about.interests.map((interest) => (
@@ -214,7 +201,7 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="space-y-4">
+        <section className="space-y-4 animate-fade-in-up" style={{ animationDelay: '160ms' }}>
           <h2 className="text-xl font-semibold">Contact</h2>
           <p>
             Do you want to know more about my work or have questions? Feel free to contact me via{' '}

@@ -39,11 +39,16 @@ const config: Config = {
           '0%': { backgroundPosition: '0% 50%' },
           '100%': { backgroundPosition: '200% 50%' },
         },
+        'toast-progress': {
+          '0%': { width: '0%' },
+          '100%': { width: '100%' },
+        },
       },
       animation: {
         'fade-in-up': 'fade-in-up 0.6s ease-out both',
         'float-slow': 'float-slow 4s ease-in-out infinite',
         'shimmer': 'shimmer 4s linear infinite',
+        'toast-progress': 'toast-progress 4s linear forwards',
       },
     },
   },

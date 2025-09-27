@@ -2,18 +2,20 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { IconMenu2, IconX } from '@tabler/icons-react';
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useMemo, useState } from 'react';
 
 export default function Header() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const links = [
-    { href: '/about', label: 'About' },
-    { href: '/projects', label: 'Projects' },
-    { href: '/contact', label: 'Contact' },
-  ];
+  const links = useMemo(
+    () => [
+      { href: '/about', label: 'About' },
+      { href: '/projects', label: 'Projects' },
+      { href: '/contact', label: 'Contact' },
+    ],
+    []
+  );
 
   const isActive = (path: string) => pathname === path || pathname?.startsWith(path + '/');
 
@@ -52,36 +54,30 @@ export default function Header() {
           </button>
         </div>
 
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              id="mobile-nav"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.18 }}
-              className="-mt-2 mb-3 rounded-2xl bg-white/70 dark:bg-black/40 backdrop-blur-xl ring-1 ring-black/10 dark:ring-white/10 p-3 md:hidden"
-            >
-              <div className="grid grid-cols-1 gap-2">
-                {links.map((l) => {
-                  const base = 'btn w-full justify-center';
-                  const active = 'btn-accent';
-                  const inactive = 'btn-outline';
-                  return (
-                    <Link
-                      key={l.href}
-                      href={l.href}
-                      onClick={() => setOpen(false)}
-                      className={`${base} ${isActive(l.href) ? active : inactive}`}
-                    >
-                      {l.label}
-                    </Link>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {open && (
+          <div
+            id="mobile-nav"
+            className="-mt-2 mb-3 rounded-2xl bg-white/70 dark:bg-black/40 backdrop-blur-xl ring-1 ring-black/10 dark:ring-white/10 p-3 md:hidden animate-fade-in-up"
+          >
+            <div className="grid grid-cols-1 gap-2">
+              {links.map((l) => {
+                const base = 'btn w-full justify-center';
+                const active = 'btn-accent';
+                const inactive = 'btn-outline';
+                return (
+                  <Link
+                    key={l.href}
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    className={`${base} ${isActive(l.href) ? active : inactive}`}
+                  >
+                    {l.label}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </nav>
   );

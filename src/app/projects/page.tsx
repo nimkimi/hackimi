@@ -1,8 +1,16 @@
-'use client';
 import { ProjectCard } from '@/components/ProjectCard';
 import projects from '@/data/projects';
 
 import AnimatedSection from '@/components/AnimatedSection';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Projects',
+  description: 'A curated list of projects delivered by frontend developer Nima Hakimi, including technologies used.',
+  alternates: {
+    canonical: 'https://hackimi.dev/projects',
+  },
+};
 
 export default function ProjectsPage() {
   return (
