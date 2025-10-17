@@ -14,8 +14,24 @@ type Props = { siteKey: string };
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" className="btn btn-accent" disabled={pending}>
-      {pending ? 'Sending…' : 'Send'}
+    <button
+      type="submit"
+      className="btn btn-accent inline-flex items-center justify-center gap-2"
+      disabled={pending}
+      aria-busy={pending}
+    >
+      {pending ? (
+        <>
+          <span className="sr-only">Sending</span>
+          <span
+            aria-hidden="true"
+            className="h-4 w-4 animate-spin rounded-full border-2 border-white/50 border-t-white"
+          />
+          <span aria-hidden="true">Sending…</span>
+        </>
+      ) : (
+        'Send'
+      )}
     </button>
   );
 }
