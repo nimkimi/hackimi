@@ -55,15 +55,14 @@ export default function NavLinksClient({
         const normalizedHref = normalize(link.href);
         const selected = isActive(pathname, normalizedHref);
         return (
-          <Link
+          <a
             key={link.href}
             href={link.href}
-            prefetch={variant === 'mobile' ? false : undefined}
             aria-current={selected ? 'page' : undefined}
             className={`${baseClass} ${selected ? activeClass : inactiveClass}`}
           >
             {link.label}
-          </Link>
+          </a>
         );
       })}
     </div>
