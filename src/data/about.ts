@@ -43,7 +43,7 @@ const about: AboutData = {
   location: 'Oslo, Norway',
   photo: '/bigSmile.JPEG',
   summary:
-    'Frontend developer with experience from NAV IT and TV 2 Skole, with a focus on accessibility and user experience. I work with modern technologies such as React, TypeScript and Kotlin to develop responsive and user-friendly applications. My background in software development and design systems provides a solid foundation for delivering holistic solutions with the user in focus.',
+    'I am a developer with experience from NAV IT and TV 2 Skole, with a focus on accessibility and user experience. I work with modern technologies such as React, TypeScript and Kotlin to develop responsive and user-friendly applications. My background in software development and design provides a solid foundation for delivering holistic solutions with the user in focus.',
 
   experience: [
     {
