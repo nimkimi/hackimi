@@ -3,7 +3,7 @@ import about from '@/data/about';
 import { buildPageMetadata } from '@/lib/metadata';
 import Image from 'next/image';
 import Link from 'next/link';
-import { IconBrandGithub, IconBrandLinkedin } from '@tabler/icons-react';
+import { IconBrandGithub, IconBrandLinkedin, IconDownload } from '@tabler/icons-react';
 
 export const metadata = buildPageMetadata({
   title: 'About',
@@ -61,6 +61,14 @@ export default function AboutPage() {
                     <span className="leading-none">{profile.platform}</span>
                   </a>
                 ))}
+                <a
+                  href="/cv.pdf"
+                  download
+                  className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-md border border-light-accent/30 dark:border-dark-accent/30 hover:bg-light-accent/10 dark:hover:bg-dark-accent/10 transition-colors"
+                >
+                  <IconDownload size={18} className="shrink-0" aria-hidden="true" />
+                  <span className="leading-none">Download CV</span>
+                </a>
               </div>
             </div>
           </div>
