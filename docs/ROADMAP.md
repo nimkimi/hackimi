@@ -38,6 +38,8 @@ Raw ideas, no commitment. See `docs/ideas.md` for even rougher captures.
 | Availability indicator | [spec](features/availability-indicator.md) | Simple badge, big signal |
 | Structured inquiry form | [spec](features/inquiry-form.md) | Pre-qualify leads |
 | Blog / articles | [spec](features/blog.md) | Long-term SEO content marketing |
+| Testing (Playwright + Vitest) | [spec](features/testing.md) | No tests exist yet; add before codebase grows |
+| i18n (EN + NO) | [spec](features/i18n.md) | Reach Norwegian small business clients |
 
 ---
 
