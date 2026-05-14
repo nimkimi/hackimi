@@ -1,0 +1,54 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+```bash
+npm run dev        # Start dev server at localhost:3000
+npm run build      # Production build
+npm run lint       # ESLint via next lint
+npm run format     # Prettier write (ts, tsx, js, jsx, md, css, yaml)
+npm run check      # Prettier check (CI)
+```
+
+Node version is pinned to `22.4.0` (see `.nvmrc`).
+
+There are no tests in this project.
+
+## Environment Variables
+
+Required at runtime for contact form functionality:
+
+| Variable | Purpose |
+|---|---|
+| `NODEMAILER_EMAIL` | SMTP sender address (required) |
+| `NODEMAILER_PASSWORD` | SMTP password (required) |
+| `NODEMAILER_HOST` | SMTP host (default: `smtp.hostinger.com`) |
+| `NODEMAILER_PORT` | SMTP port (default: `465`) |
+| `NODEMAILER_SECURE` | TLS (default: `true` when port is 465) |
+| `NODEMAILER_NAME` | Sender display name (default: `Portfolio`) |
+| `RECAPTCHA_SECRET_KEY` | Google reCAPTCHA v2 secret — optional in dev, required in prod |
+| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | reCAPTCHA public site key for the client widget |
+
+In development, reCAPTCHA is bypassed when `RECAPTCHA_SECRET_KEY` is absent.
+
+## Architecture
+
+**Next.js 15 App Router** with React 19 Server Components and Server Actions.
+
+### Key Patterns
+
+**Server/Client split for the contact form** — `src/app/contact/` is the clearest example of the pattern used throughout:
+- `page.tsx` is a Server Component that reads env vars and passes them as props
+- `ContactClient.tsx` is the `'use client'` component that owns form state via `useActionState`
+- `actions.ts` is `'use server'` — validates with Zod, verifies reCAPTCHA, sends two emails (auto-reply to sender + notification to site owner)
+- `state.ts` holds the shared `ContactFormState` type
+
+**Site constants** — all personal/site metadata (name, role, employer, social links, OG image, etc.) lives in `src/lib/site.ts`. `src/lib/metadata.ts` consumes it to build Next.js `Metadata` objects and JSON-LD. When adding new pages, use `buildPageMetadata()` for the `export const metadata`.
+
+**Data layer** — static content (projects list, about info) lives in `src/data/`. Add new projects to `src/data/projects.ts`.
+
+**Styling** — Tailwind with a custom two-theme palette (`light.*` / `dark.*` color tokens) defined in `tailwind.config.ts`. Dark mode is driven by `prefers-color-scheme` (`darkMode: 'media'`). Reusable component classes (`.card`, `.btn`, `.btn-accent`, `.btn-outline`, `.muted`) are defined as Tailwind `@layer components` in `globals.css`.
+
+**Server-only modules** — `src/lib/email.ts` and `src/lib/captcha.ts` both import `'server-only'` and must never be imported from client components.
