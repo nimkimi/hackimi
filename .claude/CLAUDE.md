@@ -52,3 +52,11 @@ In development, reCAPTCHA is bypassed when `RECAPTCHA_SECRET_KEY` is absent.
 **Styling** — Tailwind with a custom two-theme palette (`light.*` / `dark.*` color tokens) defined in `tailwind.config.ts`. Dark mode is driven by `prefers-color-scheme` (`darkMode: 'media'`). Reusable component classes (`.card`, `.btn`, `.btn-accent`, `.btn-outline`, `.muted`) are defined as Tailwind `@layer components` in `globals.css`.
 
 **Server-only modules** — `src/lib/email.ts` and `src/lib/captcha.ts` both import `'server-only'` and must never be imported from client components.
+
+## Feature Development
+
+Before starting new work, check `docs/ROADMAP.md` — it lists what's in progress, what's planned next, and what's been shipped.
+
+When a feature is complete, move it to the Done table in `docs/ROADMAP.md` with the ship date.
+
+Feature specs live in `docs/features/`. Use `docs/features/_template.md` as the starting point for new specs. A spec should have enough detail (acceptance criteria, relevant files, design notes) that implementation can proceed without clarifying questions.
