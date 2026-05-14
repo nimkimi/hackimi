@@ -40,6 +40,15 @@ Raw ideas, no commitment. See `docs/ideas.md` for even rougher captures.
 | Blog / articles | [spec](features/blog.md) | Long-term SEO content marketing |
 | Testing (Playwright + Vitest) | [spec](features/testing.md) | No tests exist yet; add before codebase grows |
 | i18n (EN + NO) | [spec](features/i18n.md) | Reach Norwegian small business clients |
+| Analytics (Plausible) | [spec](features/analytics.md) | Measure what works before optimising |
+| FAQ section | [spec](features/faq.md) | Reduce friction before first contact |
+| Pricing page | [spec](features/pricing-page.md) | Pre-qualify leads with transparent ranges |
+| Dark/light mode toggle | [spec](features/dark-light-toggle.md) | Manual override on top of system preference |
+| Dynamic OG images | [spec](features/dynamic-og-images.md) | Per-page social previews via next/og |
+| CI/CD pipeline | [spec](features/ci-cd.md) | GitHub Actions — lint, test, deploy |
+| Lighthouse showcase | [spec](features/lighthouse-showcase.md) | Display performance scores as trust signal |
+| Project cost estimator | [spec](features/cost-estimator.md) | Interactive calculator — high effort, differentiating |
+| Newsletter | [spec](features/newsletter.md) | Build audience of future clients via blog |
 
 ---
 
