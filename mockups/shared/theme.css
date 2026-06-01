@@ -1,0 +1,186 @@
+/* mockups/shared/theme.css — throwaway mockup styling
+   Refined-minimal, warm. One coral accent over warm neutrals.
+   Shared across the comparison mockups; intentionally lean. */
+
+:root {
+  --bg: #FBF7F2;          /* warm paper */
+  --surface: #FFFFFFAA;
+  --ink: #1F1A17;         /* near-black warm */
+  --muted: #6F635B;       /* warm gray */
+  --accent: #E2674A;      /* coral */
+  --accent-strong: #C9502F;
+  --ring: #E2674A55;
+
+  /* supporting tokens (derived from the baseline above) */
+  --border: #1F1A1714;    /* hairline on warm paper */
+  --border-strong: #1F1A1726;
+  --elev: 0 1px 2px #1F1A170A, 0 8px 24px -12px #1F1A1714;
+  --radius: 14px;
+}
+
+:root.dark {
+  --bg: #17120F;          /* warm charcoal */
+  --surface: #221B16AA;
+  --ink: #F2E9E2;         /* soft sand */
+  --muted: #A89C92;
+  --accent: #F07A5C;      /* brighter coral */
+  --accent-strong: #F49379;
+  --ring: #F07A5C55;
+
+  --border: #F2E9E21A;
+  --border-strong: #F2E9E22E;
+  --elev: 0 1px 2px #00000033, 0 8px 28px -12px #00000066;
+}
+
+/* ----- base ----- */
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* soft warm radial wash for atmosphere, anchored top-right */
+  background-image:
+    radial-gradient(60rem 40rem at 110% -10%, var(--ring), transparent 60%);
+  background-attachment: fixed;
+}
+
+/* honor token-driven colors but let Tailwind borders pick up our palette */
+body * { border-color: var(--border); }
+
+/* smooth theme transition without affecting reduced-motion users */
+:root, body { transition: background-color .4s ease, color .4s ease; }
+
+/* ----- helpers ----- */
+.muted  { color: var(--muted); }
+.accent { color: var(--accent); }
+
+.surface {
+  background: var(--surface);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  box-shadow: var(--elev);
+}
+
+/* coral hairline divider */
+.rule {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+  border: 0;
+}
+
+/* ----- chips ----- */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  padding: .3rem .7rem;
+  font-size: .8125rem;
+  line-height: 1;
+  color: var(--muted);
+  background: var(--surface);
+  transition: border-color .25s ease, color .25s ease, transform .25s ease;
+}
+.chip:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* badge — coral, low-key */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 999px;
+  padding: .3rem .7rem;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+.badge::before {
+  content: "";
+  width: .5rem;
+  height: .5rem;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 var(--ring);
+  animation: pulse 2.4s ease-out infinite;
+}
+@keyframes pulse {
+  0%   { box-shadow: 0 0 0 0 var(--ring); }
+  70%  { box-shadow: 0 0 0 .5rem transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+/* ----- buttons / links ----- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  padding: .45rem .8rem;
+  font-size: .875rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color .25s ease, transform .15s ease, color .25s ease;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn:active { transform: translateY(1px); }
+
+.link-back {
+  color: var(--muted);
+  transition: color .2s ease, gap .2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+}
+.link-back:hover { color: var(--accent); }
+
+/* eyebrow label above section headings */
+.eyebrow {
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ----- focus visibility (accessibility) ----- */
+a, button {
+  outline: none;
+}
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+.chip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* selection */
+::selection { background: var(--ring); color: var(--ink); }
+
+/* ----- scroll reveal ----- */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.reveal.in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .reveal { opacity: 1; transform: none; transition: none; }
+  .badge::before { animation: none; }
+  .chip:hover, .btn:active { transform: none; }
+}
