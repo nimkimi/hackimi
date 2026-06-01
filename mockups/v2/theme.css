@@ -1,0 +1,497 @@
+/* =========================================================================
+   EDITORIAL INDEX — theme.css
+   Craft foundation: tokens, type system, hairlines, mono labels, grain,
+   focus rings, motion primitives, reduced-motion backstop.
+   ========================================================================= */
+
+:root {
+  /* ---- Color: Light (warm paper) ---- */
+  --bg:        #FBF7F2;
+  --bg-tint:   #F4EDE4; /* faint surface for grain/figure wells */
+  --ink:       #1F1A17;
+  --muted:     #6F635B;
+  --faint:     #9A8E84;
+  --line:      rgba(31, 26, 23, 0.12);
+  --line-soft: rgba(31, 26, 23, 0.07);
+  --accent:    #E2674A;
+  --strong:    #C9502F;
+  --accent-tint: rgba(226, 103, 74, 0.12);
+
+  /* ---- Type ---- */
+  --font-display: "Cabinet Grotesk", "Switzer", ui-sans-serif, system-ui, sans-serif;
+  --font-body:    "Switzer", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono:    "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  /* ---- Motion ---- */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out:  cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  color-scheme: light;
+}
+
+.dark {
+  /* ---- Color: Dark (warm charcoal) ---- */
+  --bg:        #17120F;
+  --bg-tint:   #1F1915;
+  --ink:       #F2E9E2;
+  --muted:     #A89C92;
+  --faint:     #7D7268;
+  --line:      rgba(242, 233, 226, 0.14);
+  --line-soft: rgba(242, 233, 226, 0.07);
+  --accent:    #F07A5C;
+  --strong:    #F49379;
+  --accent-tint: rgba(240, 122, 92, 0.16);
+
+  color-scheme: dark;
+}
+
+/* =========================================================================
+   Base
+   ========================================================================= */
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.65;
+  font-feature-settings: "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transition: background-color 0.5s var(--ease-out), color 0.5s var(--ease-out);
+}
+
+::selection {
+  background: var(--accent);
+  color: #FBF7F2;
+}
+
+/* =========================================================================
+   Grain overlay — barely perceptible tactility
+   ========================================================================= */
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.dark .grain { mix-blend-mode: screen; opacity: 0.05; }
+
+/* =========================================================================
+   Scroll-progress hairline (top of viewport)
+   ========================================================================= */
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: 60;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* =========================================================================
+   Typography utilities
+   ========================================================================= */
+
+.font-display { font-family: var(--font-display); }
+.font-body    { font-family: var(--font-body); }
+.font-mono    { font-family: var(--font-mono); }
+
+.tnum {
+  font-variant-numeric: tabular-nums slashed-zero;
+}
+
+/* The highest-ROI detail: letter-spaced uppercase mono label */
+.mono-label {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums slashed-zero;
+}
+
+.hero-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.75rem, 6vw + 1rem, 5.5rem);
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+  margin: 0;
+}
+
+.section-heading {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(1.6rem, 2.2vw + 0.8rem, 2.4rem);
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+  margin: 0;
+}
+
+.measure { max-width: 62ch; }
+
+.lead {
+  font-size: clamp(1.05rem, 0.5vw + 1rem, 1.2rem);
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+/* =========================================================================
+   Hairlines
+   ========================================================================= */
+
+.rule       { border: 0; border-top: 1px solid var(--line); margin: 0; }
+.rule-soft  { border: 0; border-top: 1px solid var(--line-soft); margin: 0; }
+.rule-accent{ border: 0; border-top: 1px solid var(--accent); margin: 0; }
+
+/* =========================================================================
+   Links — coral animated underline
+   ========================================================================= */
+
+.link {
+  position: relative;
+  color: var(--ink);
+  text-decoration: none;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size 0.4s var(--ease-expo), color 0.3s var(--ease-out);
+  padding-bottom: 1px;
+}
+.link:hover { background-size: 100% 1px; color: var(--strong); }
+
+/* mono variant of the underline link */
+.link-mono {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-decoration: none;
+  position: relative;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 1px;
+  transition: background-size 0.4s var(--ease-expo), color 0.3s var(--ease-out);
+  padding-bottom: 2px;
+}
+.link-mono:hover { background-size: 100% 1px; color: var(--ink); }
+
+/* =========================================================================
+   Focus — designed coral rings (focus is a feature)
+   ========================================================================= */
+
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+/* =========================================================================
+   Status dot — pulsing coral
+   ========================================================================= */
+
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  position: relative;
+  flex: none;
+}
+.status-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: ping 2.4s var(--ease-out) infinite;
+}
+@keyframes ping {
+  0%   { transform: scale(1);   opacity: 0.6; }
+  70%  { transform: scale(3.2); opacity: 0; }
+  100% { transform: scale(3.2); opacity: 0; }
+}
+
+/* =========================================================================
+   Nav — vertical, mono-numbered, active indicator
+   ========================================================================= */
+
+.nav-link {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-decoration: none;
+  padding: 0.35rem 0;
+  transition: color 0.3s var(--ease-out);
+}
+.nav-link .nav-num {
+  font-size: 0.7rem;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums slashed-zero;
+  transition: color 0.3s var(--ease-out);
+}
+.nav-link .nav-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+  transform: scaleX(0.18);
+  transform-origin: 0 50%;
+  transition: transform 0.45s var(--ease-expo), background 0.3s var(--ease-out);
+}
+.nav-link:hover,
+.nav-link.is-active { color: var(--ink); }
+.nav-link:hover .nav-rule,
+.nav-link.is-active .nav-rule {
+  transform: scaleX(1);
+  background: var(--accent);
+}
+.nav-link.is-active .nav-num { color: var(--accent); }
+
+/* =========================================================================
+   Experience / Work rows
+   ========================================================================= */
+
+.work-list:hover .work-row:not(:hover) { opacity: 0.45; }
+.work-row {
+  transition: opacity 0.35s var(--ease-out);
+}
+.work-row .work-title {
+  display: inline-block;
+  transition: transform 0.4s var(--ease-expo), color 0.3s var(--ease-out);
+}
+.work-row:hover .work-title {
+  transform: translateX(10px);
+  color: var(--strong);
+}
+.work-row .work-title::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-top: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.45s var(--ease-expo);
+}
+.work-row:hover .work-title::after { transform: scaleX(1); }
+.work-row .work-arrow {
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.35s var(--ease-out), transform 0.4s var(--ease-expo);
+  color: var(--accent);
+}
+.work-row:hover .work-arrow { opacity: 1; transform: translateX(0); }
+
+/* =========================================================================
+   Cursor-follow thumbnail preview
+   ========================================================================= */
+
+.cursor-preview {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: 220px;
+  height: 150px;
+  border-radius: 4px;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-50%, -50%, 0) scale(0.92);
+  transition: opacity 0.28s var(--ease-out), transform 0.28s var(--ease-expo);
+  border: 1px solid var(--line);
+  will-change: transform, opacity;
+}
+.cursor-preview.is-visible {
+  opacity: 1;
+  transform: translate3d(-50%, -50%, 0) scale(1);
+}
+.cursor-preview-inner {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: end start;
+  padding: 0.7rem;
+}
+.cursor-preview-label {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.62rem;
+  color: #FBF7F2;
+  mix-blend-mode: difference;
+}
+
+/* placeholder gradient fields (no real screenshots) */
+.field-1 { background: linear-gradient(135deg, #E2674A 0%, #C9502F 55%, #7c2d18 100%); }
+.field-2 { background: linear-gradient(135deg, #2f6f6a 0%, #1d4b46 60%, #122e2b 100%); }
+.field-3 { background: linear-gradient(135deg, #5b6f2f 0%, #44511d 60%, #2c3312 100%); }
+
+/* =========================================================================
+   Copy button
+   ========================================================================= */
+
+.copy-btn {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.68rem;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 0.45rem 0.7rem;
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--ink); }
+.copy-btn.is-copied { border-color: var(--accent); color: var(--accent); }
+
+/* =========================================================================
+   Theme toggle
+   ========================================================================= */
+
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  transition: border-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
+}
+.theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.theme-toggle .icon-sun { display: none; }
+.theme-toggle .icon-moon { display: block; }
+.dark .theme-toggle .icon-sun { display: block; }
+.dark .theme-toggle .icon-moon { display: none; }
+
+/* =========================================================================
+   Magnetic button (email CTA)
+   ========================================================================= */
+
+.magnetic {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  will-change: transform;
+}
+
+/* =========================================================================
+   Figure well (case study placeholder)
+   ========================================================================= */
+
+.figure-well {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg-tint);
+  overflow: hidden;
+}
+.figure-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line-soft) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-soft) 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.8;
+}
+
+/* =========================================================================
+   Motion primitives — staggered reveal + scroll reveal
+   ========================================================================= */
+
+.word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.4em);
+  will-change: transform, opacity;
+}
+.is-revealed .word,
+.word.is-revealed {
+  animation: word-in 0.8s var(--ease-expo) forwards;
+}
+@keyframes word-in {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* scroll reveal — base + variants */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.8s var(--ease-expo), transform 0.8s var(--ease-expo);
+}
+.reveal.v-left  { transform: translateX(-22px); }
+.reveal.v-scale { transform: translateY(14px) scale(0.985); }
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+/* per-child stagger inside a revealed container */
+.reveal.in .stagger > * {
+  animation: word-in 0.7s var(--ease-expo) backwards;
+}
+.reveal.in .stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.reveal.in .stagger > *:nth-child(2) { animation-delay: 0.12s; }
+.reveal.in .stagger > *:nth-child(3) { animation-delay: 0.19s; }
+.reveal.in .stagger > *:nth-child(4) { animation-delay: 0.26s; }
+.reveal.in .stagger > *:nth-child(5) { animation-delay: 0.33s; }
+.reveal.in .stagger > *:nth-child(6) { animation-delay: 0.40s; }
+
+/* =========================================================================
+   Reduced-motion backstop (CSS side)
+   ========================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .word   { opacity: 1; transform: none; }
+  .reveal { opacity: 1; transform: none; }
+  .status-dot::after { display: none; }
+  .cursor-preview { display: none !important; }
+}
