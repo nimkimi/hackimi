@@ -1,8 +1,27 @@
 # Portfolio Redesign — Design Spec
 
 **Date:** 2026-06-02
-**Status:** Approved (design), pending implementation plan
+**Status:** SUPERSEDED below — see "Direction Change" (2026-06-02). Original spec retained for history.
 **Repo:** `projects/private/hackimi`
+
+---
+
+## ⚠️ Direction Change (2026-06-02) — "Developer Cosmos"
+
+After reviewing mockups, the refined-minimal/editorial direction and the A/B (multi-page vs long-scroll) structure question below were **rejected** as too understated and generic. The locked direction is now:
+
+**An immersive, bold, interactive 3D ("Developer Cosmos"), mobile-first.**
+
+- **Hero / core experience:** an interactive WebGL galaxy built with **react-three-fiber + three.js**. Each featured project is a glowing planet/world. The visitor can **drag to orbit**, **scroll to fly** through space, and **click a world to open its case study**. Ties to Nima's stated cosmology interest; gives a navigation metaphor no template has.
+- **Art direction:** vibrant, rich, alive — deep-space base with vibrant nebula accents, bloom/glow, real depth. Explicitly NOT understated. (Earlier coral-on-warm-neutral palette is superseded; final palette TBD with the cosmos art direction.)
+- **Mobile-first:** designed for phones first; aggressive performance budgeting (DPR clamp, demand frameloop, particle/geometry limits, adaptive quality), touch orbit + pinch.
+- **Accessibility (mandatory):** a non-3D fallback for `prefers-reduced-motion` / low-power / no-WebGL — a clean, accessible DOM list of projects and content. Keyboard-navigable; no focus trapped in canvas.
+- **Still in scope from the original spec below:** dedicated case page per flagship project; the three flagships (Be My Guide [In progress], Concert Radar, NAV event-registration); typed `work.ts` data; reuse of the existing contact server-action; recruiter audience.
+- **New dependencies:** `three`, `@react-three/fiber`, `@react-three/drei`, `@react-three/postprocessing` (+ possibly `maath`/`gsap` for easing, `@react-three/rapier` only if physics is needed). 3D bundle lazy-loaded via dynamic import (`ssr: false`).
+
+The concrete cosmos recipe, performance plan, and a revised implementation plan will be produced after a hero prototype is validated. Everything below this section is the original (superseded) refined-minimal spec, kept for history.
+
+---
 
 ## Goal
 

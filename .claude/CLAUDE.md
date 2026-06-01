@@ -4,9 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Product Direction
 
-This is a **developer portfolio** whose primary audience is **recruiters and hiring managers**. Optimize every decision (content, layout, copy, features) for demonstrating engineering skill, depth of work, and professional credibility — not for freelance/client conversion.
+This is a **developer portfolio** whose primary audience is **recruiters and hiring managers**. Optimize every decision for demonstrating engineering skill, depth of work, and professional credibility — not for freelance/client conversion.
 
-Note: earlier `docs/features/` specs and `docs/ROADMAP.md` were written around a freelance/small-business-client framing. That direction is **abandoned** — treat those documents as rough historical notes only, not as commitments, until they are rewritten to match this developer-portfolio direction.
+**Design direction (locked 2026-06-02): "Developer Cosmos" — a bold, immersive, interactive 3D experience, mobile-first.** The hero is an interactive WebGL galaxy (react-three-fiber + three.js) where each project is a glowing world the visitor can orbit (drag), fly to (scroll), and click to open its case study. This ties to Nima's cosmology interest and gives the site a unique navigation metaphor. The aesthetic is vibrant, rich, and animated — explicitly NOT understated/minimal. A non-3D / `prefers-reduced-motion` fallback (accessible DOM list of projects) is **mandatory** (Nima is an accessibility specialist).
+
+Earlier explorations are abandoned: a refined-minimal/editorial direction and an A/B multi-page-vs-long-scroll structure were both rejected as too understated and generic. Throwaway mockups for those live under `mockups/` (variant-a, variant-b, v2) and are historical only.
+
+Note: earlier `docs/features/` specs and `docs/ROADMAP.md` were written around a freelance/small-business-client framing. That direction is **abandoned** — treat those documents as rough historical notes only, not as commitments.
 
 ## Commands
 
