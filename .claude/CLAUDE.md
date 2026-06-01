@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Product Direction
+
+This is a **developer portfolio** whose primary audience is **recruiters and hiring managers**. Optimize every decision (content, layout, copy, features) for demonstrating engineering skill, depth of work, and professional credibility — not for freelance/client conversion.
+
+Note: earlier `docs/features/` specs and `docs/ROADMAP.md` were written around a freelance/small-business-client framing. That direction is **abandoned** — treat those documents as rough historical notes only, not as commitments, until they are rewritten to match this developer-portfolio direction.
+
 ## Commands
 
 ```bash
