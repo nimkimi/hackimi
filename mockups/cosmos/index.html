@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>Developer Cosmos — Nima Hakimi</title>
+  <meta name="description" content="An interactive 3D galaxy of projects by Nima Hakimi, Frontend Developer." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    :root{
+      --bg:#070313;
+      --bg2:#1a0b2e;
+      --ink:#f4eefb;
+      --muted:#a99dc9;
+      --magenta:#ff2e97;
+      --cyan:#22d3ee;
+      --violet:#7b2ff7;
+      --gold:#ffb454;
+      --glass:rgba(18, 9, 38, 0.55);
+      --glass-brd:rgba(255,255,255,0.10);
+      --accent:var(--magenta);
+      --sans:"Geist", system-ui, sans-serif;
+      --mono:"Geist Mono", ui-monospace, monospace;
+      --display:"Fraunces", Georgia, serif;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{
+      margin:0; height:100%;
+      background:var(--bg);
+      color:var(--ink);
+      overflow:hidden;
+      touch-action:none;
+      -webkit-font-smoothing:antialiased;
+      font-family:var(--sans);
+    }
+
+    canvas{ display:block; }
+
+    /* radial vignette over the canvas for depth */
+    #vignette{
+      position:fixed; inset:0; pointer-events:none; z-index:2;
+      background:
+        radial-gradient(120% 90% at 50% 38%, transparent 40%, rgba(5,2,12,0.55) 100%),
+        radial-gradient(60% 60% at 50% 120%, rgba(123,47,247,0.18), transparent 70%);
+      mix-blend-mode:normal;
+    }
+    /* subtle film grain */
+    #grain{
+      position:fixed; inset:-50%; pointer-events:none; z-index:3; opacity:0.05;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      animation:grain 8s steps(6) infinite;
+    }
+    @keyframes grain{
+      0%,100%{transform:translate(0,0)} 20%{transform:translate(-4%,3%)}
+      40%{transform:translate(3%,-5%)} 60%{transform:translate(-2%,4%)} 80%{transform:translate(4%,2%)}
+    }
+
+    /* ---------- HEADER ---------- */
+    header{
+      position:fixed; top:0; left:0; right:0; z-index:10;
+      display:flex; align-items:flex-start; justify-content:space-between;
+      padding:clamp(16px,3vw,30px) clamp(16px,4vw,40px);
+      pointer-events:none;
+    }
+    .brand{ pointer-events:auto; }
+    .brand .name{
+      font-family:var(--display);
+      font-weight:600;
+      font-size:clamp(18px,2.4vw,26px);
+      letter-spacing:0.01em;
+      line-height:1;
+      margin:0;
+      background:linear-gradient(92deg,#fff 0%, #ffd9ef 45%, #c7b3ff 100%);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .brand .role{
+      font-family:var(--mono);
+      font-size:11px; letter-spacing:0.18em; text-transform:uppercase;
+      color:var(--muted); margin-top:7px;
+    }
+    .tagline{
+      pointer-events:auto; text-align:right; max-width:42vw;
+      font-family:var(--mono); font-size:11px; line-height:1.6;
+      letter-spacing:0.04em; color:var(--muted);
+    }
+    .tagline b{ color:var(--ink); font-weight:500; }
+
+    /* ---------- HINT ---------- */
+    #hint{
+      position:fixed; left:50%; bottom:clamp(22px,5vh,46px); z-index:10;
+      transform:translateX(-50%);
+      font-family:var(--mono); font-size:12px; letter-spacing:0.06em;
+      color:var(--muted);
+      padding:10px 18px; border-radius:999px;
+      background:var(--glass);
+      border:1px solid var(--glass-brd);
+      backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px);
+      white-space:nowrap;
+      transition:opacity .8s ease, transform .8s ease;
+      display:flex; align-items:center; gap:10px;
+    }
+    #hint .dot{ width:5px;height:5px;border-radius:50%;background:var(--magenta);box-shadow:0 0 10px var(--magenta); }
+    #hint.hide{ opacity:0; transform:translateX(-50%) translateY(8px); pointer-events:none; }
+    #hint .sep{ opacity:0.4; }
+
+    /* ---------- LABELS ---------- */
+    #labels{ position:fixed; inset:0; z-index:6; pointer-events:none; }
+    .label{
+      position:absolute; transform:translate(-50%,-140%);
+      font-family:var(--mono); font-size:11px; letter-spacing:0.05em;
+      color:var(--ink); white-space:nowrap;
+      padding:5px 11px; border-radius:7px;
+      background:rgba(10,5,22,0.5);
+      border:1px solid var(--lblbrd, rgba(255,255,255,0.14));
+      backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+      opacity:0.65; transition:opacity .25s ease, transform .25s ease;
+      will-change:transform,left,top;
+      box-shadow:0 4px 18px rgba(0,0,0,0.35);
+    }
+    .label::after{
+      content:""; position:absolute; left:50%; bottom:-5px; transform:translateX(-50%) rotate(45deg);
+      width:7px;height:7px; background:inherit; border-right:1px solid var(--lblbrd,rgba(255,255,255,0.14));
+      border-bottom:1px solid var(--lblbrd,rgba(255,255,255,0.14));
+    }
+    .label .swatch{ display:inline-block; width:6px;height:6px;border-radius:50%; margin-right:6px; vertical-align:middle; box-shadow:0 0 8px currentColor; }
+    .label.active{ opacity:1; transform:translate(-50%,-160%) scale(1.04); }
+    .label.dim{ opacity:0.25; }
+
+    /* ---------- OVERLAY CARD ---------- */
+    #overlay{
+      position:fixed; z-index:12; inset:0;
+      display:flex; align-items:flex-end; justify-content:flex-start;
+      padding:clamp(18px,4vw,48px);
+      pointer-events:none;
+    }
+    #overlay.open{ pointer-events:auto; }
+    .card{
+      pointer-events:auto;
+      width:min(440px, 92vw);
+      background:linear-gradient(160deg, rgba(26,11,46,0.82), rgba(7,3,19,0.88));
+      border:1px solid var(--accent);
+      border-radius:20px;
+      padding:26px 26px 24px;
+      backdrop-filter:blur(18px) saturate(1.2); -webkit-backdrop-filter:blur(18px) saturate(1.2);
+      box-shadow:0 24px 70px rgba(0,0,0,0.55), 0 0 60px -20px var(--accent), inset 0 1px 0 rgba(255,255,255,0.08);
+      transform:translateY(40px) scale(0.96); opacity:0;
+      transition:transform .55s cubic-bezier(.2,.9,.25,1), opacity .45s ease;
+    }
+    #overlay.open .card{ transform:translateY(0) scale(1); opacity:1; }
+    .card .kicker{
+      font-family:var(--mono); font-size:10.5px; letter-spacing:0.22em; text-transform:uppercase;
+      color:var(--accent); display:flex; align-items:center; gap:9px; margin-bottom:14px;
+    }
+    .card .kicker .orb{ width:8px;height:8px;border-radius:50%; background:var(--accent); box-shadow:0 0 14px var(--accent); }
+    .card h2{
+      font-family:var(--display); font-weight:600; font-size:clamp(26px,5vw,34px);
+      line-height:1.05; margin:0 0 12px;
+    }
+    .card .desc{ font-size:14.5px; line-height:1.6; color:#d9d0ee; margin:0 0 20px; }
+    .badge{
+      display:inline-flex; align-items:center; gap:7px;
+      font-family:var(--mono); font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase;
+      color:var(--gold); border:1px solid color-mix(in srgb, var(--gold) 50%, transparent);
+      background:color-mix(in srgb, var(--gold) 12%, transparent);
+      padding:4px 11px; border-radius:999px; margin-bottom:18px;
+    }
+    .badge .pulse{ width:6px;height:6px;border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--gold); animation:pulse 1.6s ease-in-out infinite; }
+    @keyframes pulse{ 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
+    .card .actions{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .btn{
+      font-family:var(--mono); font-size:12.5px; letter-spacing:0.04em;
+      border-radius:11px; padding:12px 18px; cursor:pointer; border:none;
+      transition:transform .18s ease, box-shadow .25s ease, background .25s ease;
+    }
+    .btn:active{ transform:translateY(1px); }
+    .btn-primary{
+      color:#0a0414; font-weight:500;
+      background:linear-gradient(100deg, var(--accent), color-mix(in srgb,var(--accent) 60%, #fff));
+      box-shadow:0 8px 26px -8px var(--accent);
+    }
+    .btn-primary:hover{ box-shadow:0 12px 34px -8px var(--accent); transform:translateY(-1px); }
+    .btn-ghost{
+      color:var(--ink); background:transparent;
+      border:1px solid var(--glass-brd);
+    }
+    .btn-ghost:hover{ background:rgba(255,255,255,0.06); }
+    .card .close{
+      position:absolute; top:16px; right:16px; width:30px;height:30px; border-radius:9px;
+      display:grid; place-items:center; cursor:pointer; color:var(--muted);
+      background:rgba(255,255,255,0.05); border:1px solid var(--glass-brd);
+      font-family:var(--mono); font-size:15px; line-height:1; transition:.2s;
+    }
+    .card{ position:relative; }
+    .card .close:hover{ color:var(--ink); background:rgba(255,255,255,0.12); }
+
+    /* ---------- FALLBACK (reduced motion) ---------- */
+    #fallback{ display:none; }
+    #fallback.show{
+      display:block; position:fixed; inset:0; z-index:20; overflow:auto;
+      background:
+        radial-gradient(90% 60% at 80% -10%, rgba(123,47,247,0.20), transparent 60%),
+        radial-gradient(80% 60% at 10% 110%, rgba(255,46,151,0.18), transparent 60%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      padding:clamp(24px,6vw,80px) clamp(20px,5vw,64px);
+      touch-action:auto;
+    }
+    .fb-head{ max-width:780px; }
+    .fb-eyebrow{ font-family:var(--mono); font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--magenta); }
+    .fb-head h1{
+      font-family:var(--display); font-weight:600; font-size:clamp(34px,7vw,62px); line-height:1.02;
+      margin:14px 0 10px;
+      background:linear-gradient(96deg,#fff,#ffd9ef 50%,#c7b3ff);
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+    }
+    .fb-head p{ color:var(--muted); font-size:15px; line-height:1.6; max-width:54ch; }
+    .fb-grid{
+      margin-top:clamp(30px,5vw,54px);
+      display:grid; gap:18px;
+      grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+      max-width:1040px;
+    }
+    .fb-card{
+      position:relative; display:block; text-decoration:none; color:inherit;
+      border-radius:18px; padding:26px 24px 22px;
+      background:linear-gradient(165deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015));
+      border:1px solid var(--glass-brd);
+      border-top:2px solid var(--fbhue, var(--magenta));
+      transition:transform .25s ease, box-shadow .3s ease, border-color .25s ease;
+      overflow:hidden;
+    }
+    .fb-card::before{
+      content:""; position:absolute; inset:0; opacity:0.5; pointer-events:none;
+      background:radial-gradient(80% 60% at 100% 0%, color-mix(in srgb, var(--fbhue) 22%, transparent), transparent 60%);
+    }
+    .fb-card:hover, .fb-card:focus-visible{
+      transform:translateY(-4px);
+      box-shadow:0 22px 50px -22px var(--fbhue);
+      outline:none;
+    }
+    .fb-card:focus-visible{ border-color:var(--fbhue); box-shadow:0 0 0 3px color-mix(in srgb,var(--fbhue) 40%, transparent); }
+    .fb-num{ font-family:var(--mono); font-size:11px; color:var(--fbhue); letter-spacing:0.1em; }
+    .fb-card h3{ font-family:var(--display); font-weight:600; font-size:24px; margin:10px 0 8px; }
+    .fb-card p{ color:#cfc6e6; font-size:13.5px; line-height:1.55; margin:0 0 18px; position:relative; }
+    .fb-tag{ font-family:var(--mono); font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold); border:1px solid color-mix(in srgb,var(--gold) 45%,transparent); padding:3px 9px; border-radius:999px; }
+    .fb-link{ font-family:var(--mono); font-size:12px; color:var(--fbhue); display:inline-flex; align-items:center; gap:7px; }
+    .fb-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:14px; }
+    .fb-note{ margin-top:clamp(28px,5vw,48px); font-family:var(--mono); font-size:12px; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+    .fb-toggle{
+      font-family:var(--mono); font-size:12px; cursor:pointer; color:#0a0414; font-weight:500;
+      background:linear-gradient(100deg,var(--cyan),#9af0ff); border:none;
+      padding:11px 18px; border-radius:11px; box-shadow:0 8px 26px -10px var(--cyan);
+    }
+    .fb-toggle:hover{ transform:translateY(-1px); }
+
+    @media (max-width:560px){
+      .tagline{ display:none; }
+      #hint{ font-size:11px; padding:9px 14px; gap:7px; }
+      .card{ width:94vw; }
+      #overlay{ align-items:flex-end; justify-content:center; }
+    }
+    @media (max-width:380px){
+      #hint .full{ display:none; }
+    }
+    .sr-only{ position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0; }
+  </style>
+</head>
+<body>
+
+  <!-- 2D CHROME -->
+  <header id="chrome">
+    <div class="brand">
+      <h1 class="name">NIMA HAKIMI</h1>
+      <div class="role">Frontend Developer</div>
+    </div>
+    <div class="tagline">
+      <b>Developer Cosmos</b><br/>three projects, three worlds.<br/>orbit them.
+    </div>
+  </header>
+
+  <div id="labels" aria-hidden="true"></div>
+
+  <div id="hint" role="status">
+    <span class="dot"></span>
+    <span class="full">drag to orbit</span><span class="sep full">·</span>
+    <span>scroll to travel</span><span class="sep">·</span>
+    <span>click a world</span>
+  </div>
+
+  <div id="overlay" role="dialog" aria-modal="true" aria-labelledby="ov-title" aria-hidden="true">
+    <article class="card" id="card">
+      <button class="close" id="ov-close" aria-label="Close and return to the cosmos">✕</button>
+      <div class="kicker"><span class="orb"></span><span id="ov-kicker">PROJECT WORLD</span></div>
+      <h2 id="ov-title">—</h2>
+      <div id="ov-badge-wrap"></div>
+      <p class="desc" id="ov-desc">—</p>
+      <div class="actions">
+        <button class="btn btn-primary" id="ov-case">View case study →</button>
+        <button class="btn btn-ghost" id="ov-back">← Back to cosmos</button>
+      </div>
+    </article>
+  </div>
+
+  <div id="vignette"></div>
+  <div id="grain"></div>
+
+  <!-- REDUCED-MOTION / FALLBACK -->
+  <section id="fallback" aria-label="Projects (static view)">
+    <div class="fb-head">
+      <div class="fb-eyebrow">Nima Hakimi · Frontend Developer</div>
+      <h1>Developer Cosmos</h1>
+      <p>You have reduced motion enabled, so here's the calm version — the same three project worlds, grounded. Each is a world I built; pick one to explore the case study.</p>
+    </div>
+    <div class="fb-grid" id="fb-grid"></div>
+    <div class="fb-note">
+      <span>Prefer the full experience?</span>
+      <button class="fb-toggle" id="fb-enter">Enter the interactive cosmos →</button>
+    </div>
+  </section>
+
+  <script type="importmap">
+  { "imports": {
+      "three": "https://unpkg.com/three@0.169.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.169.0/examples/jsm/"
+  } }
+  </script>
+
+  <script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls }   from 'three/addons/controls/OrbitControls.js';
+  import { EffectComposer }  from 'three/addons/postprocessing/EffectComposer.js';
+  import { RenderPass }      from 'three/addons/postprocessing/RenderPass.js';
+  import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+  import { OutputPass }      from 'three/addons/postprocessing/OutputPass.js';
+
+  /* ============================ DATA (single source of truth) ============================ */
+  const PROJECTS = [
+    {
+      name: 'Be My Guide',
+      slug: 'be-my-guide',
+      hue:  '#ff2e97',                // magenta
+      one:  'Matching visually-impaired Norwegians with sighted volunteer guides.',
+      tag:  'IN PROGRESS',
+      orbit:{ a: 9.5, b: 7.2, angle: 0.55, speed: 0.16, tilt: 0.10, size: 1.05 }
+    },
+    {
+      name: 'Concert Radar',
+      slug: 'concert-radar',
+      hue:  '#22d3ee',                // cyan
+      one:  'Spotify-connected concert discovery within your radius.',
+      tag:  null,
+      orbit:{ a: 14.5, b: 12.0, angle: 2.7, speed: 0.10, tilt: -0.14, size: 1.25 }
+    },
+    {
+      name: 'NAV Event Registration',
+      slug: 'nav-event-registration',
+      hue:  '#7b2ff7',                // electric violet
+      one:  'Internal event platform I led end-to-end.',
+      tag:  null,
+      orbit:{ a: 20.0, b: 17.0, angle: 4.5, speed: 0.065, tilt: 0.07, size: 1.45 }
+    }
+  ];
+
+  const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ============================ FALLBACK LIST (built from PROJECTS) ============================ */
+  function buildFallback(){
+    const grid = document.getElementById('fb-grid');
+    grid.innerHTML = PROJECTS.map((p,i)=>`
+      <a class="fb-card" href="#${p.slug}" style="--fbhue:${p.hue}">
+        <div class="fb-num">0${i+1} / WORLD</div>
+        <h3>${p.name}</h3>
+        <p>${p.one}</p>
+        <div class="fb-foot">
+          <span class="fb-link">View case study →</span>
+          ${p.tag ? `<span class="fb-tag">${p.tag}</span>` : ``}
+        </div>
+      </a>`).join('');
+  }
+  buildFallback();
+
+  let cosmosStarted = false;
+
+  /* ============================ COSMOS BOOT ============================ */
+  function startCosmos(){
+    if (cosmosStarted) return;
+    cosmosStarted = true;
+    document.getElementById('fallback').classList.remove('show');
+
+    const renderer = new THREE.WebGLRenderer({ antialias:true, powerPreference:'high-performance' });
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+    document.body.prepend(renderer.domElement);
+
+    const scene  = new THREE.Scene();
+    scene.fog    = new THREE.FogExp2(0x070313, 0.011);
+    const camera = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 500);
+    camera.position.set(0, 6, 34);
+
+    /* gradient sky */
+    const skyMat = new THREE.ShaderMaterial({ side:THREE.BackSide, depthWrite:false,
+      uniforms:{ top:{value:new THREE.Color('#1a0b2e')}, bot:{value:new THREE.Color('#070313')}, mid:{value:new THREE.Color('#2a0f3f')} },
+      vertexShader:`varying vec3 p; void main(){ p=position; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
+      fragmentShader:`varying vec3 p; uniform vec3 top; uniform vec3 bot; uniform vec3 mid;
+        void main(){ float h=normalize(p).y*0.5+0.5; vec3 c = h<0.5 ? mix(bot,mid,h*2.0) : mix(mid,top,(h-0.5)*2.0); gl_FragColor=vec4(c,1.);} `});
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(260,32,32), skyMat));
+
+    /* nebula clouds — a few large additive sprites for colour atmosphere */
+    const nebTex = (()=> {
+      const c = document.createElement('canvas'); c.width=c.height=256;
+      const g = c.getContext('2d'); const rad=g.createRadialGradient(128,128,0,128,128,128);
+      rad.addColorStop(0,'rgba(255,255,255,0.9)'); rad.addColorStop(0.3,'rgba(255,255,255,0.35)'); rad.addColorStop(1,'rgba(255,255,255,0)');
+      g.fillStyle=rad; g.fillRect(0,0,256,256);
+      return new THREE.CanvasTexture(c);
+    })();
+    const nebGroup = new THREE.Group(); scene.add(nebGroup);
+    [['#7b2ff7',-40,-6,-90,60],['#ff2e97',55,10,-70,55],['#22d3ee',-10,-30,-110,70],['#ff2e97',30,-20,-60,40]]
+      .forEach(([col,x,y,z,s])=>{
+        const m = new THREE.Sprite(new THREE.SpriteMaterial({ map:nebTex, color:new THREE.Color(col), transparent:true, opacity:0.16, blending:THREE.AdditiveBlending, depthWrite:false }));
+        m.position.set(x,y,z); m.scale.setScalar(s); nebGroup.add(m);
+      });
+
+    /* starfield (two layers for parallax depth) */
+    function makeStars(count, rMin, rMax, size, color, opacity){
+      const pos=new Float32Array(count*3);
+      for(let i=0;i<count;i++){ const r=rMin+Math.random()*(rMax-rMin), t=Math.random()*Math.PI*2, ph=Math.acos(2*Math.random()-1);
+        pos[i*3]=r*Math.sin(ph)*Math.cos(t); pos[i*3+1]=r*Math.sin(ph)*Math.sin(t); pos[i*3+2]=r*Math.cos(ph); }
+      const g=new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos,3));
+      return new THREE.Points(g, new THREE.PointsMaterial({ size, color, sizeAttenuation:true, transparent:true, opacity, depthWrite:false }));
+    }
+    const starsFar  = makeStars(3500, 90, 200, 0.55, 0x9fb4ff, 0.85);
+    const starsNear = makeStars(900, 50, 110, 0.9, 0xffd9f5, 0.9);
+    scene.add(starsFar, starsNear);
+
+    /* sun */
+    const sun = new THREE.Mesh(new THREE.SphereGeometry(2.6,48,48),
+      new THREE.MeshBasicMaterial({ color:new THREE.Color(5.5,3.0,1.6), toneMapped:false }));
+    scene.add(sun);
+    const sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map:nebTex, color:new THREE.Color('#ffd9a0'), transparent:true, opacity:0.55, blending:THREE.AdditiveBlending, depthWrite:false }));
+    sunGlow.scale.setScalar(16); scene.add(sunGlow);
+
+    scene.add(new THREE.PointLight(0xfff0dd, 900, 0, 2));
+    scene.add(new THREE.AmbientLight(0x2a2350, 0.7));
+
+    /* orbit rings (thin glowing guides) */
+    function ring(a,b,tilt,hue){
+      const pts=[]; const seg=128;
+      for(let i=0;i<=seg;i++){ const th=i/seg*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(th)*a, 0, Math.sin(th)*b)); }
+      const g=new THREE.BufferGeometry().setFromPoints(pts);
+      const l=new THREE.Line(g, new THREE.LineBasicMaterial({ color:new THREE.Color(hue), transparent:true, opacity:0.10 }));
+      l.rotation.x = tilt; return l;
+    }
+
+    /* ===================== PLANETS ===================== */
+    const planets = [];
+    PROJECTS.forEach((proj)=>{
+      const o = proj.orbit;
+      const hue = new THREE.Color(proj.hue);
+
+      const mat = new THREE.MeshStandardMaterial({
+        color: hue.clone().multiplyScalar(0.25),
+        emissive: hue,
+        emissiveIntensity: 1.7,
+        roughness: 0.45, metalness: 0.15,
+        toneMapped: false
+      });
+      const mesh = new THREE.Mesh(new THREE.SphereGeometry(o.size, 48, 48), mat);
+
+      // soft halo sprite tinted to the planet hue
+      const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map:nebTex, color:hue, transparent:true, opacity:0.45, blending:THREE.AdditiveBlending, depthWrite:false }));
+      halo.scale.setScalar(o.size*5.5);
+      mesh.add(halo);
+
+      // a thin equatorial ring on the largest planet for visual variety
+      const group = new THREE.Group();
+      group.add(mesh);
+      group.add(ring(o.a, o.b, o.tilt, proj.hue));
+      scene.add(group);
+
+      planets.push({
+        proj, mesh, halo, mat, group,
+        baseEmissive: 1.7, baseScale: 1, hue,
+        a:o.a, b:o.b, angle:o.angle, speed:o.speed, tilt:o.tilt, size:o.size,
+        bob: Math.random()*Math.PI*2,
+        labelEl: null
+      });
+    });
+
+    /* ===================== LABELS ===================== */
+    const labelLayer = document.getElementById('labels');
+    planets.forEach(p=>{
+      const el = document.createElement('div');
+      el.className='label';
+      el.style.setProperty('--lblbrd', `color-mix(in srgb, ${p.proj.hue} 55%, transparent)`);
+      el.innerHTML = `<span class="swatch" style="color:${p.proj.hue};background:${p.proj.hue}"></span>${p.proj.name}`;
+      labelLayer.appendChild(el);
+      p.labelEl = el;
+    });
+
+    /* ===================== POST ===================== */
+    const composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene,camera));
+    const bloom = new UnrealBloomPass(new THREE.Vector2(innerWidth,innerHeight), 1.1, 0.55, 0.82);
+    composer.addPass(bloom);
+    composer.addPass(new OutputPass());
+
+    /* ===================== CONTROLS ===================== */
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; controls.dampingFactor = 0.08;
+    controls.enablePan = false; controls.minDistance = 8; controls.maxDistance = 90;
+    controls.autoRotate = true; controls.autoRotateSpeed = 0.35;   // slow drift before interaction
+    controls.target.set(0,0,0);
+
+    /* ===================== INTERACTION STATE ===================== */
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    let hovered = null;
+    let interacted = false;
+
+    const hintEl = document.getElementById('hint');
+    function dismissHint(){ hintEl.classList.add('hide'); }
+    let hintTimer = setTimeout(dismissHint, 5000);
+
+    function firstInteraction(){
+      if (interacted) return;
+      interacted = true;
+      controls.autoRotate = false;
+      clearTimeout(hintTimer);
+      dismissHint();
+    }
+    ['pointerdown','wheel','keydown','touchstart'].forEach(ev=>
+      addEventListener(ev, firstInteraction, { passive:true }));
+
+    /* fly-to animation */
+    let fly = null; // {fromPos, toPos, fromTarget, toTarget, t, dur, onDone}
+    function flyTo(toPos, toTarget, dur=1.0, onDone){
+      fly = { fromPos:camera.position.clone(), toPos:toPos.clone(),
+              fromTarget:controls.target.clone(), toTarget:toTarget.clone(),
+              t:0, dur, onDone };
+      controls.autoRotate = false;
+    }
+    const easeInOut = x => x<0.5 ? 4*x*x*x : 1 - Math.pow(-2*x+2,3)/2;
+
+    const homePos = new THREE.Vector3(0, 6, 34);
+    const homeTarget = new THREE.Vector3(0,0,0);
+
+    /* ===================== OVERLAY ===================== */
+    const overlay = document.getElementById('overlay');
+    const card = document.getElementById('card');
+    let activePlanet = null;
+
+    function openCard(p){
+      activePlanet = p;
+      card.style.setProperty('--accent', p.proj.hue);
+      document.getElementById('ov-kicker').textContent = `WORLD · ${p.proj.slug}`;
+      document.getElementById('ov-title').textContent = p.proj.name;
+      document.getElementById('ov-desc').textContent = p.proj.one;
+      const bw = document.getElementById('ov-badge-wrap');
+      bw.innerHTML = p.proj.tag ? `<span class="badge"><span class="pulse"></span>${p.proj.tag}</span>` : '';
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden','false');
+      document.getElementById('ov-case').focus();
+    }
+    function closeCard(){
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden','true');
+      activePlanet = null;
+    }
+    function goHome(){
+      closeCard();
+      flyTo(homePos, homeTarget, 1.1);
+    }
+    document.getElementById('ov-close').addEventListener('click', goHome);
+    document.getElementById('ov-back').addEventListener('click', goHome);
+    document.getElementById('ov-case').addEventListener('click', ()=>{
+      if (activePlanet) console.log('[case study]', activePlanet.proj.slug, '→ /work/'+activePlanet.proj.slug);
+    });
+    addEventListener('keydown', e=>{ if(e.key==='Escape' && overlay.classList.contains('open')) goHome(); });
+
+    /* focus a planet: fly camera to a nice offset and open card */
+    function focusPlanet(p){
+      firstInteraction();
+      const wp = new THREE.Vector3(); p.mesh.getWorldPosition(wp);
+      // camera offset: pull back along a direction so planet sits left-of-centre-ish
+      const dir = wp.clone().sub(new THREE.Vector3(0,0,0)).normalize();
+      const dist = 5.5 + p.size*2.4;
+      const camPos = wp.clone().add(new THREE.Vector3(dir.x*dist*0.4, p.size*1.6+2.2, dist));
+      flyTo(camPos, wp, 1.0, ()=> openCard(p));
+    }
+
+    /* ===================== POINTER ===================== */
+    function updatePointer(e){
+      const x = (e.touches? e.touches[0].clientX : e.clientX);
+      const y = (e.touches? e.touches[0].clientY : e.clientY);
+      pointer.x = (x/innerWidth)*2 - 1;
+      pointer.y = -(y/innerHeight)*2 + 1;
+    }
+    let lastHoverCheck = 0;
+    function checkHover(){
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(planets.map(p=>p.mesh), false);
+      const hit = hits.length ? planets.find(p=>p.mesh===hits[0].object) : null;
+      if (hit !== hovered){
+        hovered = hit;
+        renderer.domElement.style.cursor = hit ? 'pointer' : 'grab';
+        planets.forEach(p=>{
+          p.labelEl.classList.toggle('active', p===hit);
+          p.labelEl.classList.toggle('dim', !!hit && p!==hit);
+        });
+      }
+    }
+    renderer.domElement.addEventListener('pointermove', (e)=>{
+      updatePointer(e);
+      const now = performance.now();
+      if (now - lastHoverCheck > 40){ lastHoverCheck = now; checkHover(); }
+    });
+    renderer.domElement.style.cursor = 'grab';
+
+    // click vs drag discrimination
+    let downXY=null;
+    renderer.domElement.addEventListener('pointerdown', e=>{ downXY=[e.clientX,e.clientY]; updatePointer(e); });
+    renderer.domElement.addEventListener('pointerup', e=>{
+      if(!downXY) return;
+      const moved = Math.hypot(e.clientX-downXY[0], e.clientY-downXY[1]);
+      downXY=null;
+      if (moved > 6) return;       // was a drag
+      updatePointer(e); checkHover();
+      if (hovered) focusPlanet(hovered);
+    });
+
+    /* ===================== RESIZE ===================== */
+    function onResize(){
+      camera.aspect = innerWidth/innerHeight; camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+      composer.setSize(innerWidth, innerHeight);
+      bloom.setSize(innerWidth, innerHeight);
+    }
+    addEventListener('resize', onResize);
+
+    /* ===================== VISIBILITY (battery) ===================== */
+    let running = true;
+    document.addEventListener('visibilitychange', ()=>{
+      running = !document.hidden;
+      if (running){ clock.getDelta(); loop(); }   // reset delta & restart
+    });
+
+    /* ===================== LOOP ===================== */
+    const clock = new THREE.Clock();
+    const tmpV = new THREE.Vector3();
+
+    function updateLabels(){
+      for (const p of planets){
+        p.mesh.getWorldPosition(tmpV);
+        tmpV.project(camera);
+        const behind = tmpV.z > 1;
+        const x = (tmpV.x*0.5+0.5)*innerWidth;
+        const y = (-tmpV.y*0.5+0.5)*innerHeight;
+        const el = p.labelEl;
+        if (behind || tmpV.x<-1.2 || tmpV.x>1.2 || tmpV.y<-1.2 || tmpV.y>1.2){
+          el.style.opacity = 0;
+        } else {
+          el.style.left = x+'px';
+          el.style.top  = y+'px';
+          el.style.removeProperty('opacity'); // back to CSS-driven (active/dim)
+        }
+      }
+    }
+
+    function loop(){
+      if (!running) return;
+      const dt = clock.getDelta();
+      const t  = clock.getElapsedTime();
+
+      // planets orbit + idle bob + spin
+      for (const p of planets){
+        p.angle += p.speed * dt;
+        const px = Math.cos(p.angle)*p.a;
+        const pz = Math.sin(p.angle)*p.b;
+        const py = Math.sin(p.angle + p.tilt*6)*p.a*0.18 + Math.sin(t*0.6 + p.bob)*0.25;
+        p.mesh.position.set(px, py, pz);
+        p.mesh.rotation.y += dt*0.25;
+
+        // hover scale + emissive easing
+        const targetScale = (p===hovered ? 1.18 : 1) * p.baseScale;
+        const targetEmis  = (p===hovered ? p.baseEmissive*1.5 : p.baseEmissive);
+        const cur = p.mesh.scale.x;
+        p.mesh.scale.setScalar(cur + (targetScale-cur)*Math.min(1, dt*8));
+        p.mat.emissiveIntensity += (targetEmis - p.mat.emissiveIntensity)*Math.min(1, dt*6);
+      }
+
+      sun.rotation.y += dt*0.05;
+      sunGlow.material.opacity = 0.5 + Math.sin(t*1.2)*0.07;
+      starsFar.rotation.y  = t*0.006;
+      starsNear.rotation.y = t*0.012;
+      nebGroup.rotation.y  = t*0.004;
+
+      // fly-to camera animation
+      if (fly){
+        fly.t += dt/fly.dur;
+        const k = easeInOut(Math.min(1, fly.t));
+        camera.position.lerpVectors(fly.fromPos, fly.toPos, k);
+        controls.target.lerpVectors(fly.fromTarget, fly.toTarget, k);
+        if (fly.t >= 1){ const cb=fly.onDone; fly=null; if(cb) cb(); }
+      }
+
+      controls.update();
+      updateLabels();
+      composer.render();
+      requestAnimationFrame(loop);
+    }
+    loop();
+  }
+
+  /* ============================ ENTRY ============================ */
+  if (REDUCED){
+    document.getElementById('fallback').classList.add('show');
+    document.getElementById('hint').classList.add('hide');
+    document.getElementById('fb-enter').addEventListener('click', startCosmos);
+  } else {
+    startCosmos();
+  }
+  </script>
+</body>
+</html>
