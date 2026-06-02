@@ -17,7 +17,10 @@ function getTransporter(): Transporter {
 
   const host = process.env.NODEMAILER_HOST || 'smtp.hostinger.com';
   const port = Number(process.env.NODEMAILER_PORT || 465);
-  const secure = String(process.env.NODEMAILER_SECURE ?? port === 465).toLowerCase() === 'true';
+  // Treat a defined-but-empty NODEMAILER_SECURE the same as unset so it falls
+  // back to the port-based default (TLS on 465) rather than silently disabling TLS.
+  const secureEnv = process.env.NODEMAILER_SECURE;
+  const secure = secureEnv === undefined || secureEnv === '' ? port === 465 : secureEnv.toLowerCase() === 'true';
 
   transporter = nodemailer.createTransport({
     host,

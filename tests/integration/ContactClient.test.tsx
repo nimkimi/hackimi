@@ -146,15 +146,19 @@ describe('ContactClient — top-level error message', () => {
 
     render(<ContactClient siteKey="test-site-key" />);
 
-    // Both the inline form banner and the effect-driven Toast use role="alert"
-    // for errors; the inline banner is the one whose text is exactly the message.
+    // The inline banner is now visual-only (no role); it carries the exact
+    // message with error styling. (The message also appears in the Toast, so
+    // disambiguate by the banner's container class.)
     const banner = screen
-      .getAllByRole('alert')
-      .find((el) => el.className.includes('text-red-300'));
+      .getAllByText('Something went wrong sending your message.')
+      .find((el) => el.className.includes('rounded-lg'));
     expect(banner).toBeDefined();
-    expect(banner).toHaveTextContent('Something went wrong sending your message.');
+    expect(banner?.className).toContain('text-red-300');
 
-    // The toast (driven by the effect) also surfaces the error description.
+    // The Toast (driven by the effect) is the SINGLE live region announcing the
+    // error to assistive tech — exactly one role="alert" on the page now.
+    const alerts = screen.getAllByRole('alert');
+    expect(alerts).toHaveLength(1);
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
   });
 });
@@ -169,17 +173,20 @@ describe('ContactClient — success state', () => {
 
     render(<ContactClient siteKey="test-site-key" />);
 
-    // Both the inline form banner and the effect-driven Toast use role="status"
-    // on success; the inline banner is the one carrying the accent styling.
+    // The inline banner is now visual-only (no role); it carries the message
+    // with accent (not error) styling. (The message also appears in the Toast,
+    // so disambiguate by the banner's container class.)
     const banner = screen
-      .getAllByRole('status')
-      .find((el) => el.className.includes('border-accent/40'));
+      .getAllByText('Thanks! Your message is on its way.')
+      .find((el) => el.className.includes('rounded-lg'));
     expect(banner).toBeDefined();
-    expect(banner).toHaveTextContent('Thanks! Your message is on its way.');
-    // Success banner is NOT the error red styling.
+    expect(banner?.className).toContain('border-accent/40');
     expect(banner?.className).not.toContain('text-red-300');
 
-    // Success toast title is shown.
+    // The Toast is the SINGLE live region announcing success — exactly one
+    // role="status" on the page now.
+    const statuses = screen.getAllByRole('status');
+    expect(statuses).toHaveLength(1);
     expect(screen.getByText('Message sent')).toBeInTheDocument();
   });
 

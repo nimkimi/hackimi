@@ -92,11 +92,10 @@ describe('sendMail', () => {
     });
   });
 
-  it('treats an empty NODEMAILER_SECURE as false even on port 465 (edge case)', async () => {
-    // CHARACTERIZATION: `??` only falls back on null/undefined, so an empty
-    // string passes through and `''.toLowerCase() === 'true'` is false. This
-    // means a defined-but-empty NODEMAILER_SECURE silently disables TLS on the
-    // 465 default port, contrary to the "default true on 465" expectation.
+  it('treats an empty NODEMAILER_SECURE as the port-based default (TLS on 465)', async () => {
+    // A defined-but-empty NODEMAILER_SECURE is treated the same as unset, so it
+    // falls back to the port default (secure on 465) rather than silently
+    // disabling TLS.
     vi.stubEnv('NODEMAILER_EMAIL', 'sender@example.com');
     vi.stubEnv('NODEMAILER_PASSWORD', 'pw');
     vi.stubEnv('NODEMAILER_SECURE', '');
@@ -105,7 +104,7 @@ describe('sendMail', () => {
     await sendMail('subj', 'to@example.com', 'body');
 
     expect(createTransportMock).toHaveBeenCalledWith(
-      expect.objectContaining({ port: 465, secure: false }),
+      expect.objectContaining({ port: 465, secure: true }),
     );
   });
 

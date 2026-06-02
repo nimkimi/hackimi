@@ -123,8 +123,9 @@ export default function ContactClient({ siteKey }: Props) {
             className="flex w-full flex-col gap-5 rounded-2xl border border-white/10 bg-surface/40 p-6 sm:p-8"
           >
             {state.status !== 'idle' && state.message ? (
+              // Visual-only echo of the result; the Toast is the single live
+              // region that announces to assistive tech (avoids double-announce).
               <div
-                role={state.status === 'error' ? 'alert' : 'status'}
                 className={`rounded-lg border px-3.5 py-2.5 text-sm ${
                   state.status === 'error'
                     ? 'border-red-500/40 bg-red-500/10 text-red-300'

@@ -91,7 +91,7 @@ export default function AboutPage() {
                 <div className="flex flex-col gap-1">
                   <span className="font-mono text-xs tabular-nums tracking-tight text-muted">{exp.period}</span>
                   {exp.location && (
-                    <span className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-muted/70">
+                    <span className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-muted">
                       {exp.location}
                     </span>
                   )}
