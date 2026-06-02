@@ -3,22 +3,19 @@ import Reveal from '@/components/motion/Reveal';
 import MagneticButton from '@/components/motion/MagneticButton';
 import UnderlineLink from '@/components/motion/UnderlineLink';
 import WorkRow from '@/components/work/WorkRow';
+import PlaygroundSection from '@/components/playground/PlaygroundSection';
 import work from '@/data/work';
 
 export const metadata = buildPageMetadata({
   title: 'Portfolio',
-  description:
-    'Discover the work, skills, and contact information of frontend developer Nima Hakimi.',
+  description: 'Discover the work, skills, and contact information of frontend developer Nima Hakimi.',
   path: '/',
 });
 
 export default function Home() {
   return (
     <>
-      <section
-        id="top"
-        className="relative flex min-h-[88svh] flex-col justify-center py-24"
-      >
+      <section id="top" className="relative flex min-h-[88svh] flex-col justify-center py-24">
         {/* Eyebrow */}
         <div className="mb-[clamp(1.25rem,4vh,2.5rem)] flex items-center gap-3">
           <span aria-hidden className="h-px w-7 bg-accent" />
@@ -45,9 +42,8 @@ export default function Home() {
           <p className="measure text-[clamp(1rem,2.1vw,1.3125rem)] font-medium leading-relaxed text-muted">
             <span className="text-ink">Frontend developer</span> with a{' '}
             <span className="text-ink">designer&rsquo;s eye</span> — I build{' '}
-            <span className="text-ink">accessible</span>,{' '}
-            <span className="text-ink">expressive</span> interfaces for the web.
-            Currently at <span className="text-accent">NAV</span>.
+            <span className="text-ink">accessible</span>, <span className="text-ink">expressive</span> interfaces for
+            the web. Currently at <span className="text-accent">NAV</span>.
           </p>
         </Reveal>
 
@@ -56,22 +52,14 @@ export default function Home() {
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
             <MagneticButton href="#work">View work</MagneticButton>
             <UnderlineLink href="#contact">Get in touch</UnderlineLink>
-            <UnderlineLink
-              href="https://github.com/nimkimi"
-              target="_blank"
-              rel="noreferrer"
-              className="text-muted"
-            >
+            <UnderlineLink href="https://github.com/nimkimi" target="_blank" rel="noreferrer" className="text-muted">
               GitHub
             </UnderlineLink>
           </div>
         </Reveal>
 
         {/* Scroll cue */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute bottom-6 right-0 hidden items-center gap-3 sm:flex"
-        >
+        <div aria-hidden className="pointer-events-none absolute bottom-6 right-0 hidden items-center gap-3 sm:flex">
           <span className="mono-label">Scroll</span>
           <span className="relative h-9 w-px overflow-hidden bg-white/15">
             <span className="absolute left-0 top-0 h-full w-px animate-scroll-cue bg-accent" />
@@ -94,19 +82,18 @@ export default function Home() {
         </div>
 
         <div className="mt-12">
-          <UnderlineLink
-            href="/work"
-            className="font-mono text-xs uppercase tracking-[0.12em]"
-          >
+          <UnderlineLink href="/work" className="font-mono text-xs uppercase tracking-[0.12em]">
             All work →
           </UnderlineLink>
         </div>
       </section>
 
-      {/* Anchor placeholders — filled by later tasks */}
+      {/* Playground — live interactive component demos */}
       <section id="playground" className="scroll-mt-24 py-24">
-        <h2 className="mono-label">Playground</h2>
+        <PlaygroundSection />
       </section>
+
+      {/* Anchor placeholders — filled by later tasks */}
       <section id="contact" className="scroll-mt-24 py-24">
         <h2 className="mono-label">Get in touch</h2>
       </section>
