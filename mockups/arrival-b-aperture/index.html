@@ -1,0 +1,779 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Nima Hakimi — Reveal through the mark (arrival variant B · aperture)</title>
+<meta name="description" content="Prototype: arrival variant B — a drawn NH monogram fills to a solid shape, becomes a window cut out of the black overlay, then scales up from its own centre so the hero is revealed THROUGH the letterforms." />
+
+<!-- Type -->
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=satoshi@400,500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   TOKENS — brand constants (shared across all variants)
+   ============================================================ */
+:root{
+  --bg:#0E0E10;
+  --bg-soft:#141417;
+  --text:#F5F5F0;
+  --muted:#8A8A82;
+  --line:rgba(245,245,240,.10);
+  --accent:#C6FF3D;
+  --accent-glow:rgba(198,255,61,.55);
+
+  --display:"Clash Display","Satoshi",system-ui,sans-serif;
+  --body:"Satoshi",system-ui,-apple-system,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --ease:cubic-bezier(.16,1,.3,1);   /* expo.out — signature entrance curve */
+  --pad:clamp(20px,5vw,72px);
+  --maxw:1320px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  font-weight:400;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+  min-height:100svh;
+}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#0b0b0c}
+
+/* subtle atmospheric depth so the near-black isn't flat */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(198,255,61,.05), transparent 55%),
+    radial-gradient(90% 70% at 50% 120%, rgba(255,255,255,.03), transparent 60%);
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;
+  padding:18px var(--pad);
+  backdrop-filter:saturate(120%) blur(6px);
+}
+.nav__logo-slot{
+  position:relative;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;flex:0 0 auto;
+  color:var(--text);
+}
+.nav__logo-slot svg{width:28px;height:28px;overflow:visible}
+/* logo starts invisible — it settles in at the end of the sequence */
+.nav__logo-slot .logo-mono{opacity:0;transform:scale(.7)}
+
+.nav__links{
+  display:none;gap:26px;align-items:center;
+  font-family:var(--mono);font-size:13px;letter-spacing:.02em;color:var(--muted);
+}
+.nav__links a{transition:color .2s var(--ease)}
+.nav__links a:hover{color:var(--text)}
+.nav__cta{
+  font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.01em;
+  color:#0b0b0c;background:var(--accent);
+  padding:9px 16px;border-radius:999px;
+  border:1px solid rgba(198,255,61,.6);
+  box-shadow:0 0 0 0 var(--accent-glow);
+  transition:box-shadow .25s var(--ease), transform .25s var(--ease);
+}
+.nav__cta:hover{box-shadow:0 6px 24px -6px var(--accent-glow);transform:translateY(-1px)}
+
+@media(min-width:760px){.nav__links{display:flex}}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative;z-index:1;
+  max-width:var(--maxw);margin:0 auto;
+  padding:clamp(40px,9vh,120px) var(--pad) clamp(60px,12vh,140px);
+}
+.hero__eyebrow{
+  font-family:var(--mono);font-size:12px;font-weight:500;
+  letter-spacing:.26em;text-transform:uppercase;color:var(--accent);
+  display:inline-flex;align-items:center;gap:10px;
+  margin-bottom:clamp(18px,4vh,34px);
+}
+.hero__eyebrow::before{
+  content:"";width:26px;height:1px;background:var(--accent);opacity:.7;
+}
+
+.hero__title{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(52px,13vw,168px);
+  line-height:.92;letter-spacing:-.02em;
+  color:var(--text);
+  margin:0 0 clamp(22px,4vh,40px);
+}
+.hero__title .word{display:inline-block;white-space:nowrap}
+/* Each word reveals through a clip mask, as if uncovered by the aperture.
+   The inner span carries the yPercent slide; the outer span clips it. */
+.hero__title .mask{
+  display:inline-block;overflow:hidden;
+  /* tiny vertical padding so descenders/period aren't clipped at rest */
+  padding:.02em 0;
+}
+.hero__title .mask > span{
+  display:inline-block;
+  transform:translateY(110%);
+  will-change:transform;
+}
+#name-period{
+  color:var(--accent);
+  opacity:0;transform:scale(.2);
+  transform-origin:center bottom;
+  will-change:transform,opacity;
+}
+
+.hero__lead{
+  font-family:var(--body);font-weight:400;
+  font-size:clamp(16px,2.1vw,21px);line-height:1.55;
+  color:var(--muted);max-width:60ch;
+}
+.hero__lead b{color:var(--text);font-weight:500}
+.hero__lead .acc{color:var(--accent)}
+
+/* ============================================================
+   ARRIVAL OVERLAY (aperture) — a full-screen SVG that masks a
+   black rect with the NH cut out as a transparent hole.
+   Sits ABOVE hero so the whole sequence reads with zero layout
+   shift. pointer-events:none (replay handles input).
+   ============================================================ */
+.arrival{
+  position:fixed;inset:0;z-index:60;pointer-events:none;
+  overflow:hidden;
+}
+/* the SVG fills the viewport; viewBox is set to px in JS so the
+   mask geometry is in screen pixels (accurate at any size). */
+.arrival__svg{
+  position:absolute;inset:0;width:100%;height:100%;display:block;
+  will-change:opacity;
+}
+/* the opaque overlay rect — masked by #aperture-mask */
+#overlay-rect{ fill:var(--bg); }
+
+/* The NH paths used INSIDE the mask must be pure black so they punch a
+   transparent hole; the rest of the mask is white (opaque overlay shows). */
+.mask-nh{ fill:#000; stroke:#000; }
+
+/* The lime rim/glow NH — a VISIBLE layer drawn just behind the hole edge,
+   scaled in lockstep with the aperture, echoing the accent on the opening. */
+.rim-nh{
+  fill:none;
+  stroke:var(--accent);
+  stroke-width:3;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  opacity:0;
+  filter:drop-shadow(0 0 6px rgba(198,255,61,.65))
+         drop-shadow(0 0 16px rgba(198,255,61,.35));
+  will-change:opacity;
+}
+
+/* ---------- the drawing monogram (PART 1) ----------
+   This is a SEPARATE fixed SVG that draws the NH with the spark.
+   Once drawn + filled, it hands off to the aperture (which then
+   takes over as the masked window). It lives above the overlay. */
+.mono{
+  position:fixed;top:0;left:0;z-index:62;
+  width:120px;height:120px;
+  transform-origin:0 0;
+  pointer-events:none;
+  will-change:transform,opacity;
+}
+.mono svg{width:120px;height:120px;overflow:visible;display:block}
+.mono .stroke-nh{
+  fill:none;
+  stroke:var(--accent);
+  stroke-width:8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+/* the solid/filled NH that cross-fades in over the strokes so the mark can
+   act as a window aperture. It reuses the stroke geometry but at the SAME
+   thickness (9) as the aperture-mask NH, so the on-screen solid shape is
+   pixel-identical to the future transparent hole. Rendered as a solid
+   off-white stroke (no thin draw dash) = a solid mark. */
+.mono .fill-nh{
+  fill:none;
+  stroke:var(--text);
+  stroke-width:9;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  opacity:0;
+  will-change:opacity;
+}
+
+/* the glowing spark dot that rides the drawing tip */
+.spark{
+  position:fixed;top:0;left:0;z-index:64;
+  width:9px;height:9px;border-radius:50%;
+  background:var(--accent);
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  opacity:0;
+  box-shadow:
+    0 0 6px 2px var(--accent-glow),
+    0 0 14px 5px rgba(198,255,61,.35),
+    0 0 30px 10px rgba(198,255,61,.18);
+  will-change:transform,opacity;
+}
+
+/* ============================================================
+   REPLAY
+   ============================================================ */
+.replay{
+  position:fixed;right:16px;bottom:16px;z-index:80;
+  font-family:var(--mono);font-size:12px;letter-spacing:.04em;
+  color:var(--text);background:rgba(20,20,23,.7);
+  border:1px solid var(--line);
+  padding:9px 14px;border-radius:999px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;
+  backdrop-filter:blur(8px);
+  transition:border-color .2s var(--ease), color .2s var(--ease);
+}
+.replay:hover{border-color:var(--accent);color:var(--accent)}
+.replay__dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+/* footer-ish filler so the page has body to scroll into */
+.section{
+  position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;
+  padding:0 var(--pad) clamp(60px,12vh,120px);
+}
+.section__row{
+  display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;
+  padding-top:28px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:13px;color:var(--muted);
+}
+.section__row .tag{
+  border:1px solid var(--line);border-radius:999px;padding:6px 12px;
+}
+
+/* ============================================================
+   REDUCED MOTION + RESTING FRAME
+   ============================================================ */
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+/* class applied by JS to compose the resting frame (also CSS backstop) */
+.is-resting .hero__title .mask > span{transform:none!important}
+.is-resting #name-period{opacity:1!important;transform:none!important}
+.is-resting .nav__logo-slot .logo-mono{opacity:1!important;transform:none!important}
+.is-resting .arrival{display:none!important}
+.is-resting .mono{display:none!important}
+.is-resting .spark{display:none!important}
+</style>
+</head>
+<body>
+
+  <!-- ===================== NAV ===================== -->
+  <nav class="nav" aria-label="Primary">
+    <span class="nav__logo-slot" id="nav-logo-slot" aria-label="Nima Hakimi — home">
+      <!-- persistent logo monogram, fades in at the end -->
+      <svg class="logo-mono" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+        <path d="M22 96 L22 24 L74 92 L74 24" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M84 24 L84 96 M84 60 L112 60 M112 24 L112 96" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+
+    <div class="nav__links">
+      <a href="#">Work</a>
+      <a href="#">About</a>
+      <a href="#">Writing</a>
+    </div>
+
+    <a class="nav__cta" href="#">Let's talk</a>
+  </nav>
+
+  <!-- ===================== HERO ===================== -->
+  <header class="hero">
+    <span class="hero__eyebrow">Frontend Developer</span>
+
+    <h1 class="hero__title" id="hero-title" aria-label="Nima Hakimi.">
+      <span class="word"><span class="mask"><span id="name-1">Nima</span></span></span>
+      <span class="word"><span class="mask"><span id="name-2">Hakimi</span></span><span id="name-period">.</span></span>
+    </h1>
+
+    <p class="hero__lead">
+      <b>Frontend developer with a designer's eye</b> — I build
+      <span class="acc">accessible, expressive</span> interfaces.
+      Currently at NAV.
+    </p>
+  </header>
+
+  <section class="section" aria-hidden="true">
+    <div class="section__row">
+      <span class="tag">React</span>
+      <span class="tag">TypeScript</span>
+      <span class="tag">Motion</span>
+      <span class="tag">Design Systems</span>
+      <span class="tag">Accessibility</span>
+    </div>
+  </section>
+
+  <!-- ===================== ARRIVAL OVERLAY (APERTURE) =====================
+       Full-screen SVG. The black overlay rect is masked so the NH is a
+       TRANSPARENT HOLE; the rim NH is a visible lime stroke behind the edge.
+       The #aperture-g group is scaled from screen-centre by JS.            -->
+  <div class="arrival" id="arrival" aria-hidden="true">
+    <svg class="arrival__svg" id="arrival-svg" preserveAspectRatio="xMidYMid slice"
+         viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <mask id="aperture-mask" maskUnits="userSpaceOnUse"
+              x="0" y="0" width="100" height="100">
+          <!-- WHITE = overlay is OPAQUE (covers hero) -->
+          <rect id="mask-bg" x="0" y="0" width="100" height="100" fill="#fff"/>
+          <!-- BLACK NH = transparent HOLE (hero visible through letterforms).
+               Lives in the scaled group so the hole grows from NH centre. -->
+          <g id="aperture-mask-g">
+            <!-- N + H black so the punched hole is solidly the letter shape.
+                 The d is rewritten to SCREEN px in JS (placeAperture); GSAP
+                 only animates scale around the NH centre (svgOrigin). -->
+            <path class="mask-nh" id="mask-N"
+                  d="M22 96 L22 24 L74 92 L74 24"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+            <path class="mask-nh" id="mask-H"
+                  d="M84 96 L84 24 M84 60 L112 60 M112 24 L112 96"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+        </mask>
+      </defs>
+
+      <!-- the opaque overlay, with the NH punched out by the mask -->
+      <rect id="overlay-rect" x="0" y="0" width="100" height="100"
+            mask="url(#aperture-mask)"/>
+
+      <!-- VISIBLE lime rim/glow NH, scaled in lockstep with the aperture so
+           the opening edge glows acid-lime as it expands. -->
+      <g id="aperture-rim-g">
+        <path class="rim-nh" id="rim-N" d="M22 96 L22 24 L74 92 L74 24"/>
+        <path class="rim-nh" id="rim-H" d="M84 96 L84 24 M84 60 L112 60 M112 24 L112 96"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- the drawing monogram (the SEED, PART 1). Strokes draw on; a filled
+       version cross-fades in so the mark can become the window. -->
+  <div class="mono" id="mono" aria-hidden="true">
+    <svg id="mono-svg" viewBox="0 0 120 120" fill="none">
+      <!-- "filled" NH (handoff target): same geometry & thickness as the
+           aperture-mask NH, so the solid mark == the future transparent hole -->
+      <path class="fill-nh" id="fill-N" d="M22 96 L22 24 L74 92 L74 24"/>
+      <path class="fill-nh" id="fill-H" d="M84 96 L84 24 M84 60 L112 60 M112 24 L112 96"/>
+      <!-- stroked NH (the draw): N then H -->
+      <path class="stroke-nh" id="mono-N" d="M22 96 L22 24 L74 92 L74 24"/>
+      <path class="stroke-nh" id="mono-H" d="M84 96 L84 24 M84 60 L112 60 M112 24 L112 96"/>
+    </svg>
+  </div>
+
+  <!-- the spark -->
+  <div class="spark" id="spark" aria-hidden="true"></div>
+
+  <!-- ===================== REPLAY ===================== -->
+  <button class="replay" id="replay" type="button">
+    <span class="replay__dot"></span> Replay
+  </button>
+
+  <!-- GSAP core only -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+  <script>
+  (function(){
+    "use strict";
+
+    /* ---------- guarded lookups ---------- */
+    var $ = function(id){ return document.getElementById(id); };
+    var els = {
+      arrival:    $("arrival"),
+      arrivalSvg: $("arrival-svg"),
+      mask:       $("aperture-mask"),
+      maskBg:     $("mask-bg"),
+      overlayRect:$("overlay-rect"),
+      apertureG:  $("aperture-mask-g"),
+      maskN:      $("mask-N"),
+      maskH:      $("mask-H"),
+      rimG:       $("aperture-rim-g"),
+      rimN:       $("rim-N"),
+      rimH:       $("rim-H"),
+      mono:       $("mono"),
+      monoSvg:    $("mono-svg"),
+      pathN:      $("mono-N"),
+      pathH:      $("mono-H"),
+      fillN:      $("fill-N"),
+      fillH:      $("fill-H"),
+      spark:      $("spark"),
+      name1:      $("name-1"),
+      name2:      $("name-2"),
+      period:     $("name-period"),
+      logoMono:   document.querySelector(".nav__logo-slot .logo-mono"),
+      replay:     $("replay"),
+      title:      $("hero-title")
+    };
+
+    var prefersReduced = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* If a critical element is missing OR GSAP didn't load, bail to the
+       composed resting frame so the page is always usable. */
+    var critical = [els.arrival, els.arrivalSvg, els.overlayRect, els.apertureG,
+                    els.mono, els.spark, els.name1, els.name2, els.period, els.title];
+    var hasAll = critical.every(function(n){ return !!n; });
+
+    function showResting(){ document.body.classList.add("is-resting"); }
+
+    if (!hasAll || typeof window.gsap === "undefined" || prefersReduced){
+      showResting();
+      if (els.replay && (!hasAll || typeof window.gsap === "undefined")){
+        els.replay.style.display = "none";
+      }
+      if (prefersReduced && els.replay) els.replay.style.display = "none";
+      return;
+    }
+
+    var gsap = window.gsap;
+
+    /* ---------- geometry helpers ---------- */
+    function pageRect(el){
+      var r = el.getBoundingClientRect();
+      return {
+        left:r.left+window.scrollX, top:r.top+window.scrollY,
+        right:r.right+window.scrollX, bottom:r.bottom+window.scrollY,
+        width:r.width, height:r.height,
+        cx:r.left+window.scrollX+r.width/2,
+        cy:r.top+window.scrollY+r.height/2
+      };
+    }
+
+    // Convert an SVG userspace point (mono 0..120 viewBox) to PAGE px using
+    // the mono svg's LIVE rendered rect — lets the spark ride the real tip.
+    function svgPointToPage(x, y){
+      var r = els.monoSvg.getBoundingClientRect();
+      return {
+        x: r.left + window.scrollX + (x/120) * r.width,
+        y: r.top  + window.scrollY + (y/120) * r.height
+      };
+    }
+
+    /* ---------- combined path sampling (N then H) ---------- */
+    var lenN = els.pathN.getTotalLength();
+    var lenH = els.pathH.getTotalLength();
+    var lenTotal = lenN + lenH;
+
+    function tipAt(p){
+      var d = p * lenTotal, pt;
+      if (d <= lenN) pt = els.pathN.getPointAtLength(d);
+      else pt = els.pathH.getPointAtLength(Math.min(d - lenN, lenH));
+      return svgPointToPage(pt.x, pt.y);
+    }
+
+    function primeDraw(){
+      gsap.set(els.pathN, { strokeDasharray:lenN, strokeDashoffset:lenN, stroke:"#C6FF3D" });
+      gsap.set(els.pathH, { strokeDasharray:lenH, strokeDashoffset:lenH, stroke:"#C6FF3D" });
+    }
+
+    /* ----------------------------------------------------------------
+       APERTURE GEOMETRY
+       The arrival SVG viewBox is set to screen pixels so mask geometry
+       is in real px. The NH (mono userspace 0..120) is placed CENTRED on
+       screen at the SAME on-screen size/position as the drawn monogram,
+       so the handoff is seamless. The NH path d is authored directly in
+       screen px (placeAperture); GSAP then animates ONLY a uniform scale
+       around the NH centre (svgOrigin) to open the aperture.
+       ---------------------------------------------------------------- */
+    var apertureBase = null;  // { s, originX, originY } — NH centre in px
+
+    // size the arrival svg viewBox to the viewport in px
+    function sizeArrivalSvg(){
+      var vw = window.innerWidth, vh = window.innerHeight;
+      els.arrivalSvg.setAttribute("viewBox", "0 0 " + vw + " " + vh);
+      // the mask region itself must cover the whole px viewBox
+      if (els.mask){
+        els.mask.setAttribute("width", vw);
+        els.mask.setAttribute("height", vh);
+      }
+      // mask bg + overlay rect must cover the whole px viewBox
+      if (els.maskBg){
+        els.maskBg.setAttribute("width", vw);
+        els.maskBg.setAttribute("height", vh);
+      }
+      els.overlayRect.setAttribute("width", vw);
+      els.overlayRect.setAttribute("height", vh);
+    }
+
+    // centered display geometry shared by the drawn mono AND the aperture NH
+    var centeredState = null;
+    function computeCentered(){
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var displaySize = Math.min(vw, vh) * 0.34;
+      displaySize = Math.max(150, Math.min(displaySize, 320));
+      var scale = displaySize / 120;
+      // top-left of the 120x120 box, viewport coords (overlay is fixed → no scroll)
+      var x = vw/2 - displaySize/2;
+      var y = vh*0.44 - displaySize/2;
+      return { x:x, y:y, scale:scale, size:displaySize, cx:vw/2, cy:vh*0.44 };
+    }
+
+    // place the moving (drawn) mono — page coords (fixed el, scroll≈0 at start)
+    function placeMonoCentered(){
+      centeredState = computeCentered();
+      gsap.set(els.mono, {
+        x: window.scrollX + centeredState.x,
+        y: window.scrollY + centeredState.y,
+        scale: centeredState.scale
+      });
+    }
+
+    // The two NH strokes in userspace (mono 0..120 viewBox). We map these to
+    // SCREEN px to author the aperture-mask + rim paths, then GSAP only scales
+    // them (around the NH centre) — no translate ambiguity.
+    var NH_USER = {
+      N: [[22,96],[22,24],[74,92],[74,24]],          // polyline
+      H: [[[84,96],[84,24]],[[84,60],[112,60]],[[112,24],[112,96]]] // 3 segments
+    };
+    function ptToPx(c, x, y){ return [ (c.x + x*c.scale), (c.y + y*c.scale) ]; }
+    function polyToD(c, pts){
+      return pts.map(function(p,i){
+        var q = ptToPx(c, p[0], p[1]);
+        return (i===0?"M":"L") + q[0].toFixed(2) + " " + q[1].toFixed(2);
+      }).join(" ");
+    }
+    function segsToD(c, segs){
+      return segs.map(function(s){
+        var a = ptToPx(c, s[0][0], s[0][1]);
+        var b = ptToPx(c, s[1][0], s[1][1]);
+        return "M" + a[0].toFixed(2) + " " + a[1].toFixed(2) +
+               " L" + b[0].toFixed(2) + " " + b[1].toFixed(2);
+      }).join(" ");
+    }
+
+    // Author the aperture NH paths in SCREEN px so they sit exactly over the
+    // drawn mono; set px stroke-width (9 userspace units * scale). GSAP then
+    // animates ONLY scale around the NH centre (svgOrigin) — the holes grow
+    // from the mark's own centre.
+    function placeAperture(){
+      var c = centeredState || computeCentered();
+      var dN = polyToD(c, NH_USER.N);
+      var dH = segsToD(c, NH_USER.H);
+      var swMask = (9 * c.scale).toFixed(2);   // mask hole thickness in px
+      var swRim  = (4 * c.scale).toFixed(2);   // lime rim thickness in px
+
+      els.maskN.setAttribute("d", dN); els.maskH.setAttribute("d", dH);
+      els.maskN.setAttribute("stroke-width", swMask);
+      els.maskH.setAttribute("stroke-width", swMask);
+      els.rimN.setAttribute("d", dN); els.rimH.setAttribute("d", dH);
+      els.rimN.setAttribute("stroke-width", swRim);
+      els.rimH.setAttribute("stroke-width", swRim);
+
+      var originX = c.x + 60 * c.scale;   // NH centre in screen px
+      var originY = c.y + 60 * c.scale;
+      apertureBase = { s:1, originX:originX, originY:originY };
+
+      // base scale multiplier = 1 (holes are NH-sized), grown around centre
+      [els.apertureG, els.rimG].forEach(function(g){
+        gsap.set(g, { scale:1, svgOrigin: originX + " " + originY });
+      });
+    }
+
+    /* ---------- resting / reset of all animated props ---------- */
+    function resetAll(){
+      document.body.classList.remove("is-resting");
+
+      sizeArrivalSvg();
+
+      // overlay visible & FULLY opaque during Part 1 (NO hole yet — the mask
+      // is detached so the drawn mono reads against solid black; the hole is
+      // applied only at the handoff so the hero never peeks early).
+      gsap.set(els.arrival, { display:"block" });
+      gsap.set(els.arrivalSvg, { opacity:1 });
+      els.overlayRect.removeAttribute("mask");
+
+      // drawn mono centered, strokes primed, fill hidden
+      gsap.set(els.mono, { opacity:1 });
+      gsap.set([els.fillN, els.fillH], { opacity:0 });
+
+      // rim hidden at start
+      gsap.set([els.rimN, els.rimH], { opacity:0 });
+
+      // hero name hidden behind masks; period hidden
+      gsap.set([els.name1, els.name2], { yPercent:110 });
+      gsap.set(els.period, { opacity:0, scale:.2 });
+
+      // logo hidden
+      if (els.logoMono) gsap.set(els.logoMono, { opacity:0, scale:.7 });
+
+      // spark hidden until draw starts
+      gsap.set(els.spark, { opacity:0 });
+
+      primeDraw();
+      placeMonoCentered();
+      placeAperture();   // sets scale:1 + svgOrigin on both groups
+    }
+
+    /* ---------- the sequence ---------- */
+    var tl = null;
+
+    function build(){
+      resetAll();
+
+      tl = gsap.timeline({ defaults:{ ease:"expo.out" } });
+
+      /* ============================================================
+         PART 1 — NH draws on (0.0–1.0s) — IDENTICAL across variants
+         ============================================================ */
+      tl.add(function(){
+        var t0 = tipAt(0);
+        gsap.set(els.spark, { x:t0.x, y:t0.y, opacity:1 });
+      }, 0);
+
+      var draw = { p:0 };
+      tl.to(draw, {
+        p:1, duration:0.9, ease:"expo.out",
+        onUpdate:function(){
+          var p = draw.p;
+          var drawn = p * lenTotal;
+          els.pathN.style.strokeDashoffset = Math.max(0, lenN - drawn);
+          els.pathH.style.strokeDashoffset = Math.max(0, lenH - Math.max(0, drawn - lenN));
+          var t = tipAt(p);
+          gsap.set(els.spark, { x:t.x, y:t.y });
+        }
+      }, 0.05);
+
+      // "ink drying": each stroke settles lime -> off-white after it finishes
+      tl.to(els.pathN, { stroke:"#F5F5F0", duration:0.35, ease:"power1.out" },
+            0.05 + 0.9 * (lenN/lenTotal) + 0.05);
+      tl.to(els.pathH, { stroke:"#F5F5F0", duration:0.35, ease:"power1.out" },
+            0.05 + 0.9 + 0.04);
+
+      // park spark exactly at the path end
+      tl.add(function(){
+        var tEnd = tipAt(1);
+        gsap.set(els.spark, { x:tEnd.x, y:tEnd.y });
+      }, 0.05 + 0.9);
+
+      /* ============================================================
+         PART 2 — THE TRANSITION: reveal through the mark (aperture)
+         ============================================================ */
+
+      /* 1) (1.0–1.2s) STROKE -> FILL.
+         Cross-fade the stroked NH into a SOLID/FILLED NH so the mark can
+         act as a window. The filled paths share the SAME geometry as the
+         aperture-mask NH, so the on-screen solid shape == the future hole. */
+      tl.to([els.fillN, els.fillH], { opacity:1, duration:0.22, ease:"power2.out" }, 1.0);
+      tl.to([els.pathN, els.pathH], { opacity:0, duration:0.20, ease:"power2.out" }, 1.06);
+
+      /* 2) (1.2–1.95s) APERTURE OPENS.
+         Swap the visible solid mono for the masked overlay aperture (they
+         are pixel-aligned, so this is invisible), then SCALE the NH hole up
+         from its OWN centre: extra scale ~1 -> ~16. As it grows the see-
+         through NH openings expand until the overlay is entirely gone and
+         the hero is fully revealed THROUGH the letterforms. */
+      tl.add(function(){
+        // hand off: APPLY the mask now so the NH becomes a transparent hole
+        // exactly where the solid mono was, then hide the solid mono. They are
+        // pixel-aligned, so the swap is invisible — the mark turns into a
+        // window into the hero in the same instant the opening begins.
+        els.overlayRect.setAttribute("mask", "url(#aperture-mask)");
+        gsap.set(els.mono, { opacity:0 });
+        // bring the lime rim in as the opening starts to glow.
+        gsap.set([els.rimN, els.rimH], { opacity:1 });
+      }, 1.2);
+
+      // the actual aperture scale-up — grows the NH holes from the mark centre.
+      // We animate an EXTRA scale on top of the base; final multiplier ~16.
+      var grow = { k:1 };
+      tl.to(grow, {
+        k:16, duration:0.75, ease:"power2.out",
+        onUpdate:function(){
+          // px paths already bake the display size, so scale multiplier
+          // 1 -> 16 grows the NH holes from the mark centre (svgOrigin).
+          gsap.set([els.apertureG, els.rimG], { scale: grow.k });
+        }
+      }, 1.2);
+
+      // fade the lime rim out near the end so it doesn't linger as a hard edge
+      tl.to([els.rimN, els.rimH], { opacity:0, duration:0.35, ease:"power1.out" }, 1.62);
+
+      // once the holes have swallowed the screen, drop the overlay svg entirely
+      tl.to(els.arrivalSvg, { opacity:0, duration:0.18, ease:"power1.out" }, 1.82);
+      tl.add(function(){ gsap.set(els.arrival, { display:"none" }); }, 2.05);
+
+      /* 3) (1.6–2.0s) HERO UNVEILED.
+         Time the name reveal so it feels uncovered by the growing aperture
+         passing over the headline. Masked yPercent:110->0 slide. */
+      tl.to(els.name1, { yPercent:0, duration:0.7, ease:"expo.out" }, 1.6);
+      tl.to(els.name2, { yPercent:0, duration:0.7, ease:"expo.out" }, 1.72);
+
+      /* the lime period lands — parked spark flies in -> becomes the period */
+      tl.add(function(){
+        var rp = pageRect(els.period);
+        var px = rp.left + rp.width * 0.5;
+        var py = rp.top + rp.height * 0.80;
+        gsap.set(els.spark, { opacity:1 });
+        gsap.to(els.spark, {
+          x:px, y:py, duration:0.26, ease:"power2.in",
+          onComplete:function(){
+            gsap.set(els.spark, { opacity:0 });
+            gsap.to(els.period, { opacity:1, scale:1, duration:0.5, ease:"back.out(2.4)" });
+          }
+        });
+      }, 1.95);
+
+      /* a small NH monogram settles into the nav logo slot as persistent logo */
+      if (els.logoMono){
+        tl.to(els.logoMono, { opacity:1, scale:1, duration:0.5, ease:"back.out(1.8)" }, 2.05);
+      }
+
+      return tl;
+    }
+
+    /* ---------- run / replay ---------- */
+    function play(){
+      if (tl) tl.kill();
+      if (window.scrollY > 4) window.scrollTo(0,0);
+      build();
+    }
+
+    els.replay.addEventListener("click", play);
+
+    // recompute centered placement on resize while overlay still showing
+    var rt;
+    window.addEventListener("resize", function(){
+      clearTimeout(rt);
+      rt = setTimeout(function(){
+        if (els.arrival && els.arrival.style.display !== "none"){
+          sizeArrivalSvg();
+          placeMonoCentered();
+          placeAperture();   // re-authors px paths + resets scale:1
+        }
+      }, 120);
+    });
+
+    // wait for fonts so glyph rects are accurate, then play
+    function start(){ play(); }
+    if (document.fonts && document.fonts.ready){
+      document.fonts.ready.then(start).catch(start);
+      setTimeout(function(){ if(!tl) start(); }, 1200);
+    } else {
+      window.addEventListener("load", start);
+    }
+  })();
+  </script>
+</body>
+</html>
