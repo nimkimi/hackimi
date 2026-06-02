@@ -24,7 +24,7 @@ npm run format     # Prettier write (ts, tsx, js, jsx, md, css, yaml)
 npm run check      # Prettier check (CI)
 ```
 
-Node version is pinned to `22.4.0` (see `.nvmrc`).
+Node version is pinned to `24` (see `.nvmrc`); `engines` requires `>=22.12.0`. CI runs on the `.nvmrc` version.
 
 ## Testing
 
