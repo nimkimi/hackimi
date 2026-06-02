@@ -2,13 +2,14 @@
 
 import { useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { INTRO_KEY, shouldPlayIntro } from '@/lib/intro';
+import { shouldPlayIntro } from '@/lib/intro';
 
 /**
  * SIGNATURE ARRIVAL ANIMATION — "Reveal through the mark" (aperture, variant B).
  *
  * Ported from the validated prototype `mockups/arrival-b-aperture/index.html`.
- * Choreography (~2.1s, once per session):
+ * Plays on every full page load / refresh (skipped only under reduced motion).
+ * Choreography (~2.1s):
  *   1. A centered NH monogram DRAWS ON via strokeDashoffset, a glowing acid-lime
  *      spark riding the drawing tip; strokes settle lime -> ink ("ink drying").
  *   2. The stroked NH cross-fades into a SOLID NH, which becomes a TRANSPARENT
@@ -24,8 +25,8 @@ import { INTRO_KEY, shouldPlayIntro } from '@/lib/intro';
  *   sessionStorage / matchMedia are read ONLY inside the layout effect.
  * - No CLS: the hero and nav already exist in final layout *under* the overlay.
  *   This component only animates their reveal; it never gates their existence.
- * - Skip path (reduced-motion OR already-seen): overlay removed before paint,
- *   hero/nav/period left in their default visible state. No GSAP, no flash.
+ * - Skip path (reduced-motion): overlay removed before paint, hero/nav/period
+ *   left in their default visible state. No GSAP, no flash.
  * - Fail-safe: every DOM lookup is guarded; the timeline build is wrapped in
  *   try/catch that restores the final visible state on any error. The page can
  *   never get stuck behind the overlay or with the hero hidden.
@@ -104,19 +105,11 @@ export default function Preloader() {
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // Test affordance: ?replay clears the seen flag so the intro plays again.
-    if (window.location.search.includes('replay')) {
-      try {
-        window.sessionStorage.removeItem(INTRO_KEY);
-      } catch {
-        /* ignore */
-      }
-    }
-
     const reduce = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
-    const play = shouldPlayIntro(window.sessionStorage, reduce);
+    // Plays on every full page load / refresh; skipped only under reduced motion.
+    const play = shouldPlayIntro(reduce);
 
     // Restores the final, visible resting frame and tears down the overlay.
     // Safe to call from the skip path, on completion, or from error handling.
@@ -370,14 +363,7 @@ export default function Preloader() {
           // ---- the sequence ------------------------------------------------
           tl = gsap.timeline({
             defaults: { ease: 'expo.out' },
-            onComplete: () => {
-              try {
-                window.sessionStorage.setItem(INTRO_KEY, '1');
-              } catch {
-                /* ignore */
-              }
-              finish();
-            },
+            onComplete: finish,
           });
 
           // PART 1 — NH draws on (0.0 -> 1.0s) with the spark riding the tip.
