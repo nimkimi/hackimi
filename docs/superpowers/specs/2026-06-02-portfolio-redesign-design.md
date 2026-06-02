@@ -1,12 +1,49 @@
 # Portfolio Redesign — Design Spec
 
 **Date:** 2026-06-02
-**Status:** SUPERSEDED — see the LATEST "Direction Change" immediately below. Earlier sections retained for history only.
+**Status:** ✅ APPROVED DESIGN (validated via prototype `mockups/v3/index.html`). See "FINAL APPROVED DIRECTION" below. Earlier sections retained for history only.
 **Repo:** `projects/private/hackimi`
 
 ---
 
-## ⚠️ Direction Change #2 (2026-06-02) — "Designer × Developer" + signature arrival animation (CURRENT)
+## ✅ FINAL APPROVED DIRECTION (2026-06-02) — "Design-forward developer" + monogram arrival
+
+Validated by the user against the built prototype **`mockups/v3/index.html`** ("I like the design, let's go for that"). Build THIS for real in Next.js.
+
+**Identity / positioning (important nuance):** Nima is a **frontend developer with a designer's eye** — position him as a **developer**, NOT a designer ("a developer with designer taste, not a designer"). Copy leads with developer identity; the design-forward execution is the differentiator. Hero eyebrow `FRONTEND DEVELOPER`; positioning line e.g. *"Frontend developer with a designer's eye — I build accessible, expressive interfaces. Currently at NAV."*
+
+**The signature arrival animation (~2s, once per session, the centerpiece):**
+1. An **"NH" SVG monogram strokes itself on** (draw-on via `stroke-dashoffset`, expo.out).
+2. It **flies up + scales into the nav** to become the persistent header logo (measured-rect tween).
+3. **"Nima Hakimi"** reveals line/word-by-word behind `overflow:hidden` masks (stagger, expo.out).
+4. One **acid-lime accent pop** on settle, then hands off — never blocks past ~2s.
+- Once-per-session via `sessionStorage`; `prefers-reduced-motion` → skip intro entirely (instant final state). Overlay is fixed/inset over a hero that already exists in final layout (no reflow/CLS).
+
+**Art direction:**
+- Palette: near-black base `#0E0E10`, off-white text `#F5F5F0` / muted `#8A8A82`, ONE committed accent **acid lime `#C6FF3D`** (arrival pop, link/hover underlines, magnetic CTA, cursor). Subtle STATIC grain.
+- Type: **Clash Display** (expressive hero/titles), **Satoshi** (body/UI), **Geist Mono** (uppercase letter-spaced labels, section numbers, metadata — the "engineer" tell).
+- Motion is expressive but PURPOSEFUL: masked scroll reveals (not fade-up-everything), lime animated underlines, magnetic CTA, optional contextual cursor, Lenis smooth scroll. All reduced-motion-safe.
+
+**Structure:**
+- Sticky nav (NH monogram logo + Work / About / Playground / Contact + magnetic "Let's talk" CTA).
+- Hero (eyebrow, masked name reveal, positioning line, scroll cue).
+- **Selected Work** as expressive rows (not cards): mono index · name · outcome · tech tags; hover draws lime underline + reveals preview + dims siblings. Links to case studies.
+- **Case studies** per flagship (Be My Guide [In progress], Concert Radar, NAV Event Registration) — show BOTH design decisions and engineering decisions.
+- **Playground** — a small set of live, interactive components as tangible proof he builds what he designs (the engineering-depth signal).
+- About (developer-with-design-taste duality) and a big-type Contact with the magnetic CTA.
+
+**Hard requirements:**
+- **Mobile-first AND verified beautiful on both mobile and desktop** (explicitly checked at multiple breakpoints — not just "built responsive").
+- **Accessibility** (a11y specialist): reduced-motion fallback for the intro + all motion, keyboard nav, visible focus, sufficient contrast, semantic markup.
+- Reuse the existing contact server-action + reCAPTCHA flow; keep typed data (`work.ts`); recruiter audience.
+
+**Tech to add:** GSAP (arrival timeline; hand-split text + measured-rect monogram move — avoid paid plugins), Lenis (smooth scroll), Motion already added. Likely Clash Display/Satoshi via Fontshare + Geist Mono via Google Fonts (self-host for production performance).
+
+Everything below this section (Direction Change #2/#1 and the original refined-minimal spec) is **historical/superseded**.
+
+---
+
+## ⚠️ Direction Change #2 (2026-06-02) — "Designer × Developer" + signature arrival animation (SUPERSEDED by FINAL above)
 
 The interactive 3D "Developer Cosmos" below was also **rejected** ("felt random / gimmicky / not me"). The key realization: the client is a **developer AND a designer** (design-engineer hybrid), so the site should read like a strong **designer's portfolio backed by developer substance** — expressive, art-directed, slick color, with **purposeful** motion (nothing random/decorative).
 
