@@ -1,0 +1,111 @@
+'use client';
+
+import { useRef } from 'react';
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useReducedMotion,
+} from 'motion/react';
+import type { MouseEvent, ReactNode } from 'react';
+
+type MagneticButtonProps = {
+  children: ReactNode;
+  href?: string;
+  onClick?: () => void;
+  className?: string;
+  /** Max pixel translation toward the cursor. */
+  strength?: number;
+};
+
+const BASE_CLASS =
+  'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium bg-accent text-base transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-base';
+
+/**
+ * A CTA that drifts toward the cursor on hover and springs back on leave.
+ *
+ * The magnetic effect is disabled for touch devices (`pointer: coarse`) and
+ * for users who request reduced motion — in those cases a plain, statically
+ * styled element is rendered. Renders an `<a>` when `href` is provided,
+ * otherwise a `<button>`.
+ */
+export default function MagneticButton({
+  children,
+  href,
+  onClick,
+  className,
+  strength = 8,
+}: MagneticButtonProps) {
+  const reduce = useReducedMotion();
+  const ref = useRef<HTMLElement>(null);
+
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const springConfig = { stiffness: 250, damping: 18, mass: 0.4 };
+  const springX = useSpring(x, springConfig);
+  const springY = useSpring(y, springConfig);
+
+  const classes = `${BASE_CLASS} ${className ?? ''}`.trim();
+
+  // Touch devices and reduced-motion users get a plain element — no listeners,
+  // no transforms.
+  const coarsePointer =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(pointer: coarse)').matches;
+
+  if (reduce || coarsePointer) {
+    if (href) {
+      return (
+        <a href={href} onClick={onClick} className={classes}>
+          {children}
+        </a>
+      );
+    }
+    return (
+      <button type="button" onClick={onClick} className={classes}>
+        {children}
+      </button>
+    );
+  }
+
+  const handleMove = (e: MouseEvent) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const relX = e.clientX - (rect.left + rect.width / 2);
+    const relY = e.clientY - (rect.top + rect.height / 2);
+    // Normalise against half-size and clamp the pull to `strength` px.
+    const cap = (v: number, half: number) =>
+      Math.max(-1, Math.min(1, v / half)) * strength;
+    x.set(cap(relX, rect.width / 2));
+    y.set(cap(relY, rect.height / 2));
+  };
+
+  const handleLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  const shared = {
+    ref: ref as React.Ref<never>,
+    onMouseMove: handleMove,
+    onMouseLeave: handleLeave,
+    onClick,
+    className: classes,
+    style: { x: springX, y: springY },
+  };
+
+  if (href) {
+    return (
+      <motion.a href={href} {...shared}>
+        {children}
+      </motion.a>
+    );
+  }
+
+  return (
+    <motion.button type="button" {...shared}>
+      {children}
+    </motion.button>
+  );
+}
