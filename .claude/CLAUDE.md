@@ -18,14 +18,24 @@ Note: earlier `docs/features/` specs and `docs/ROADMAP.md` were written around a
 npm run dev        # Start dev server at localhost:3000
 npm run build      # Production build
 npm run lint       # ESLint via next lint
-npm run test       # Vitest (vitest run) — tests in tests/
+npm run test       # Vitest (vitest run) — unit/component/integration
+npm run test:e2e   # Playwright end-to-end (boots next dev; specs in e2e/)
 npm run format     # Prettier write (ts, tsx, js, jsx, md, css, yaml)
 npm run check      # Prettier check (CI)
 ```
 
 Node version is pinned to `22.4.0` (see `.nvmrc`).
 
-Tests run with Vitest: `npm run test` (`vitest run`). Test files live in `tests/`.
+## Testing
+
+**TDD is the standard for all new work** (features and bugfixes): write the failing test first, then the implementation. The existing suite was retrofitted as characterization tests; from here, no behavior change ships without a test.
+
+Two runners, configured in `vitest.config.ts` via `test.projects`:
+- **`node` project** — pure logic + server code. Specs in `tests/unit/` (lib, data) and `tests/server/` (server action, captcha, email, sitemap, robots). `server-only` is aliased to a no-op stub; `@/` resolves to `src/`.
+- **`jsdom` project** — React (RTL + `@testing-library/jest-dom` + user-event). Specs in `tests/components/` and `tests/integration/` (App Router pages + ContactClient). Global `matchMedia`/`IntersectionObserver`/`ResizeObserver` stubs live in `tests/setup/jsdom-setup.ts`.
+- **Playwright** — real-browser E2E in `e2e/` (arrival animation, reduced-motion, scroll reveal, nav/work/contact flows, axe a11y smoke). Reduced-motion in E2E must use `page.emulateMedia({ reducedMotion: 'reduce' })` — `test.use({ reducedMotion })` does NOT propagate to `window.matchMedia`, which `Preloader`/`Reveal` read.
+
+All test tooling is `devDependencies` only — zero production-bundle/runtime impact.
 
 ## Environment Variables
 
