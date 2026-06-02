@@ -107,19 +107,19 @@ const work: CaseStudy[] = [
     links: [{ label: 'GitHub', href: 'https://github.com/nimkimi/concert-radar' }],
     images: [
       {
-        src: '/work/concert-radar/dashboard.jpg',
-        alt: 'Concert Radar dashboard (dark theme) with oversized type reading “6 upcoming shows near Bergen”, an up-next Sigrid concert card, and source filters on a near-black UI with Spotify-green accents.',
-        caption: 'Dashboard',
-      },
-      {
         src: '/work/concert-radar/landing.jpg',
-        alt: 'Concert Radar landing (dark theme) — “Never miss a show from an artist you actually listen to.” with a Connect with Spotify call to action over a dim concert-crowd hero.',
+        alt: "Concert Radar landing — 'Never miss a show from an artist you actually listen to.'",
         caption: 'Landing',
       },
       {
-        src: '/work/concert-radar/detail.jpg',
-        alt: 'Concert detail page (dark theme) for Sigrid at USF Verftet in Bergen, showing date, distance, venue, and Ticketmaster ticketing source on a near-black layout with Spotify-green accents.',
-        caption: 'Concert detail',
+        src: '/work/concert-radar/sigrid.jpg',
+        alt: 'Sigrid — a real artist the app surfaces, USF Verftet, Bergen',
+        caption: 'Sigrid · USF Verftet, Bergen',
+      },
+      {
+        src: '/work/concert-radar/aurora.jpg',
+        alt: 'Aurora — a real artist the app surfaces, Bergenhus Festning',
+        caption: 'Aurora · Bergenhus Festning',
       },
     ],
     sections: [
