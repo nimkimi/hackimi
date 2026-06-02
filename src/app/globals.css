@@ -7,36 +7,64 @@
     @apply antialiased;
   }
   body {
-    @apply selection:bg-light-accent/20 selection:text-light-primary dark:selection:bg-dark-accent/20 dark:selection:text-dark-primary;
+    @apply bg-base text-ink font-sans;
+  }
+  ::selection {
+    background: #c6ff3d;
+    color: #0e0e10;
   }
   a {
-    @apply underline-offset-4 hover:underline;
+    @apply no-underline;
   }
 }
 
 @layer components {
-  .card {
-    @apply rounded-xl border border-light-accent/20 dark:border-dark-accent/20 bg-white/60 dark:bg-black/20 backdrop-blur;
+  .mono-label {
+    @apply font-mono uppercase tracking-[0.12em] text-xs text-muted;
   }
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium transition-colors border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-light-accent/40 dark:focus-visible:ring-dark-accent/40;
+  .measure {
+    max-width: 62ch;
   }
-  .btn-outline {
-    @apply border-light-accent dark:border-dark-accent text-inherit;
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  .btn-outline:hover {
-    @apply bg-light-accent text-white;
+}
+
+/* Selected Work rows — hover interactions, fine pointers only.
+   Touch devices and reduced-motion (global backstop below) get a calm,
+   static list with no dimming or shifting. */
+@media (hover: hover) and (pointer: fine) {
+  .work-list:hover .work-row {
+    opacity: 0.34;
   }
-  .dark .btn-outline:hover {
-    @apply bg-dark-accent text-white;
+  .work-list:hover .work-row:hover {
+    opacity: 1;
   }
-  .btn-accent {
-    @apply bg-light-accent text-white border-light-accent dark:bg-dark-accent dark:text-white dark:border-dark-accent;
+  .work-row:hover .work-row__name,
+  .work-row:focus-visible .work-row__name {
+    transform: translateX(18px);
   }
-  .muted {
-    @apply text-light-secondary dark:text-dark-secondary;
+  .work-row:hover .work-row__name::after,
+  .work-row:focus-visible .work-row__name::after {
+    transform: scaleX(1);
   }
-  .safe-top {
-    padding-top: env(safe-area-inset-top);
+  .work-row:hover .work-row__preview,
+  .work-row:focus-visible .work-row__preview {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }

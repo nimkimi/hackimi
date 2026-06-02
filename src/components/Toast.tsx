@@ -58,34 +58,30 @@ export function Toast({ toast, onClose }: { toast: ToastState; onClose: () => vo
       aria-live={renderedToast.type === 'error' ? 'assertive' : 'polite'}
     >
       <div
-        className={`pointer-events-auto relative flex items-start gap-3 rounded-xl px-4 py-3 shadow-2xl ring-1 ring-black/5 dark:ring-white/10 backdrop-blur-xl bg-white/80 dark:bg-black/50 text-sm max-w-[92vw] sm:max-w-sm before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-l-xl ${
-          renderedToast.type === 'success' ? 'before:bg-light-accent dark:before:bg-dark-accent' : 'before:bg-red-500'
+        className={`pointer-events-auto relative flex items-start gap-3 overflow-hidden rounded-xl border border-white/10 bg-surface/95 px-4 py-3 text-sm shadow-2xl shadow-black/40 backdrop-blur-xl max-w-[92vw] sm:max-w-sm before:absolute before:inset-y-0 before:left-0 before:w-1 ${
+          renderedToast.type === 'success' ? 'before:bg-accent' : 'before:bg-red-500'
         }`}
       >
         <button
           aria-label="Dismiss"
-          className="absolute top-2.5 right-2.5 inline-flex h-6 w-6 items-center justify-center rounded-md text-xs/none opacity-60 hover:opacity-100 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-light-accent/40 dark:focus-visible:ring-dark-accent/40"
+          className="absolute top-2.5 right-2.5 inline-flex h-6 w-6 items-center justify-center rounded-md text-base/none text-muted transition-colors hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
           onClick={onClose}
         >
           ×
         </button>
         {renderedToast.type === 'success' ? (
-          <IconCircleCheckFilled
-            size={20}
-            className="shrink-0 text-light-accent dark:text-dark-accent"
-            aria-hidden="true"
-          />
+          <IconCircleCheckFilled size={20} className="shrink-0 text-accent" aria-hidden="true" />
         ) : (
           <IconAlertTriangleFilled size={20} className="shrink-0 text-red-500" aria-hidden="true" />
         )}
         <div className="pr-6 leading-5">
-          <p className="font-medium leading-5">{renderedToast.title}</p>
-          <p className="mt-0.5 text-[13px] muted leading-5">{renderedToast.desc}</p>
+          <p className="font-medium leading-5 text-ink">{renderedToast.title}</p>
+          <p className="mt-0.5 text-[13px] leading-5 text-muted">{renderedToast.desc}</p>
         </div>
         <span
           aria-hidden
-          className={`pointer-events-none absolute bottom-0 left-0 h-0.5 rounded-b-xl ${
-            renderedToast.type === 'success' ? 'bg-light-accent/70 dark:bg-dark-accent/70' : 'bg-red-500/80'
+          className={`pointer-events-none absolute bottom-0 left-0 h-0.5 ${
+            renderedToast.type === 'success' ? 'bg-accent/70' : 'bg-red-500/80'
           } animate-toast-progress`}
         />
       </div>

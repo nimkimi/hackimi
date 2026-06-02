@@ -2,21 +2,25 @@
 
 import { submitContact } from '@/app/contact/actions';
 import { initialContactState } from '@/app/contact/state';
-import AnimatedSection from '@/components/AnimatedSection';
 import { Toast, type ToastState } from '@/components/Toast';
-import { IconMail } from '@tabler/icons-react';
+import Reveal from '@/components/motion/Reveal';
 import Script from 'next/script';
 import { useActionState, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
 type Props = { siteKey: string };
 
+const FIELD_CLASS =
+  'w-full min-h-11 rounded-lg border border-white/15 bg-surface px-3.5 py-2.5 text-base text-ink placeholder:text-muted/60 transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50';
+
+const LABEL_CLASS = 'mono-label';
+
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <button
       type="submit"
-      className="btn btn-accent inline-flex items-center justify-center gap-2"
+      className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-base transition-colors hover:bg-accent-dim focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-base disabled:cursor-not-allowed disabled:opacity-70"
       disabled={pending}
       aria-busy={pending}
     >
@@ -25,12 +29,12 @@ function SubmitButton() {
           <span className="sr-only">Sending</span>
           <span
             aria-hidden="true"
-            className="h-4 w-4 animate-spin rounded-full border-2 border-white/50 border-t-white"
+            className="h-4 w-4 animate-spin rounded-full border-2 border-base/40 border-t-base"
           />
           <span aria-hidden="true">Sending…</span>
         </>
       ) : (
-        'Send'
+        'Send message'
       )}
     </button>
   );
@@ -39,7 +43,7 @@ function SubmitButton() {
 function FieldError({ id, errors }: { id: string; errors?: string[] }) {
   if (!errors || errors.length === 0) return null;
   return (
-    <p id={id} className="text-xs text-red-500">
+    <p id={id} className="text-xs text-red-400">
       {errors[0]}
     </p>
   );
@@ -52,7 +56,6 @@ function resetRecaptcha() {
 }
 
 export default function ContactClient({ siteKey }: Props) {
-  const formElementStyles = 'flex flex-col gap-1 w-full text-left';
   const formRef = useRef<HTMLFormElement | null>(null);
   const [toast, setToast] = useState<ToastState>(null);
   const [state, formAction, pending] = useActionState(submitContact, initialContactState);
@@ -77,104 +80,148 @@ export default function ContactClient({ siteKey }: Props) {
   const values = state.values;
 
   return (
-    <AnimatedSection>
+    <section className="py-12 sm:py-16">
       {siteKey ? <Script src="https://www.google.com/recaptcha/api.js" strategy="lazyOnload" /> : null}
-      <div className="max-w-4xl mx-auto text-center">
-        <h1 className="text-3xl sm:text-4xl font-bold mb-4 inline-flex items-center gap-3 leading-none">
-          <IconMail size={44} className="shrink-0" aria-hidden="true" />
-          <span>Contact me</span>
-        </h1>
-      </div>
-      <form
-        action={formAction}
-        ref={formRef}
-        className="flex flex-col gap-4 w-full max-w-lg mx-auto p-6 rounded-xl border border-light-accent/20 dark:border-dark-accent/20 bg-white/60 dark:bg-black/20 backdrop-blur"
-      >
-        {state.status !== 'idle' && state.message ? (
-          <div
-            role={state.status === 'error' ? 'alert' : 'status'}
-            className={`rounded-lg border px-3 py-2 text-sm ${
-              state.status === 'error'
-                ? 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-200'
-                : 'border-light-accent/40 bg-light-accent/10 text-light-primary dark:border-dark-accent/40 dark:bg-dark-accent/10 dark:text-dark-primary'
-            }`}
-          >
-            {state.message}
-          </div>
-        ) : null}
 
-        <fieldset disabled={pending} className="contents">
-          <span className={formElementStyles}>
-            <label htmlFor="name">Name</label>
-            <input
-              id="name"
-              name="name"
-              type="text"
-              key={`name-${values.name}`}
-              defaultValue={values.name}
-              className="w-full rounded-md border border-light-accent/30 dark:border-dark-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-light-accent/40 dark:focus:ring-dark-accent/40"
-              required
-              aria-invalid={fieldErrors.name ? 'true' : undefined}
-              aria-describedby={fieldErrors.name ? 'name-error' : undefined}
-            />
-            <FieldError id="name-error" errors={fieldErrors.name} />
-          </span>
-          <span className={formElementStyles}>
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              key={`email-${values.email}`}
-              defaultValue={values.email}
-              className="w-full rounded-md border border-light-accent/30 dark:border-dark-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-light-accent/40 dark:focus:ring-dark-accent/40"
-              required
-              aria-invalid={fieldErrors.email ? 'true' : undefined}
-              aria-describedby={fieldErrors.email ? 'email-error' : undefined}
-            />
-            <FieldError id="email-error" errors={fieldErrors.email} />
-          </span>
-          <span className={formElementStyles}>
-            <label htmlFor="subject">Subject</label>
-            <input
-              id="subject"
-              name="subject"
-              type="text"
-              key={`subject-${values.subject}`}
-              defaultValue={values.subject}
-              className="w-full rounded-md border border-light-accent/30 dark:border-dark-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-light-accent/40 dark:focus:ring-dark-accent/40"
-              required
-              aria-invalid={fieldErrors.subject ? 'true' : undefined}
-              aria-describedby={fieldErrors.subject ? 'subject-error' : undefined}
-            />
-            <FieldError id="subject-error" errors={fieldErrors.subject} />
-          </span>
-          <span className={formElementStyles}>
-            <label htmlFor="message">Message</label>
-            <textarea
-              id="message"
-              name="message"
-              key={`message-${values.message}`}
-              defaultValue={values.message}
-              className="min-h-[120px] w-full rounded-md border border-light-accent/30 dark:border-dark-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-light-accent/40 dark:focus:ring-dark-accent/40"
-              required
-              aria-invalid={fieldErrors.message ? 'true' : undefined}
-              aria-describedby={fieldErrors.message ? 'message-error' : undefined}
-            />
-            <FieldError id="message-error" errors={fieldErrors.message} />
-          </span>
-          {siteKey ? (
-            <div className="self-start">
-              <div className="g-recaptcha" data-sitekey={siteKey} />
+      <div className="grid grid-cols-1 gap-x-16 gap-y-12 lg:grid-cols-[1fr_minmax(0,32rem)]">
+        {/* Left — invitation */}
+        <header className="max-w-xl">
+          <Reveal>
+            <div className="mb-[clamp(1.25rem,4vh,2.25rem)] flex items-center gap-3">
+              <span aria-hidden className="h-px w-7 bg-accent" />
+              <span className="mono-label text-accent">Contact</span>
             </div>
-          ) : (
-            <div className="text-sm text-red-500">reCAPTCHA is not configured.</div>
-          )}
-          <SubmitButton />
-        </fieldset>
-      </form>
+          </Reveal>
+
+          <h1
+            className="font-display font-bold leading-[1.04] tracking-tight"
+            style={{ fontSize: 'clamp(2.25rem, 6vw, 4rem)' }}
+          >
+            <span className="block overflow-hidden">
+              <Reveal>Let’s build</Reveal>
+            </span>
+            <span className="block overflow-hidden">
+              <Reveal delay={0.06}>
+                something <span className="text-accent">good.</span>
+              </Reveal>
+            </span>
+          </h1>
+
+          <Reveal delay={0.12} className="mt-[clamp(1.5rem,5vh,2.5rem)]">
+            <p className="measure text-[clamp(1rem,2vw,1.1875rem)] leading-relaxed text-muted">
+              Open to frontend roles and collaborations. Have a question about my work, or a team I’d be a fit for?
+              Drop a line — I read everything and reply.
+            </p>
+          </Reveal>
+        </header>
+
+        {/* Right — form */}
+        <Reveal delay={0.1}>
+          <form
+            action={formAction}
+            ref={formRef}
+            className="flex w-full flex-col gap-5 rounded-2xl border border-white/10 bg-surface/40 p-6 sm:p-8"
+          >
+            {state.status !== 'idle' && state.message ? (
+              <div
+                role={state.status === 'error' ? 'alert' : 'status'}
+                className={`rounded-lg border px-3.5 py-2.5 text-sm ${
+                  state.status === 'error'
+                    ? 'border-red-500/40 bg-red-500/10 text-red-300'
+                    : 'border-accent/40 bg-accent/10 text-ink'
+                }`}
+              >
+                {state.message}
+              </div>
+            ) : null}
+
+            <fieldset disabled={pending} className="contents">
+              <div className="flex flex-col gap-2 text-left">
+                <label htmlFor="name" className={LABEL_CLASS}>
+                  Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  type="text"
+                  key={`name-${values.name}`}
+                  defaultValue={values.name}
+                  className={FIELD_CLASS}
+                  required
+                  aria-invalid={fieldErrors.name ? 'true' : undefined}
+                  aria-describedby={fieldErrors.name ? 'name-error' : undefined}
+                />
+                <FieldError id="name-error" errors={fieldErrors.name} />
+              </div>
+
+              <div className="flex flex-col gap-2 text-left">
+                <label htmlFor="email" className={LABEL_CLASS}>
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  key={`email-${values.email}`}
+                  defaultValue={values.email}
+                  className={FIELD_CLASS}
+                  required
+                  aria-invalid={fieldErrors.email ? 'true' : undefined}
+                  aria-describedby={fieldErrors.email ? 'email-error' : undefined}
+                />
+                <FieldError id="email-error" errors={fieldErrors.email} />
+              </div>
+
+              <div className="flex flex-col gap-2 text-left">
+                <label htmlFor="subject" className={LABEL_CLASS}>
+                  Subject
+                </label>
+                <input
+                  id="subject"
+                  name="subject"
+                  type="text"
+                  key={`subject-${values.subject}`}
+                  defaultValue={values.subject}
+                  className={FIELD_CLASS}
+                  required
+                  aria-invalid={fieldErrors.subject ? 'true' : undefined}
+                  aria-describedby={fieldErrors.subject ? 'subject-error' : undefined}
+                />
+                <FieldError id="subject-error" errors={fieldErrors.subject} />
+              </div>
+
+              <div className="flex flex-col gap-2 text-left">
+                <label htmlFor="message" className={LABEL_CLASS}>
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  key={`message-${values.message}`}
+                  defaultValue={values.message}
+                  className={`${FIELD_CLASS} min-h-[140px] resize-y`}
+                  required
+                  aria-invalid={fieldErrors.message ? 'true' : undefined}
+                  aria-describedby={fieldErrors.message ? 'message-error' : undefined}
+                />
+                <FieldError id="message-error" errors={fieldErrors.message} />
+              </div>
+
+              {siteKey ? (
+                <div className="self-start">
+                  <div className="g-recaptcha" data-sitekey={siteKey} />
+                </div>
+              ) : (
+                <div className="text-sm text-red-400">reCAPTCHA is not configured.</div>
+              )}
+
+              <SubmitButton />
+            </fieldset>
+          </form>
+        </Reveal>
+      </div>
 
       <Toast toast={toast} onClose={() => setToast(null)} />
-    </AnimatedSection>
+    </section>
   );
 }
