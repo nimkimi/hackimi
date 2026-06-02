@@ -237,7 +237,6 @@ export default function Preloader() {
           };
 
           let centered: Centered = computeCentered();
-          let apertureOrigin = { x: 0, y: 0 };
 
           const sizeArrivalSvg = () => {
             const vw = window.innerWidth;
@@ -321,7 +320,8 @@ export default function Preloader() {
 
             const originX = c.x + 60 * c.scale;
             const originY = c.y + 60 * c.scale;
-            apertureOrigin = { x: originX, y: originY };
+            // Set the scale pivot ONCE here (not per frame) — the open tween then
+            // only animates `scale`, reusing this origin.
             [apertureG, rimG].forEach((g) => {
               gsap.set(g, { scale: 1, svgOrigin: `${originX} ${originY}` });
             });
@@ -355,9 +355,10 @@ export default function Preloader() {
             opacity: 1,
           });
 
-          // Hero name hidden behind its mask; period hidden; nav logo hidden.
+          // Hero name hidden behind its mask; nav logo hidden. The period is NOT
+          // hidden separately — it rides with the name line so the reveal is one
+          // clean motion (no "name without its period" gap).
           gsap.set(heroLines, { yPercent: 110 });
-          if (period) gsap.set(period, { opacity: 0, scale: 0.2 });
           if (navLogo) gsap.set(navLogo, { opacity: 0, scale: 0.7 });
           // Centre the spark on its own coordinate (GSAP owns the transform,
           // so we can't rely on a CSS translate -50% — use xPercent/yPercent).
@@ -449,33 +450,36 @@ export default function Preloader() {
             gsap.set(arrival, { pointerEvents: 'none' });
           }, 1.2);
 
+          // Open the aperture: scale the NH hole up only a MODEST amount (cheap
+          // raster; svgOrigin was set once in placeAperture), then let a GPU-cheap
+          // opacity dissolve finish the reveal. Scaling a masked + filtered group
+          // all the way to fill the screen is what made v1 janky — this keeps the
+          // per-frame raster small and hands the rest to a composited fade.
           const grow = { k: 1 };
           tl.to(
             grow,
             {
-              k: 16,
-              duration: 0.75,
-              ease: 'power2.out',
+              k: 5.5,
+              duration: 0.55,
+              ease: 'power3.out',
               onUpdate: () => {
-                const o = `${apertureOrigin.x} ${apertureOrigin.y}`;
-                gsap.set([apertureG, rimG], { scale: grow.k, svgOrigin: o });
+                gsap.set([apertureG, rimG], { scale: grow.k });
               },
             },
             1.2,
           );
 
-          // Fade the lime rim out near the end so it doesn't linger as a hard edge.
+          // The dark overlay dissolves to complete the reveal — overlaps the scale
+          // so it reads as "the mark opens and melts into the page".
           tl.to(
             [rimN, rimH],
-            { opacity: 0, duration: 0.35, ease: 'power1.out' },
-            1.62,
+            { opacity: 0, duration: 0.3, ease: 'power1.out' },
+            1.5,
           );
-
-          // Once the holes have swallowed the screen, drop the overlay svg.
           tl.to(
             svg,
-            { opacity: 0, duration: 0.18, ease: 'power1.out' },
-            1.82,
+            { opacity: 0, duration: 0.5, ease: 'power2.inOut' },
+            1.5,
           );
           tl.add(() => {
             gsap.set(arrival, { display: 'none' });
@@ -488,31 +492,42 @@ export default function Preloader() {
             1.6,
           );
 
-          // The parked spark flies into the name's period and lands as the
-          // lime period. Robust: guarded; if the period is missing it simply
-          // reveals with the name (yPercent slide already shows it).
+          // Flourish: the parked spark glides into the name's period and lands
+          // with a small lime pulse. The period is already visible (it rode in
+          // with the name), so this never leaves a "missing period" gap. Fully
+          // guarded — if the period can't be measured, the spark just fades out.
           if (period) {
             tl.add(() => {
               const rp = period.getBoundingClientRect();
+              if (!rp.width && !rp.height) {
+                gsap.to(spark, { opacity: 0, duration: 0.2 });
+                return;
+              }
               const px = rp.left + rp.width * 0.5;
-              const py = rp.top + rp.height * 0.8;
+              const py = rp.top + rp.height * 0.55;
               gsap.set(spark, { opacity: 1 });
               gsap.to(spark, {
                 x: px,
                 y: py,
-                duration: 0.26,
-                ease: 'power2.in',
+                duration: 0.32,
+                ease: 'power2.inOut',
                 onComplete: () => {
-                  gsap.set(spark, { opacity: 0 });
-                  gsap.to(period, {
-                    opacity: 1,
-                    scale: 1,
-                    duration: 0.5,
-                    ease: 'back.out(2.4)',
-                  });
+                  gsap.to(spark, { opacity: 0, duration: 0.18 });
+                  gsap.fromTo(
+                    period,
+                    { scale: 1 },
+                    {
+                      scale: 1.3,
+                      duration: 0.15,
+                      yoyo: true,
+                      repeat: 1,
+                      transformOrigin: 'center 80%',
+                      ease: 'power2.out',
+                    },
+                  );
                 },
               });
-            }, 1.95);
+            }, 2.0);
           }
 
           // The small NH settles into the nav logo slot as the persistent logo.
@@ -633,33 +648,28 @@ export default function Preloader() {
 
         {/* VISIBLE lime rim/glow NH, scaled in lockstep with the aperture. */}
         <g ref={rimGRef}>
+          {/* Lime rim on the opening edge. No drop-shadow filter — recomputing a
+              filter on a scaling path every frame is a major jank source; a plain
+              lime stroke scales cleanly. */}
           <path
             ref={rimNRef}
             d={NH.N}
             fill="none"
             stroke={ACCENT}
-            strokeWidth={3}
+            strokeWidth={3.5}
             strokeLinecap="round"
             strokeLinejoin="round"
             opacity={0}
-            style={{
-              filter:
-                'drop-shadow(0 0 6px rgba(198,255,61,.65)) drop-shadow(0 0 16px rgba(198,255,61,.35))',
-            }}
           />
           <path
             ref={rimHRef}
             d={NH.H}
             fill="none"
             stroke={ACCENT}
-            strokeWidth={3}
+            strokeWidth={3.5}
             strokeLinecap="round"
             strokeLinejoin="round"
             opacity={0}
-            style={{
-              filter:
-                'drop-shadow(0 0 6px rgba(198,255,61,.65)) drop-shadow(0 0 16px rgba(198,255,61,.35))',
-            }}
           />
         </g>
       </svg>

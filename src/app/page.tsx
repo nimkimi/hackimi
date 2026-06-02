@@ -31,7 +31,7 @@ export default function Home() {
           <span className="block overflow-hidden">
             <span data-hero-line className="block will-change-transform">
               Nima Hakimi
-              <span id="name-period" className="text-accent">
+              <span id="name-period" className="inline-block text-accent">
                 .
               </span>
             </span>
