@@ -55,6 +55,31 @@
   }
 }
 
+/* Selected Work rows — hover interactions, fine pointers only.
+   Touch devices and reduced-motion (global backstop below) get a calm,
+   static list with no dimming or shifting. */
+@media (hover: hover) and (pointer: fine) {
+  .work-list:hover .work-row {
+    opacity: 0.34;
+  }
+  .work-list:hover .work-row:hover {
+    opacity: 1;
+  }
+  .work-row:hover .work-row__name,
+  .work-row:focus-visible .work-row__name {
+    transform: translateX(18px);
+  }
+  .work-row:hover .work-row__name::after,
+  .work-row:focus-visible .work-row__name::after {
+    transform: scaleX(1);
+  }
+  .work-row:hover .work-row__preview,
+  .work-row:focus-visible .work-row__preview {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -2,6 +2,8 @@ import { buildPageMetadata } from '@/lib/metadata';
 import Reveal from '@/components/motion/Reveal';
 import MagneticButton from '@/components/motion/MagneticButton';
 import UnderlineLink from '@/components/motion/UnderlineLink';
+import WorkRow from '@/components/work/WorkRow';
+import work from '@/data/work';
 
 export const metadata = buildPageMetadata({
   title: 'Portfolio',
@@ -77,10 +79,31 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Anchor placeholders — filled by later tasks */}
+      {/* Selected Work */}
       <section id="work" className="scroll-mt-24 py-24">
-        <h2 className="mono-label">Selected Work</h2>
+        <Reveal>
+          <h2 className="mono-label">Selected Work</h2>
+        </Reveal>
+
+        <div className="work-list mt-2 border-t border-white/10">
+          {work.map((c, index) => (
+            <Reveal key={c.slug} delay={index * 0.05}>
+              <WorkRow c={c} index={index} />
+            </Reveal>
+          ))}
+        </div>
+
+        <div className="mt-12">
+          <UnderlineLink
+            href="/work"
+            className="font-mono text-xs uppercase tracking-[0.12em]"
+          >
+            All work →
+          </UnderlineLink>
+        </div>
       </section>
+
+      {/* Anchor placeholders — filled by later tasks */}
       <section id="playground" className="scroll-mt-24 py-24">
         <h2 className="mono-label">Playground</h2>
       </section>
