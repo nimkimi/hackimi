@@ -1,3 +1,5 @@
+> **SUPERSEDED (2026-06-02):** This plan was for the abandoned refined-minimal direction. The live plan is `2026-06-02-portfolio-v3-build.md` (design-forward developer + monogram arrival).
+
 # Portfolio Redesign Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
