@@ -108,17 +108,17 @@ const work: CaseStudy[] = [
     images: [
       {
         src: '/work/concert-radar/dashboard.jpg',
-        alt: 'Concert Radar dashboard with oversized type reading “23 upcoming shows near Bergen”, summary stats, and source filters.',
+        alt: 'Concert Radar dashboard with oversized type reading “6 upcoming shows near Bergen”, an up-next Sigrid concert card, and source filters.',
         caption: 'Dashboard',
       },
       {
         src: '/work/concert-radar/landing.jpg',
-        alt: 'Concert Radar marketing landing page introducing the Spotify-connected concert discovery app.',
+        alt: 'Concert Radar landing — “Never miss a show from an artist you actually listen to.” with a Connect with Spotify call to action.',
         caption: 'Landing',
       },
       {
         src: '/work/concert-radar/detail.jpg',
-        alt: 'A concert detail page showing the artist, venue, date, and ticketing sources for a single show.',
+        alt: 'Concert detail page for Sigrid at USF Verftet in Bergen, showing date, distance, venue, and Ticketmaster ticketing source.',
         caption: 'Concert detail',
       },
     ],
