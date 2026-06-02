@@ -1,3 +1,4 @@
+import Preloader from '@/components/intro/Preloader';
 import SiteNav from '@/components/layout/SiteNav';
 import SmoothScroll from '@/components/motion/SmoothScroll';
 import './globals.css';
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${clashDisplay.variable} ${satoshi.variable} ${geistMono.variable}`}
     >
       <body className="min-h-screen bg-base text-ink font-sans">
+        <Preloader />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
