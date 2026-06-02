@@ -30,7 +30,10 @@ export default function Home() {
         >
           <span className="block overflow-hidden">
             <span data-hero-line className="block will-change-transform">
-              Nima Hakimi<span className="text-accent">.</span>
+              Nima Hakimi
+              <span id="name-period" className="text-accent">
+                .
+              </span>
             </span>
           </span>
         </h1>
