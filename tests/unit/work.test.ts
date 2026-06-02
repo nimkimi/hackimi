@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import work, { type CaseStudy } from '../src/data/work';
+import work, { type CaseStudy } from '../../src/data/work';
 
 describe('work data', () => {
   it('has the three flagship slugs', () => {

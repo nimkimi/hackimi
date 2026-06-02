@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { shouldPlayIntro } from '../src/lib/intro';
+import { shouldPlayIntro } from '../../src/lib/intro';
 
 describe('shouldPlayIntro', () => {
   it('plays on every load when motion is allowed', () => {
