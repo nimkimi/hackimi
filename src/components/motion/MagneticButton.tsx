@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import {
   motion,
   useMotionValue,
@@ -8,6 +9,20 @@ import {
   useReducedMotion,
 } from 'motion/react';
 import type { MouseEvent, ReactNode } from 'react';
+
+// A motion-enabled next/link so internal navigation stays client-side (no full
+// reload, no re-firing the Preloader) while still receiving the magnetic spring
+// transform via `style`.
+const MotionLink = motion.create(Link);
+
+/**
+ * Internal app routes (`/contact`, `/about`) navigate client-side via next/link.
+ * Hash-only links (`#work`) and external links (`http`, `mailto`, `tel`) stay as
+ * plain anchors. A `/#work`-style link is treated as a hash link, not a route.
+ */
+function isInternalRoute(href: string): boolean {
+  return href.startsWith('/') && !href.startsWith('/#');
+}
 
 type MagneticButtonProps = {
   children: ReactNode;
@@ -26,8 +41,9 @@ const BASE_CLASS =
  *
  * The magnetic effect is disabled for touch devices (`pointer: coarse`) and
  * for users who request reduced motion — in those cases a plain, statically
- * styled element is rendered. Renders an `<a>` when `href` is provided,
- * otherwise a `<button>`.
+ * styled element is rendered. With `href`, renders a next/link `<Link>` for
+ * internal app routes (client-side nav, prefetch) and a plain `<a>` for hash
+ * and external links; without `href`, a `<button>`.
  */
 export default function MagneticButton({
   children,
@@ -63,6 +79,13 @@ export default function MagneticButton({
   // true after mount on a fine-pointer device.
   if (reduce || !magneticEnabled) {
     if (href) {
+      if (isInternalRoute(href)) {
+        return (
+          <Link href={href} onClick={onClick} className={classes}>
+            {children}
+          </Link>
+        );
+      }
       return (
         <a href={href} onClick={onClick} className={classes}>
           {children}
@@ -104,6 +127,15 @@ export default function MagneticButton({
   };
 
   if (href) {
+    // Internal routes navigate client-side; the magnetic spring is applied to
+    // the underlying <a> next/link renders, so the effect still works.
+    if (isInternalRoute(href)) {
+      return (
+        <MotionLink href={href} {...shared}>
+          {children}
+        </MotionLink>
+      );
+    }
     return (
       <motion.a href={href} {...shared}>
         {children}

@@ -75,7 +75,6 @@ export default function Reveal({
   return (
     <div ref={ref} className={`overflow-hidden ${className ?? ''}`}>
       <div
-        className="will-change-transform"
         style={{
           transform: shown ? 'translateY(0)' : 'translateY(110%)',
           transition: `transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`,

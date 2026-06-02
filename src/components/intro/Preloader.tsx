@@ -111,9 +111,15 @@ export default function Preloader() {
     // Plays on every full page load / refresh; skipped only under reduced motion.
     const play = shouldPlayIntro(reduce);
 
+    // Tracks whether the intro reached its final resting frame, so the unmount
+    // cleanup knows whether it must restore that frame itself (Fast Refresh /
+    // unmount mid-play).
+    let completed = false;
+
     // Restores the final, visible resting frame and tears down the overlay.
     // Safe to call from the skip path, on completion, or from error handling.
     const finish = () => {
+      completed = true;
       const heroLines =
         document.querySelectorAll<HTMLElement>('[data-hero-line]');
       const navSlot = document.querySelector<HTMLElement>('#nav-logo-slot');
@@ -131,6 +137,10 @@ export default function Preloader() {
     }
 
     // PLAY PATH --------------------------------------------------------------
+    // Capture the overlay node now so the cleanup doesn't read a possibly-stale
+    // ref (the element is rendered while `show` is true and is the node we must
+    // hide on an interrupted unmount).
+    const arrivalEl = arrivalRef.current;
     let tl: gsap.core.Timeline | null = null;
     let resizeHandler: (() => void) | null = null;
     let resizeTimer: ReturnType<typeof setTimeout> | undefined;
@@ -556,6 +566,22 @@ export default function Preloader() {
       if (resizeHandler) window.removeEventListener('resize', resizeHandler);
       clearTimeout(resizeTimer);
       tl?.kill();
+
+      // If we're torn down mid-play (Fast Refresh, navigation), the timeline
+      // never reached `finish`, so the hero/nav/period are still parked in their
+      // pre-reveal transforms and the overlay still covers the page. Clear the
+      // inline transforms so they're left VISIBLE and hide the overlay. We do
+      // NOT call setShow here — the component is unmounting. All lookups guarded.
+      if (!completed) {
+        const heroLines =
+          document.querySelectorAll<HTMLElement>('[data-hero-line]');
+        const navSlot = document.querySelector<HTMLElement>('#nav-logo-slot');
+        const period = document.querySelector<HTMLElement>('#name-period');
+        if (heroLines.length) gsap.set(heroLines, { clearProps: 'transform' });
+        if (navSlot) gsap.set(navSlot, { clearProps: 'opacity,transform' });
+        if (period) gsap.set(period, { clearProps: 'opacity,transform' });
+        if (arrivalEl) gsap.set(arrivalEl, { display: 'none' });
+      }
     };
     // Run once on mount.
     // eslint-disable-next-line react-hooks/exhaustive-deps

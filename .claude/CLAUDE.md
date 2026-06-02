@@ -6,9 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a **developer portfolio** whose primary audience is **recruiters and hiring managers**. Optimize every decision for demonstrating engineering skill, depth of work, and professional credibility — not for freelance/client conversion.
 
-**Design direction (APPROVED 2026-06-02, validated via prototype `mockups/v3/index.html`): a design-forward developer portfolio with a signature ~2s monogram arrival animation, mobile-first.** Nima is a **frontend developer with a designer's eye** — positioned as a developer, NOT a designer. The site has designer-grade art direction (near-black + acid-lime `#C6FF3D`, Clash Display / Satoshi / Geist Mono) and a signature ~2-second arrival: an NH monogram strokes on → flies into the nav as the logo → name reveals behind masks → one acid-lime pop (once per session; instant under `prefers-reduced-motion`). Purposeful motion only (Lenis scroll, masked reveals, magnetic CTA). Structure: hero, Selected Work rows → case studies, a live-component Playground (engineering proof), About, contact. **Hard requirements:** beautiful on BOTH mobile and desktop (explicitly verified), full a11y (reduced-motion, keyboard, contrast). See the spec's "FINAL APPROVED DIRECTION" section for the build detail. Adds GSAP + Lenis.
+**Design direction (APPROVED 2026-06-02, originally validated via a now-removed `mockups/v3` prototype): a design-forward developer portfolio with a signature ~2s monogram arrival animation, mobile-first.** Nima is a **frontend developer with a designer's eye** — positioned as a developer, NOT a designer. The site has designer-grade art direction (near-black + acid-lime `#C6FF3D`, Clash Display / Satoshi / Geist Mono) and a signature ~2-second arrival: an NH monogram strokes on → flies into the nav as the logo → name reveals behind masks → one acid-lime pop (once per session; instant under `prefers-reduced-motion`). Purposeful motion only (Lenis scroll, masked reveals, magnetic CTA). Structure: hero, Selected Work rows → case studies, a live-component Playground (engineering proof), About, contact. **Hard requirements:** beautiful on BOTH mobile and desktop (explicitly verified), full a11y (reduced-motion, keyboard, contrast). See the spec's "FINAL APPROVED DIRECTION" section for the build detail. Adds GSAP + Lenis.
 
-Abandoned explorations (all built + rejected, kept under `mockups/` for history only): refined-minimal multi-page (`variant-a`) & long-scroll (`variant-b`) — too understated; high-craft editorial (`v2`) — too quiet/generic; interactive 3D galaxy (`cosmos`) — felt random/gimmicky. The react-three-fiber/3D direction is dead. The approved prototype is `mockups/v3/`.
+Abandoned explorations (all built + rejected, since deleted — the `mockups/` prototypes no longer exist): refined-minimal multi-page (`variant-a`) & long-scroll (`variant-b`) — too understated; high-craft editorial (`v2`) — too quiet/generic; interactive 3D galaxy (`cosmos`) — felt random/gimmicky. The react-three-fiber/3D direction is dead. The approved direction was the former `v3` prototype, now realized in the live app.
 
 Note: earlier `docs/features/` specs and `docs/ROADMAP.md` were written around a freelance/small-business-client framing. That direction is **abandoned** — treat those documents as rough historical notes only, not as commitments.
 
@@ -18,13 +18,14 @@ Note: earlier `docs/features/` specs and `docs/ROADMAP.md` were written around a
 npm run dev        # Start dev server at localhost:3000
 npm run build      # Production build
 npm run lint       # ESLint via next lint
+npm run test       # Vitest (vitest run) — tests in tests/
 npm run format     # Prettier write (ts, tsx, js, jsx, md, css, yaml)
 npm run check      # Prettier check (CI)
 ```
 
 Node version is pinned to `22.4.0` (see `.nvmrc`).
 
-There are no tests in this project.
+Tests run with Vitest: `npm run test` (`vitest run`). Test files live in `tests/`.
 
 ## Environment Variables
 
@@ -59,7 +60,7 @@ In development, reCAPTCHA is bypassed when `RECAPTCHA_SECRET_KEY` is absent.
 
 **Data layer** — static content (projects list, about info) lives in `src/data/`. Add new projects to `src/data/projects.ts`.
 
-**Styling** — Tailwind with a custom two-theme palette (`light.*` / `dark.*` color tokens) defined in `tailwind.config.ts`. Dark mode is driven by `prefers-color-scheme` (`darkMode: 'media'`). Reusable component classes (`.card`, `.btn`, `.btn-accent`, `.btn-outline`, `.muted`) are defined as Tailwind `@layer components` in `globals.css`.
+**Styling** — Tailwind with a single dark color scheme (no light/dark theming, no `darkMode` config). The palette is a flat set of tokens in `tailwind.config.ts`: `base` (`#0E0E10`), `surface`, `ink`, `muted`, `accent` (`#C6FF3D`), `accent-dim`. The old reusable component classes (`.card`/`.btn`/`.btn-accent`/`.btn-outline`/`.muted`) and the two-theme palette have been removed. The current helper classes in `globals.css` (`@layer components`) are `.mono-label` (mono uppercase tracked label), `.measure` (62ch max-width), and `.grain` (fixed noise overlay).
 
 **Server-only modules** — `src/lib/email.ts` and `src/lib/captcha.ts` both import `'server-only'` and must never be imported from client components.
 
