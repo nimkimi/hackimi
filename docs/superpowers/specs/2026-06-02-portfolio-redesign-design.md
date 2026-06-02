@@ -1,14 +1,29 @@
 # Portfolio Redesign — Design Spec
 
 **Date:** 2026-06-02
-**Status:** SUPERSEDED below — see "Direction Change" (2026-06-02). Original spec retained for history.
+**Status:** SUPERSEDED — see the LATEST "Direction Change" immediately below. Earlier sections retained for history only.
 **Repo:** `projects/private/hackimi`
 
 ---
 
-## ⚠️ Direction Change (2026-06-02) — "Developer Cosmos"
+## ⚠️ Direction Change #2 (2026-06-02) — "Designer × Developer" + signature arrival animation (CURRENT)
 
-After reviewing mockups, the refined-minimal/editorial direction and the A/B (multi-page vs long-scroll) structure question below were **rejected** as too understated and generic. The locked direction is now:
+The interactive 3D "Developer Cosmos" below was also **rejected** ("felt random / gimmicky / not me"). The key realization: the client is a **developer AND a designer** (design-engineer hybrid), so the site should read like a strong **designer's portfolio backed by developer substance** — expressive, art-directed, slick color, with **purposeful** motion (nothing random/decorative).
+
+**Current locked direction:**
+- A **design-forward "designer × developer" portfolio**: designer-grade typography, color, and layout creativity + real engineering credibility (the three flagship case studies).
+- A signature **~2-second arrival/intro animation** on first load that creates a positive, uplifting feeling (e.g. masked text reveal / curtain wipe / monogram draw — TBD from research). Once per session; `prefers-reduced-motion` → instant. Mobile-first.
+- Motion is expressive but INTENTIONAL — every element earns its place.
+- Reduced-motion fallback mandatory (a11y specialist).
+- Concrete art direction, intro concept, palette, and structure are being finalized from a design-portfolio research pass + a built prototype.
+
+Everything below (Direction Change #1 "Developer Cosmos" and the original refined-minimal spec) is **historical/abandoned**. Still carried forward: recruiter audience, the three flagships (Be My Guide [In progress], Concert Radar, NAV event-registration), typed `work.ts` data, reuse of the existing contact server-action, dedicated case pages.
+
+---
+
+## ⚠️ Direction Change #1 (2026-06-02) — "Developer Cosmos" (ABANDONED)
+
+After reviewing mockups, the refined-minimal/editorial direction and the A/B (multi-page vs long-scroll) structure question below were **rejected** as too understated and generic. This direction was then ALSO abandoned (see Direction Change #2 above).
 
 **An immersive, bold, interactive 3D ("Developer Cosmos"), mobile-first.**
 
