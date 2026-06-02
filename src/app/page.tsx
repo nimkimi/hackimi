@@ -5,6 +5,7 @@ import UnderlineLink from '@/components/motion/UnderlineLink';
 import WorkRow from '@/components/work/WorkRow';
 import PlaygroundSection from '@/components/playground/PlaygroundSection';
 import work from '@/data/work';
+import { SITE_EMAIL, SITE_SOCIAL_LINKS } from '@/lib/site';
 
 export const metadata = buildPageMetadata({
   title: 'Portfolio',
@@ -93,9 +94,44 @@ export default function Home() {
         <PlaygroundSection />
       </section>
 
-      {/* Anchor placeholders — filled by later tasks */}
-      <section id="contact" className="scroll-mt-24 py-24">
-        <h2 className="mono-label">Get in touch</h2>
+      {/* Contact — big-type closing moment */}
+      <section id="contact" className="scroll-mt-24 border-t border-white/10 py-24">
+        <Reveal>
+          <h2 className="mono-label text-accent">Open to frontend roles</h2>
+        </Reveal>
+
+        <h3
+          className="mt-6 font-display font-bold leading-[1.02] tracking-tight"
+          style={{ fontSize: 'clamp(2.75rem, 11vw, 8rem)' }}
+        >
+          <span className="block overflow-hidden">
+            <Reveal>Let’s talk.</Reveal>
+          </span>
+        </h3>
+
+        <Reveal delay={0.1} className="mt-[clamp(1.5rem,5vh,2.5rem)]">
+          <p className="measure text-[clamp(1rem,2.1vw,1.3125rem)] leading-relaxed text-muted">
+            Looking for a frontend developer who sweats the details? I’m{' '}
+            <span className="text-ink">open to new opportunities</span> — let’s get into it.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.2} className="mt-[clamp(2rem,7vh,3.5rem)]">
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+            <MagneticButton href="/contact">Start a conversation</MagneticButton>
+            <UnderlineLink href={`mailto:${SITE_EMAIL}`} className="text-muted">
+              {SITE_EMAIL}
+            </UnderlineLink>
+            <UnderlineLink
+              href={SITE_SOCIAL_LINKS.github}
+              target="_blank"
+              rel="noreferrer"
+              className="text-muted"
+            >
+              GitHub
+            </UnderlineLink>
+          </div>
+        </Reveal>
       </section>
     </>
   );

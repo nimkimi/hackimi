@@ -1,223 +1,264 @@
-import AnimatedSection from '@/components/AnimatedSection';
 import about from '@/data/about';
 import { buildPageMetadata } from '@/lib/metadata';
-import Image from 'next/image';
-import Link from 'next/link';
-import { IconBrandGithub, IconBrandLinkedin, IconDownload } from '@tabler/icons-react';
+import { SITE_EMAIL } from '@/lib/site';
+import Reveal from '@/components/motion/Reveal';
+import UnderlineLink from '@/components/motion/UnderlineLink';
+import MagneticButton from '@/components/motion/MagneticButton';
 
 export const metadata = buildPageMetadata({
   title: 'About',
-  description: 'Learn about the experience, education, and skills of frontend developer Nima Hakimi based in Oslo.',
+  description:
+    'Nima Hakimi — frontend developer with a designer’s eye, building accessible, expressive web interfaces. Experience, education, and skills.',
   path: '/about',
 });
 
+/** Small mono-labelled section header with a hairline rule beneath it. */
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <Reveal>
+      <h2 className="mono-label">{children}</h2>
+    </Reveal>
+  );
+}
+
 export default function AboutPage() {
   return (
-    <AnimatedSection>
-      <article className="space-y-10 max-w-4xl mx-auto">
-        <header className="space-y-2 text-center animate-fade-in-up" style={{ animationDelay: '40ms' }}>
-          <h1 className="text-3xl sm:text-4xl font-bold">About</h1>
-          <p className="muted max-w-2xl mx-auto">A concise overview of my background, experience, and skills.</p>
-        </header>
+    <article className="py-12 sm:py-16">
+      {/* Intro — developer-first identity, design taste as the edge */}
+      <header className="max-w-5xl">
+        <Reveal>
+          <div className="mb-[clamp(1.25rem,4vh,2.25rem)] flex items-center gap-3">
+            <span aria-hidden className="h-px w-7 bg-accent" />
+            <span className="mono-label text-accent">About</span>
+          </div>
+        </Reveal>
 
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Profile</h2>
-          <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
-            <div
-              className="w-32 h-32 relative rounded-full overflow-hidden flex-shrink-0 animate-fade-in-up"
-              style={{ animationDelay: '60ms' }}
+        <h1
+          className="font-display font-bold leading-[1.04] tracking-tight"
+          style={{ fontSize: 'clamp(2.25rem, 6.5vw, 4.5rem)' }}
+        >
+          <span className="block overflow-hidden">
+            <Reveal>I’m a frontend developer</Reveal>
+          </span>
+          <span className="block overflow-hidden">
+            <Reveal delay={0.06}>
+              with a designer’s <span className="text-accent">eye.</span>
+            </Reveal>
+          </span>
+        </h1>
+
+        <Reveal delay={0.12} className="mt-[clamp(1.5rem,5vh,2.5rem)]">
+          <p className="measure text-[clamp(1rem,2vw,1.25rem)] leading-relaxed text-muted">
+            I build <span className="text-ink">accessible</span>, <span className="text-ink">expressive</span>{' '}
+            interfaces with React, TypeScript and Kotlin. Engineering comes first — but a feel for typography, motion
+            and detail is the edge that makes the work land. Currently building platform frontend at{' '}
+            <span className="text-ink">NAV</span>, based in {about.location}.
+          </p>
+        </Reveal>
+
+        <Reveal delay={0.2} className="mt-[clamp(1.75rem,6vh,2.75rem)]">
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+            <MagneticButton href="/contact">Get in touch</MagneticButton>
+            {about.profiles.map((profile) => (
+              <UnderlineLink
+                key={profile.platform}
+                href={profile.url}
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-xs uppercase tracking-[0.12em] text-muted"
+              >
+                {profile.platform}
+              </UnderlineLink>
+            ))}
+            <UnderlineLink
+              href="/cv.pdf"
+              className="font-mono text-xs uppercase tracking-[0.12em] text-muted"
             >
-              <Image
-                src={about.photo}
-                alt={about.name}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 33vw"
-                priority
-              />
-            </div>
-            <div className="space-y-3">
-              <div className="animate-fade-in-up" style={{ animationDelay: '120ms' }}>
-                <h3 className="text-lg font-medium">{about.name}</h3>
-                <p className="text-sm text-muted dark:text-muted">{about.location}</p>
-              </div>
-              <p className="animate-fade-in-up leading-relaxed max-w-3xl" style={{ animationDelay: '160ms' }}>
-                {about.summary}
-              </p>
-              <div className="animate-fade-in-up flex flex-wrap gap-3 pt-2" style={{ animationDelay: '200ms' }}>
-                {about.profiles.map((profile) => (
-                  <a
-                    key={profile.platform}
-                    href={profile.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-md border border-accent/30 dark:border-accent/30 hover:bg-accent/10 dark:hover:bg-accent/10 transition-colors"
-                  >
-                    {profile.platform === 'GitHub' ? (
-                      <IconBrandGithub size={18} className="shrink-0" aria-hidden="true" />
-                    ) : (
-                      <IconBrandLinkedin size={18} className="shrink-0" aria-hidden="true" />
-                    )}
-                    <span className="leading-none">{profile.platform}</span>
-                  </a>
-                ))}
-                <a
-                  href="/cv.pdf"
-                  download
-                  className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-md border border-accent/30 dark:border-accent/30 hover:bg-accent/10 dark:hover:bg-accent/10 transition-colors"
-                >
-                  <IconDownload size={18} className="shrink-0" aria-hidden="true" />
-                  <span className="leading-none">Download CV</span>
-                </a>
-              </div>
-            </div>
+              CV ↓
+            </UnderlineLink>
           </div>
-        </section>
+        </Reveal>
+      </header>
 
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Experiences</h2>
-          <ul className="relative space-y-6 before:absolute before:left-4 before:top-0 before:h-full before:w-px before:bg-accent/30 dark:before:bg-accent/30">
-            {about.experience.map((exp, i) => (
-              <li
-                key={`${exp.company}-${exp.title}`}
-                className="relative ml-10 rounded-lg border border-accent/20 dark:border-accent/20 p-4 animate-fade-in-up"
-                style={{ animationDelay: `${i * 80}ms` }}
-              >
-                <span className="absolute -left-6 top-4 h-3 w-3 rounded-full bg-accent dark:bg-accent shadow" />
-                <div className="flex items-center justify-between gap-4 flex-wrap">
-                  <h3 className="font-medium">
+      {/* Experience — hairline-separated rows */}
+      <section className="mt-[clamp(4rem,12vh,7rem)]">
+        <SectionLabel>Experience</SectionLabel>
+
+        <div className="mt-6 border-t border-white/10">
+          {about.experience.map((exp, i) => (
+            <Reveal key={`${exp.company}-${exp.title}`} delay={i * 0.04}>
+              <div className="grid grid-cols-1 gap-y-3 border-b border-white/10 py-7 md:grid-cols-[10rem_1fr] md:gap-x-8">
+                <div className="flex flex-col gap-1">
+                  <span className="font-mono text-xs tabular-nums tracking-tight text-muted">{exp.period}</span>
+                  {exp.location && (
+                    <span className="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-muted/70">
+                      {exp.location}
+                    </span>
+                  )}
+                </div>
+
+                <div>
+                  <h3 className="font-display text-xl font-semibold leading-snug sm:text-2xl">
                     {exp.title}
-                    {exp.company ? ` — ${exp.company}` : ''}
+                    {exp.company ? (
+                      <>
+                        {' '}
+                        <span className="text-muted">@</span> {exp.company}
+                      </>
+                    ) : null}
                   </h3>
-                  <span className="text-sm text-muted dark:text-muted">{exp.period}</span>
-                </div>
-                {exp.location && (
-                  <p className="text-sm text-muted dark:text-muted mt-1">{exp.location}</p>
-                )}
-                <ul className="mt-2 space-y-1">
-                  {exp.details.map((detail, j) => (
-                    <li key={j} className="text-sm ml-4 list-disc text-muted dark:text-muted">
-                      {detail}
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="space-y-4">
-          <h2 className="text-xl font-semibold">Education</h2>
-          <ul className="space-y-3">
-            {about.education.map((edu, i) => (
-              <li
-                key={`${edu.institution}-${edu.degree}`}
-                className="rounded-lg border border-accent/20 dark:border-accent/20 p-4 animate-fade-in-up"
-                style={{ animationDelay: `${i * 70}ms` }}
-              >
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <h3 className="font-medium">
-                    {edu.degree} — {edu.institution}
-                  </h3>
-                  <span className="text-sm text-muted dark:text-muted">{edu.period}</span>
-                </div>
-                {edu.location && (
-                  <p className="text-sm text-muted dark:text-muted mt-1">{edu.location}</p>
-                )}
-                {edu.details && edu.details.length > 0 && (
-                  <ul className="mt-2 space-y-1">
-                    {edu.details.map((detail, j) => (
-                      <li key={j} className="text-sm ml-4 list-disc text-muted dark:text-muted">
-                        {detail}
-                      </li>
-                    ))}
+                  <ul className="measure mt-3 space-y-2">
+                    {exp.details.map((detail, j) => {
+                      const techMatch = detail.match(/^Technologies:\s*(.+)$/);
+                      if (techMatch) {
+                        return (
+                          <li key={j} className="flex flex-wrap gap-2 pt-1">
+                            {techMatch[1].split(/,\s*/).map((tech) => (
+                              <span
+                                key={tech}
+                                className="rounded-full border border-white/10 px-2.5 py-1 font-mono text-[0.6875rem] text-muted"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                          </li>
+                        );
+                      }
+                      return (
+                        <li key={j} className="text-[0.9375rem] leading-relaxed text-muted">
+                          {detail}
+                        </li>
+                      );
+                    })}
                   </ul>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        <section className="space-y-4 animate-fade-in-up" style={{ animationDelay: '100ms' }}>
-          <h2 className="text-xl font-semibold">Skills</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="text-md font-medium mb-3">Technical</h3>
-              <div className="flex flex-wrap gap-2">
-                {about.skills.technical.map((skill) => (
-                  <span
-                    key={skill}
-                    className="text-sm px-3 py-1 rounded-md border border-accent/30 dark:border-accent/30"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div>
-              <h3 className="text-md font-medium mb-3">Personal</h3>
-              <div className="flex flex-wrap gap-2">
-                {about.skills.personal.map((skill) => (
-                  <span
-                    key={skill}
-                    className="text-sm px-3 py-1 rounded-md border border-accent/30 dark:border-accent/30"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="space-y-4 animate-fade-in-up" style={{ animationDelay: '120ms' }}>
-          <h2 className="text-xl font-semibold">Languages</h2>
-          <div className="flex flex-wrap gap-4">
-            {about.languages.map((language) => (
-              <div key={language.name} className="flex flex-col items-center">
-                <span className="font-medium">{language.name}</span>
-                <div className="flex mt-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span
-                      key={i}
-                      className={`w-2 h-2 mx-0.5 rounded-full ${
-                        i < language.proficiency
-                          ? 'bg-accent dark:bg-accent'
-                          : 'bg-accent/20 dark:bg-accent/20'
-                      }`}
-                    />
-                  ))}
                 </div>
               </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* Education */}
+      <section className="mt-[clamp(4rem,12vh,7rem)]">
+        <SectionLabel>Education</SectionLabel>
+
+        <div className="mt-6 border-t border-white/10">
+          {about.education.map((edu, i) => (
+            <Reveal key={`${edu.institution}-${edu.degree}`} delay={i * 0.04}>
+              <div className="grid grid-cols-1 gap-y-2 border-b border-white/10 py-6 md:grid-cols-[10rem_1fr] md:gap-x-8">
+                <span className="font-mono text-xs tabular-nums tracking-tight text-muted">{edu.period}</span>
+                <div>
+                  <h3 className="text-base font-medium leading-snug sm:text-lg">
+                    {edu.degree} <span className="text-muted">@</span> {edu.institution}
+                  </h3>
+                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted">
+                    {edu.location && <span>{edu.location}</span>}
+                    {edu.details?.map((detail) => (
+                      <span key={detail} className="text-muted">
+                        {detail}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* Skills + Languages + Interests grid */}
+      <section className="mt-[clamp(4rem,12vh,7rem)] grid grid-cols-1 gap-x-12 gap-y-12 lg:grid-cols-2">
+        <div>
+          <SectionLabel>Technical</SectionLabel>
+          <Reveal delay={0.04}>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {about.skills.technical.map((skill) => (
+                <li
+                  key={skill}
+                  className="rounded-full border border-white/10 px-3 py-1.5 font-mono text-xs text-muted transition-colors hover:border-accent/40 hover:text-ink"
+                >
+                  {skill}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+
+        <div>
+          <SectionLabel>Strengths</SectionLabel>
+          <Reveal delay={0.04}>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {about.skills.personal.map((skill) => (
+                <li
+                  key={skill}
+                  className="rounded-full border border-white/10 px-3 py-1.5 font-mono text-xs text-muted transition-colors hover:border-accent/40 hover:text-ink"
+                >
+                  {skill}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+
+        <div>
+          <SectionLabel>Languages</SectionLabel>
+          <div className="mt-6 border-t border-white/10">
+            {about.languages.map((language, i) => (
+              <Reveal key={language.name} delay={i * 0.03}>
+                <div className="flex items-center justify-between gap-4 border-b border-white/10 py-3">
+                  <span className="text-sm">{language.name}</span>
+                  <span aria-hidden className="flex gap-1.5">
+                    {Array.from({ length: 5 }).map((_, dot) => (
+                      <span
+                        key={dot}
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          dot < language.proficiency ? 'bg-accent' : 'bg-white/15'
+                        }`}
+                      />
+                    ))}
+                  </span>
+                  <span className="sr-only">
+                    Proficiency {language.proficiency} of 5
+                  </span>
+                </div>
+              </Reveal>
             ))}
           </div>
-        </section>
+        </div>
 
-        <section className="space-y-4 animate-fade-in-up" style={{ animationDelay: '140ms' }}>
-          <h2 className="text-xl font-semibold">Interests</h2>
-          <div className="flex flex-wrap gap-2">
-            {about.interests.map((interest) => (
-              <span
-                key={interest}
-                className="text-sm px-3 py-1 rounded-md border border-accent/30 dark:border-accent/30"
-              >
-                {interest}
-              </span>
-            ))}
-          </div>
-        </section>
+        <div>
+          <SectionLabel>Interests</SectionLabel>
+          <Reveal delay={0.04}>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              {about.interests.map((interest) => (
+                <li
+                  key={interest}
+                  className="rounded-full border border-white/10 px-3 py-1.5 font-mono text-xs text-muted"
+                >
+                  {interest}
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        </div>
+      </section>
 
-        <section className="space-y-4 animate-fade-in-up" style={{ animationDelay: '160ms' }}>
-          <h2 className="text-xl font-semibold">Contact</h2>
-          <p>
-            Do you want to know more about my work or have questions? Feel free to contact me via{' '}
-            <Link href="/contact" className="text-accent dark:text-accent hover:underline">
-              the contact page
-            </Link>
+      {/* Closing contact nudge */}
+      <section className="mt-[clamp(4rem,12vh,7rem)] border-t border-white/10 pt-12">
+        <Reveal>
+          <p className="measure text-lg leading-relaxed text-muted sm:text-xl">
+            Want to know more about my work, or talk about a role?{' '}
+            <UnderlineLink href="/contact" className="text-ink">
+              Send me a message
+            </UnderlineLink>{' '}
+            or email{' '}
+            <UnderlineLink href={`mailto:${SITE_EMAIL}`} className="text-ink">
+              {SITE_EMAIL}
+            </UnderlineLink>
             .
           </p>
-        </section>
-      </article>
-    </AnimatedSection>
+        </Reveal>
+      </section>
+    </article>
   );
 }
