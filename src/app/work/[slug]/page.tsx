@@ -4,6 +4,7 @@ import Reveal from '@/components/motion/Reveal';
 import UnderlineLink from '@/components/motion/UnderlineLink';
 import CaseHero from '@/components/work/CaseHero';
 import CaseSection from '@/components/work/CaseSection';
+import { CaseCover, CaseGallery } from '@/components/work/CaseGallery';
 import work from '@/data/work';
 
 export function generateStaticParams() {
@@ -51,11 +52,15 @@ export default async function CasePage({
 
       <CaseHero c={c} />
 
+      <CaseCover images={c.images} />
+
       <div className="mt-[clamp(1rem,4vh,2.5rem)]">
         {c.sections.map((section, index) => (
           <CaseSection key={section.heading} section={section} index={index} />
         ))}
       </div>
+
+      <CaseGallery images={c.images} />
 
       {/* Foot: back + next project */}
       <Reveal className="mt-[clamp(3rem,8vh,5rem)] border-t border-white/10 pt-10">

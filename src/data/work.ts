@@ -3,6 +3,7 @@ export type CaseSection = {
   body: string;
 };
 export type CaseLink = { label: string; href: string };
+export type CaseImage = { src: string; alt: string; caption?: string };
 export type CaseStudy = {
   slug: string;
   title: string;
@@ -12,6 +13,9 @@ export type CaseStudy = {
   tech: string[];
   links?: CaseLink[];
   inProgress?: boolean;
+  // Real screenshots from the design mockups; first image is the cover.
+  // Optional — cases without a built UI (e.g. internal tools) omit this.
+  images?: CaseImage[];
   sections: CaseSection[]; // exactly the 5 headings, in order
 };
 
@@ -41,6 +45,23 @@ const work: CaseStudy[] = [
     ],
     inProgress: true,
     links: [{ label: 'GitHub', href: 'https://github.com/nimkimi/be-my-guide' }],
+    images: [
+      {
+        src: '/work/be-my-guide/landing.jpg',
+        alt: 'Be My Guide landing page with a hero photo of a runner on a forest trail and two role-based entry points: find a guide or become one.',
+        caption: 'Landing',
+      },
+      {
+        src: '/work/be-my-guide/feed.jpg',
+        alt: 'A guide’s request feed showing nearby open requests grouped by week, with activity filters for running, hiking, and cross-country skiing.',
+        caption: 'Guide feed',
+      },
+      {
+        src: '/work/be-my-guide/request.jpg',
+        alt: 'A single request detail view a guide sees before offering to help, with activity, time, and the participant’s note.',
+        caption: 'Request detail',
+      },
+    ],
     sections: [
       {
         heading: 'Context',
@@ -84,6 +105,23 @@ const work: CaseStudy[] = [
       'Vitest',
     ],
     links: [{ label: 'GitHub', href: 'https://github.com/nimkimi/concert-radar' }],
+    images: [
+      {
+        src: '/work/concert-radar/dashboard.jpg',
+        alt: 'Concert Radar dashboard with oversized type reading “23 upcoming shows near Bergen”, summary stats, and source filters.',
+        caption: 'Dashboard',
+      },
+      {
+        src: '/work/concert-radar/landing.jpg',
+        alt: 'Concert Radar marketing landing page introducing the Spotify-connected concert discovery app.',
+        caption: 'Landing',
+      },
+      {
+        src: '/work/concert-radar/detail.jpg',
+        alt: 'A concert detail page showing the artist, venue, date, and ticketing sources for a single show.',
+        caption: 'Concert detail',
+      },
+    ],
     sections: [
       {
         heading: 'Context',

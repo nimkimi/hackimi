@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import type { CaseStudy } from '@/data/work';
 
 /**
@@ -20,6 +21,8 @@ export default function WorkRow({ c, index }: { c: CaseStudy; index: number }) {
   const num = String(index + 1).padStart(2, '0');
   // Keep the row visually focused but uncluttered: a few representative tags.
   const tags = c.tech.slice(0, 4);
+  // Use the real cover screenshot in the hover preview when the case has one.
+  const cover = c.images?.[0];
 
   return (
     <Link
@@ -68,11 +71,24 @@ export default function WorkRow({ c, index }: { c: CaseStudy; index: number }) {
         aria-hidden
         className="work-row__preview relative hidden aspect-[4/3] w-[clamp(118px,16vw,230px)] justify-self-end overflow-hidden rounded-[10px] border border-white/10 bg-[linear-gradient(135deg,#1a1a1e,#101013)] opacity-0 [clip-path:inset(0_0_100%_0)] transition-[clip-path,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:block"
       >
-        <span className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:22px_22px] opacity-50" />
-        <span className="absolute bottom-3.5 left-3.5 h-7 w-7 rounded-full bg-accent opacity-80 blur-[2px]" />
-        <span className="absolute inset-0 grid place-items-center px-3 text-center font-display text-[13px] font-bold uppercase leading-tight tracking-[0.05em] text-ink/[0.12]">
-          {c.title}
-        </span>
+        {cover ? (
+          <Image
+            src={cover.src}
+            alt=""
+            width={1280}
+            height={800}
+            sizes="230px"
+            className="absolute inset-0 h-full w-full object-cover object-top"
+          />
+        ) : (
+          <>
+            <span className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:22px_22px] opacity-50" />
+            <span className="absolute bottom-3.5 left-3.5 h-7 w-7 rounded-full bg-accent opacity-80 blur-[2px]" />
+            <span className="absolute inset-0 grid place-items-center px-3 text-center font-display text-[13px] font-bold uppercase leading-tight tracking-[0.05em] text-ink/[0.12]">
+              {c.title}
+            </span>
+          </>
+        )}
       </span>
     </Link>
   );
