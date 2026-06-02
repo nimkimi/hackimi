@@ -20,9 +20,13 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
+    // In CI, run against a production build (next build && next start): no
+    // on-demand route compilation or hydration lag, so the UI is interactive
+    // immediately and time-sensitive assertions (e.g. the contact "Sending…"
+    // pending state) don't flake. Locally use the dev server for fast iteration.
+    command: process.env.CI ? 'npm run build && npm run start' : 'npm run dev',
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 180_000,
   },
 });
