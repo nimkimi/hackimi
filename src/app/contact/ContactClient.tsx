@@ -11,7 +11,7 @@ import { useFormStatus } from 'react-dom';
 type Props = { siteKey: string };
 
 const FIELD_CLASS =
-  'w-full rounded-lg border border-white/15 bg-surface px-3.5 py-2.5 text-ink placeholder:text-muted/60 transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50';
+  'w-full min-h-11 rounded-lg border border-white/15 bg-surface px-3.5 py-2.5 text-base text-ink placeholder:text-muted/60 transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50';
 
 const LABEL_CLASS = 'mono-label';
 
@@ -199,7 +199,7 @@ export default function ContactClient({ siteKey }: Props) {
                   name="message"
                   key={`message-${values.message}`}
                   defaultValue={values.message}
-                  className={`min-h-[140px] resize-y ${FIELD_CLASS}`}
+                  className={`${FIELD_CLASS} min-h-[140px] resize-y`}
                   required
                   aria-invalid={fieldErrors.message ? 'true' : undefined}
                   aria-describedby={fieldErrors.message ? 'message-error' : undefined}

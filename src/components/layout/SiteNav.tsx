@@ -93,7 +93,7 @@ export default function SiteNav() {
         <div className="flex items-center gap-3 md:hidden">
           <Link
             href="/contact"
-            className="mono-label rounded-full bg-accent px-4 py-2 !text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+            className="mono-label inline-flex min-h-11 items-center rounded-full bg-accent px-4 py-2.5 !text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           >
             Let&apos;s talk
           </Link>
@@ -103,7 +103,7 @@ export default function SiteNav() {
             aria-controls="mobile-nav-panel"
             aria-label={open ? 'Close menu' : 'Open menu'}
             onClick={() => setOpen((v) => !v)}
-            className="flex h-9 w-9 items-center justify-center rounded-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+            className="flex h-11 w-11 items-center justify-center rounded-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
           >
             <span className="relative block h-3.5 w-5" aria-hidden>
               <span
