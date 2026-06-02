@@ -39,12 +39,17 @@ const config: Config = {
           '0%': { width: '0%' },
           '100%': { width: '100%' },
         },
+        'scroll-cue': {
+          '0%': { transform: 'translateY(-100%)' },
+          '60%, 100%': { transform: 'translateY(100%)' },
+        },
       },
       animation: {
         'fade-in-up': 'fade-in-up 0.6s ease-out both',
         'float-slow': 'float-slow 4s ease-in-out infinite',
         'shimmer': 'shimmer 4s linear infinite',
         'toast-progress': 'toast-progress 4s linear forwards',
+        'scroll-cue': 'scroll-cue 2.2s cubic-bezier(0.16,1,0.3,1) infinite',
       },
     },
   },

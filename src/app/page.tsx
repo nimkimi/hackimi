@@ -1,59 +1,89 @@
-import Image from 'next/image';
-import Link from 'next/link';
 import { buildPageMetadata } from '@/lib/metadata';
-import { IconArrowRight, IconBrandGithub, IconMail } from '@tabler/icons-react';
+import Reveal from '@/components/motion/Reveal';
+import MagneticButton from '@/components/motion/MagneticButton';
+import UnderlineLink from '@/components/motion/UnderlineLink';
 
 export const metadata = buildPageMetadata({
   title: 'Portfolio',
-  description: 'Discover the work, skills, and contact information of frontend developer Nima Hakimi.',
+  description:
+    'Discover the work, skills, and contact information of frontend developer Nima Hakimi.',
   path: '/',
 });
 
 export default function Home() {
   return (
-    <section className="flex min-h-[75vh] flex-col items-center justify-center text-center gap-8 max-w-4xl mx-auto">
-      <div className="relative animate-fade-in-up" style={{ animationDelay: '80ms' }}>
-        <div className="absolute -inset-12 rounded-full bg-gradient-to-tr from-accent/35 to-transparent dark:from-accent/25 blur-3xl" />
-        <div className="relative h-28 w-28 sm:h-36 sm:w-36 mx-auto mb-5 rounded-full overflow-hidden ring-2 ring-accent/40 dark:ring-accent/40 shadow-xl">
-          <Image src="/nima.JPG" alt="Nima Hakimi" fill className="object-cover" priority />
+    <>
+      <section
+        id="top"
+        className="relative flex min-h-[88svh] flex-col justify-center py-24"
+      >
+        {/* Eyebrow */}
+        <div className="mb-[clamp(1.25rem,4vh,2.5rem)] flex items-center gap-3">
+          <span aria-hidden className="h-px w-7 bg-accent" />
+          <span className="mono-label text-accent">Frontend Developer</span>
         </div>
-        <h1 className="relative text-4xl sm:text-6xl font-extrabold tracking-tight">
-          <span className="bg-clip-text text-transparent bg-[linear-gradient(110deg,theme(colors.ink)_0%,theme(colors.ink)_40%,theme(colors.accent)_60%,theme(colors.ink)_80%)] bg-[length:200%_100%] animate-[shimmer_4s_ease_infinite]">
-            Hi, I’m Nima Hakimi
+
+        {/* Name headline — masked reveal target lives in `data-hero-line` */}
+        <h1
+          className="font-display font-bold tracking-tight leading-[1.02]"
+          style={{ fontSize: 'clamp(2.75rem, 9vw, 7rem)' }}
+        >
+          <span className="block overflow-hidden">
+            <span data-hero-line className="block will-change-transform">
+              Nima Hakimi<span className="text-accent">.</span>
+            </span>
           </span>
         </h1>
-      </div>
 
-      <p
-        className="animate-fade-in-up text-lg sm:text-xl text-muted dark:text-muted max-w-2xl"
-        style={{ animationDelay: '160ms' }}
-      >
-        I craft elegant, fast, and accessible web apps. Dive into my projects or learn more about me.
-      </p>
+        {/* Positioning line */}
+        <Reveal delay={0.1} className="mt-[clamp(1.5rem,5vh,3rem)]">
+          <p className="measure text-[clamp(1rem,2.1vw,1.3125rem)] font-medium leading-relaxed text-muted">
+            <span className="text-ink">Frontend developer</span> with a{' '}
+            <span className="text-ink">designer&rsquo;s eye</span> — I build{' '}
+            <span className="text-ink">accessible</span>,{' '}
+            <span className="text-ink">expressive</span> interfaces for the web.
+            Currently at <span className="text-accent">NAV</span>.
+          </p>
+        </Reveal>
 
-      <div
-        className="animate-fade-in-up flex flex-wrap items-center justify-center gap-3 sm:gap-4"
-        style={{ animationDelay: '220ms' }}
-      >
-        <Link href="/projects" className="btn btn-outline">
-          <span className="flex items-center gap-2 leading-none">
-            View Projects <IconArrowRight size={18} className="shrink-0" aria-hidden="true" />
+        {/* CTA row */}
+        <Reveal delay={0.2} className="mt-[clamp(2rem,7vh,3.5rem)]">
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
+            <MagneticButton href="#work">View work</MagneticButton>
+            <UnderlineLink href="#contact">Get in touch</UnderlineLink>
+            <UnderlineLink
+              href="https://github.com/nimkimi"
+              target="_blank"
+              rel="noreferrer"
+              className="text-muted"
+            >
+              GitHub
+            </UnderlineLink>
+          </div>
+        </Reveal>
+
+        {/* Scroll cue */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute bottom-6 right-0 hidden items-center gap-3 sm:flex"
+        >
+          <span className="mono-label">Scroll</span>
+          <span className="relative h-9 w-px overflow-hidden bg-white/15">
+            <span className="absolute left-0 top-0 h-full w-px animate-scroll-cue bg-accent" />
           </span>
-        </Link>
-        <Link href="/about" className="btn btn-accent">
-          About Me
-        </Link>
-        <a href="/contact" className="btn btn-outline px-4 py-2">
-          <span className="flex items-center gap-2 leading-none">
-            <IconMail size={18} className="shrink-0" aria-hidden="true" /> Contact
-          </span>
-        </a>
-        <a href="https://github.com/nimkimi" target="_blank" rel="noreferrer" className="btn btn-outline px-4 py-2">
-          <span className="flex items-center gap-2 leading-none">
-            <IconBrandGithub size={18} className="shrink-0" aria-hidden="true" /> GitHub
-          </span>
-        </a>
-      </div>
-    </section>
+        </div>
+      </section>
+
+      {/* Anchor placeholders — filled by later tasks */}
+      <section id="work" className="scroll-mt-24 py-24">
+        <h2 className="mono-label">Selected Work</h2>
+      </section>
+      <section id="playground" className="scroll-mt-24 py-24">
+        <h2 className="mono-label">Playground</h2>
+      </section>
+      <section id="contact" className="scroll-mt-24 py-24">
+        <h2 className="mono-label">Get in touch</h2>
+      </section>
+    </>
   );
 }
