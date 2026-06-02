@@ -15,7 +15,7 @@ export function ProjectCard({ title, description, href, imageSrc, tags, index = 
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="group relative overflow-hidden rounded-xl border border-light-accent/20 dark:border-dark-accent/20 bg-white/60 dark:bg-black/20 backdrop-blur shadow-sm transition-transform duration-200 ease-out hover:-translate-y-1 animate-fade-in-up"
+      className="group relative overflow-hidden rounded-xl border border-accent/20 dark:border-accent/20 bg-white/60 dark:bg-black/20 backdrop-blur shadow-sm transition-transform duration-200 ease-out hover:-translate-y-1 animate-fade-in-up"
       style={{ animationDelay: `${index * 70}ms` }}
     >
       {imageSrc ? (
@@ -34,13 +34,13 @@ export function ProjectCard({ title, description, href, imageSrc, tags, index = 
 
       <div className="p-4 space-y-2">
         <h3 className="font-semibold text-lg">{title}</h3>
-        <p className="text-sm text-light-secondary dark:text-dark-secondary">{description}</p>
+        <p className="text-sm text-muted dark:text-muted">{description}</p>
         {tags && tags.length > 0 && (
           <div className="flex flex-wrap gap-2 pt-2">
             {tags.map((t) => (
               <span
                 key={t}
-                className="text-xs px-2 py-1 rounded-md border border-light-accent/30 dark:border-dark-accent/30 bg-white/40 dark:bg-white/5"
+                className="text-xs px-2 py-1 rounded-md border border-accent/30 dark:border-accent/30 bg-white/40 dark:bg-white/5"
               >
                 {t}
               </span>

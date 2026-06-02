@@ -88,7 +88,7 @@ export default function ContactClient({ siteKey }: Props) {
       <form
         action={formAction}
         ref={formRef}
-        className="flex flex-col gap-4 w-full max-w-lg mx-auto p-6 rounded-xl border border-light-accent/20 dark:border-dark-accent/20 bg-white/60 dark:bg-black/20 backdrop-blur"
+        className="flex flex-col gap-4 w-full max-w-lg mx-auto p-6 rounded-xl border border-accent/20 dark:border-accent/20 bg-white/60 dark:bg-black/20 backdrop-blur"
       >
         {state.status !== 'idle' && state.message ? (
           <div
@@ -96,7 +96,7 @@ export default function ContactClient({ siteKey }: Props) {
             className={`rounded-lg border px-3 py-2 text-sm ${
               state.status === 'error'
                 ? 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-200'
-                : 'border-light-accent/40 bg-light-accent/10 text-light-primary dark:border-dark-accent/40 dark:bg-dark-accent/10 dark:text-dark-primary'
+                : 'border-accent/40 bg-accent/10 text-ink dark:border-accent/40 dark:bg-accent/10 dark:text-ink'
             }`}
           >
             {state.message}
@@ -112,7 +112,7 @@ export default function ContactClient({ siteKey }: Props) {
               type="text"
               key={`name-${values.name}`}
               defaultValue={values.name}
-              className="w-full rounded-md border border-light-accent/30 dark:border-dark-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-light-accent/40 dark:focus:ring-dark-accent/40"
+              className="w-full rounded-md border border-accent/30 dark:border-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/40 dark:focus:ring-accent/40"
               required
               aria-invalid={fieldErrors.name ? 'true' : undefined}
               aria-describedby={fieldErrors.name ? 'name-error' : undefined}
@@ -127,7 +127,7 @@ export default function ContactClient({ siteKey }: Props) {
               type="email"
               key={`email-${values.email}`}
               defaultValue={values.email}
-              className="w-full rounded-md border border-light-accent/30 dark:border-dark-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-light-accent/40 dark:focus:ring-dark-accent/40"
+              className="w-full rounded-md border border-accent/30 dark:border-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/40 dark:focus:ring-accent/40"
               required
               aria-invalid={fieldErrors.email ? 'true' : undefined}
               aria-describedby={fieldErrors.email ? 'email-error' : undefined}
@@ -142,7 +142,7 @@ export default function ContactClient({ siteKey }: Props) {
               type="text"
               key={`subject-${values.subject}`}
               defaultValue={values.subject}
-              className="w-full rounded-md border border-light-accent/30 dark:border-dark-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-light-accent/40 dark:focus:ring-dark-accent/40"
+              className="w-full rounded-md border border-accent/30 dark:border-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/40 dark:focus:ring-accent/40"
               required
               aria-invalid={fieldErrors.subject ? 'true' : undefined}
               aria-describedby={fieldErrors.subject ? 'subject-error' : undefined}
@@ -156,7 +156,7 @@ export default function ContactClient({ siteKey }: Props) {
               name="message"
               key={`message-${values.message}`}
               defaultValue={values.message}
-              className="min-h-[120px] w-full rounded-md border border-light-accent/30 dark:border-dark-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-light-accent/40 dark:focus:ring-dark-accent/40"
+              className="min-h-[120px] w-full rounded-md border border-accent/30 dark:border-accent/30 bg-transparent px-3 py-2 focus:outline-none focus:ring-2 focus:ring-accent/40 dark:focus:ring-accent/40"
               required
               aria-invalid={fieldErrors.message ? 'true' : undefined}
               aria-describedby={fieldErrors.message ? 'message-error' : undefined}

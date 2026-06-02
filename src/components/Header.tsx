@@ -16,7 +16,7 @@ export default function Header() {
         <div className="my-3 rounded-2xl bg-white/50 dark:bg-black/30 backdrop-blur-xl ring-1 ring-black/10 dark:ring-white/10 px-4 sm:px-6 py-2 shadow-sm relative">
           <div className="flex items-center justify-between gap-3">
             <Link href="/" className="relative inline-flex items-center">
-              <span className="text-lg font-extrabold tracking-tight bg-clip-text text-transparent bg-[linear-gradient(110deg,theme(colors.light.primary)_0%,theme(colors.light.accent)_40%,theme(colors.light.primary)_80%)] dark:bg-[linear-gradient(110deg,theme(colors.dark.primary)_0%,theme(colors.dark.accent)_40%,theme(colors.dark.primary)_80%)] bg-[length:200%_100%] hover:animate-[shimmer_2.5s_linear_infinite]">
+              <span className="text-lg font-extrabold tracking-tight bg-clip-text text-transparent bg-[linear-gradient(110deg,theme(colors.ink)_0%,theme(colors.accent)_40%,theme(colors.ink)_80%)] bg-[length:200%_100%] hover:animate-[shimmer_2.5s_linear_infinite]">
                 N.HAKIMI
               </span>
             </Link>

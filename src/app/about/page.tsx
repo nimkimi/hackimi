@@ -39,7 +39,7 @@ export default function AboutPage() {
             <div className="space-y-3">
               <div className="animate-fade-in-up" style={{ animationDelay: '120ms' }}>
                 <h3 className="text-lg font-medium">{about.name}</h3>
-                <p className="text-sm text-light-secondary dark:text-dark-secondary">{about.location}</p>
+                <p className="text-sm text-muted dark:text-muted">{about.location}</p>
               </div>
               <p className="animate-fade-in-up leading-relaxed max-w-3xl" style={{ animationDelay: '160ms' }}>
                 {about.summary}
@@ -51,7 +51,7 @@ export default function AboutPage() {
                     href={profile.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-md border border-light-accent/30 dark:border-dark-accent/30 hover:bg-light-accent/10 dark:hover:bg-dark-accent/10 transition-colors"
+                    className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-md border border-accent/30 dark:border-accent/30 hover:bg-accent/10 dark:hover:bg-accent/10 transition-colors"
                   >
                     {profile.platform === 'GitHub' ? (
                       <IconBrandGithub size={18} className="shrink-0" aria-hidden="true" />
@@ -64,7 +64,7 @@ export default function AboutPage() {
                 <a
                   href="/cv.pdf"
                   download
-                  className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-md border border-light-accent/30 dark:border-dark-accent/30 hover:bg-light-accent/10 dark:hover:bg-dark-accent/10 transition-colors"
+                  className="inline-flex items-center gap-2 text-sm px-3 py-1 rounded-md border border-accent/30 dark:border-accent/30 hover:bg-accent/10 dark:hover:bg-accent/10 transition-colors"
                 >
                   <IconDownload size={18} className="shrink-0" aria-hidden="true" />
                   <span className="leading-none">Download CV</span>
@@ -76,27 +76,27 @@ export default function AboutPage() {
 
         <section className="space-y-4">
           <h2 className="text-xl font-semibold">Experiences</h2>
-          <ul className="relative space-y-6 before:absolute before:left-4 before:top-0 before:h-full before:w-px before:bg-light-accent/30 dark:before:bg-dark-accent/30">
+          <ul className="relative space-y-6 before:absolute before:left-4 before:top-0 before:h-full before:w-px before:bg-accent/30 dark:before:bg-accent/30">
             {about.experience.map((exp, i) => (
               <li
                 key={`${exp.company}-${exp.title}`}
-                className="relative ml-10 rounded-lg border border-light-accent/20 dark:border-dark-accent/20 p-4 animate-fade-in-up"
+                className="relative ml-10 rounded-lg border border-accent/20 dark:border-accent/20 p-4 animate-fade-in-up"
                 style={{ animationDelay: `${i * 80}ms` }}
               >
-                <span className="absolute -left-6 top-4 h-3 w-3 rounded-full bg-light-accent dark:bg-dark-accent shadow" />
+                <span className="absolute -left-6 top-4 h-3 w-3 rounded-full bg-accent dark:bg-accent shadow" />
                 <div className="flex items-center justify-between gap-4 flex-wrap">
                   <h3 className="font-medium">
                     {exp.title}
                     {exp.company ? ` — ${exp.company}` : ''}
                   </h3>
-                  <span className="text-sm text-light-secondary dark:text-dark-secondary">{exp.period}</span>
+                  <span className="text-sm text-muted dark:text-muted">{exp.period}</span>
                 </div>
                 {exp.location && (
-                  <p className="text-sm text-light-secondary dark:text-dark-secondary mt-1">{exp.location}</p>
+                  <p className="text-sm text-muted dark:text-muted mt-1">{exp.location}</p>
                 )}
                 <ul className="mt-2 space-y-1">
                   {exp.details.map((detail, j) => (
-                    <li key={j} className="text-sm ml-4 list-disc text-light-secondary dark:text-dark-secondary">
+                    <li key={j} className="text-sm ml-4 list-disc text-muted dark:text-muted">
                       {detail}
                     </li>
                   ))}
@@ -112,22 +112,22 @@ export default function AboutPage() {
             {about.education.map((edu, i) => (
               <li
                 key={`${edu.institution}-${edu.degree}`}
-                className="rounded-lg border border-light-accent/20 dark:border-dark-accent/20 p-4 animate-fade-in-up"
+                className="rounded-lg border border-accent/20 dark:border-accent/20 p-4 animate-fade-in-up"
                 style={{ animationDelay: `${i * 70}ms` }}
               >
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <h3 className="font-medium">
                     {edu.degree} — {edu.institution}
                   </h3>
-                  <span className="text-sm text-light-secondary dark:text-dark-secondary">{edu.period}</span>
+                  <span className="text-sm text-muted dark:text-muted">{edu.period}</span>
                 </div>
                 {edu.location && (
-                  <p className="text-sm text-light-secondary dark:text-dark-secondary mt-1">{edu.location}</p>
+                  <p className="text-sm text-muted dark:text-muted mt-1">{edu.location}</p>
                 )}
                 {edu.details && edu.details.length > 0 && (
                   <ul className="mt-2 space-y-1">
                     {edu.details.map((detail, j) => (
-                      <li key={j} className="text-sm ml-4 list-disc text-light-secondary dark:text-dark-secondary">
+                      <li key={j} className="text-sm ml-4 list-disc text-muted dark:text-muted">
                         {detail}
                       </li>
                     ))}
@@ -147,7 +147,7 @@ export default function AboutPage() {
                 {about.skills.technical.map((skill) => (
                   <span
                     key={skill}
-                    className="text-sm px-3 py-1 rounded-md border border-light-accent/30 dark:border-dark-accent/30"
+                    className="text-sm px-3 py-1 rounded-md border border-accent/30 dark:border-accent/30"
                   >
                     {skill}
                   </span>
@@ -160,7 +160,7 @@ export default function AboutPage() {
                 {about.skills.personal.map((skill) => (
                   <span
                     key={skill}
-                    className="text-sm px-3 py-1 rounded-md border border-light-accent/30 dark:border-dark-accent/30"
+                    className="text-sm px-3 py-1 rounded-md border border-accent/30 dark:border-accent/30"
                   >
                     {skill}
                   </span>
@@ -182,8 +182,8 @@ export default function AboutPage() {
                       key={i}
                       className={`w-2 h-2 mx-0.5 rounded-full ${
                         i < language.proficiency
-                          ? 'bg-light-accent dark:bg-dark-accent'
-                          : 'bg-light-accent/20 dark:bg-dark-accent/20'
+                          ? 'bg-accent dark:bg-accent'
+                          : 'bg-accent/20 dark:bg-accent/20'
                       }`}
                     />
                   ))}
@@ -199,7 +199,7 @@ export default function AboutPage() {
             {about.interests.map((interest) => (
               <span
                 key={interest}
-                className="text-sm px-3 py-1 rounded-md border border-light-accent/30 dark:border-dark-accent/30"
+                className="text-sm px-3 py-1 rounded-md border border-accent/30 dark:border-accent/30"
               >
                 {interest}
               </span>
@@ -211,7 +211,7 @@ export default function AboutPage() {
           <h2 className="text-xl font-semibold">Contact</h2>
           <p>
             Do you want to know more about my work or have questions? Feel free to contact me via{' '}
-            <Link href="/contact" className="text-light-accent dark:text-dark-accent hover:underline">
+            <Link href="/contact" className="text-accent dark:text-accent hover:underline">
               the contact page
             </Link>
             .

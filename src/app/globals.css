@@ -7,36 +7,59 @@
     @apply antialiased;
   }
   body {
-    @apply selection:bg-light-accent/20 selection:text-light-primary dark:selection:bg-dark-accent/20 dark:selection:text-dark-primary;
+    @apply bg-base text-ink font-sans;
+  }
+  ::selection {
+    background: #c6ff3d;
+    color: #0e0e10;
   }
   a {
-    @apply underline-offset-4 hover:underline;
+    @apply no-underline;
   }
 }
 
 @layer components {
-  .card {
-    @apply rounded-xl border border-light-accent/20 dark:border-dark-accent/20 bg-white/60 dark:bg-black/20 backdrop-blur;
+  .mono-label {
+    @apply font-mono uppercase tracking-[0.12em] text-xs text-muted;
   }
+  .measure {
+    max-width: 62ch;
+  }
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.045;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Neutralized legacy classes — kept compiling for pages restyled in later tasks */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium transition-colors border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-light-accent/40 dark:focus-visible:ring-dark-accent/40;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium transition-colors border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40;
   }
   .btn-outline {
-    @apply border-light-accent dark:border-dark-accent text-inherit;
+    @apply border-accent text-inherit;
   }
   .btn-outline:hover {
-    @apply bg-light-accent text-white;
-  }
-  .dark .btn-outline:hover {
-    @apply bg-dark-accent text-white;
+    @apply bg-accent text-base;
   }
   .btn-accent {
-    @apply bg-light-accent text-white border-light-accent dark:bg-dark-accent dark:text-white dark:border-dark-accent;
+    @apply bg-accent text-base border-accent;
   }
   .muted {
-    @apply text-light-secondary dark:text-dark-secondary;
+    @apply text-muted;
   }
   .safe-top {
     padding-top: env(safe-area-inset-top);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }

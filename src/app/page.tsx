@@ -13,19 +13,19 @@ export default function Home() {
   return (
     <section className="flex min-h-[75vh] flex-col items-center justify-center text-center gap-8 max-w-4xl mx-auto">
       <div className="relative animate-fade-in-up" style={{ animationDelay: '80ms' }}>
-        <div className="absolute -inset-12 rounded-full bg-gradient-to-tr from-light-accent/35 to-transparent dark:from-dark-accent/25 blur-3xl" />
-        <div className="relative h-28 w-28 sm:h-36 sm:w-36 mx-auto mb-5 rounded-full overflow-hidden ring-2 ring-light-accent/40 dark:ring-dark-accent/40 shadow-xl">
+        <div className="absolute -inset-12 rounded-full bg-gradient-to-tr from-accent/35 to-transparent dark:from-accent/25 blur-3xl" />
+        <div className="relative h-28 w-28 sm:h-36 sm:w-36 mx-auto mb-5 rounded-full overflow-hidden ring-2 ring-accent/40 dark:ring-accent/40 shadow-xl">
           <Image src="/nima.JPG" alt="Nima Hakimi" fill className="object-cover" priority />
         </div>
         <h1 className="relative text-4xl sm:text-6xl font-extrabold tracking-tight">
-          <span className="bg-clip-text text-transparent bg-[linear-gradient(110deg,theme(colors.light.primary)_0%,theme(colors.light.primary)_40%,theme(colors.light.accent)_60%,theme(colors.light.primary)_80%)] dark:bg-[linear-gradient(110deg,theme(colors.dark.primary)_0%,theme(colors.dark.primary)_40%,theme(colors.dark.accent)_60%,theme(colors.dark.primary)_80%)] bg-[length:200%_100%] animate-[shimmer_4s_ease_infinite]">
+          <span className="bg-clip-text text-transparent bg-[linear-gradient(110deg,theme(colors.ink)_0%,theme(colors.ink)_40%,theme(colors.accent)_60%,theme(colors.ink)_80%)] bg-[length:200%_100%] animate-[shimmer_4s_ease_infinite]">
             Hi, I’m Nima Hakimi
           </span>
         </h1>
       </div>
 
       <p
-        className="animate-fade-in-up text-lg sm:text-xl text-light-secondary dark:text-dark-secondary max-w-2xl"
+        className="animate-fade-in-up text-lg sm:text-xl text-muted dark:text-muted max-w-2xl"
         style={{ animationDelay: '160ms' }}
       >
         I craft elegant, fast, and accessible web apps. Dive into my projects or learn more about me.

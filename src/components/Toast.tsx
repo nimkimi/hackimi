@@ -59,12 +59,12 @@ export function Toast({ toast, onClose }: { toast: ToastState; onClose: () => vo
     >
       <div
         className={`pointer-events-auto relative flex items-start gap-3 rounded-xl px-4 py-3 shadow-2xl ring-1 ring-black/5 dark:ring-white/10 backdrop-blur-xl bg-white/80 dark:bg-black/50 text-sm max-w-[92vw] sm:max-w-sm before:absolute before:inset-y-0 before:left-0 before:w-1 before:rounded-l-xl ${
-          renderedToast.type === 'success' ? 'before:bg-light-accent dark:before:bg-dark-accent' : 'before:bg-red-500'
+          renderedToast.type === 'success' ? 'before:bg-accent dark:before:bg-accent' : 'before:bg-red-500'
         }`}
       >
         <button
           aria-label="Dismiss"
-          className="absolute top-2.5 right-2.5 inline-flex h-6 w-6 items-center justify-center rounded-md text-xs/none opacity-60 hover:opacity-100 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-light-accent/40 dark:focus-visible:ring-dark-accent/40"
+          className="absolute top-2.5 right-2.5 inline-flex h-6 w-6 items-center justify-center rounded-md text-xs/none opacity-60 hover:opacity-100 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 dark:focus-visible:ring-accent/40"
           onClick={onClose}
         >
           ×
@@ -72,7 +72,7 @@ export function Toast({ toast, onClose }: { toast: ToastState; onClose: () => vo
         {renderedToast.type === 'success' ? (
           <IconCircleCheckFilled
             size={20}
-            className="shrink-0 text-light-accent dark:text-dark-accent"
+            className="shrink-0 text-accent dark:text-accent"
             aria-hidden="true"
           />
         ) : (
@@ -85,7 +85,7 @@ export function Toast({ toast, onClose }: { toast: ToastState; onClose: () => vo
         <span
           aria-hidden
           className={`pointer-events-none absolute bottom-0 left-0 h-0.5 rounded-b-xl ${
-            renderedToast.type === 'success' ? 'bg-light-accent/70 dark:bg-dark-accent/70' : 'bg-red-500/80'
+            renderedToast.type === 'success' ? 'bg-accent/70 dark:bg-accent/70' : 'bg-red-500/80'
           } animate-toast-progress`}
         />
       </div>
