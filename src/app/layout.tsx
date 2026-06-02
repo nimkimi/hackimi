@@ -1,4 +1,5 @@
-import Header from '@/components/Header';
+import SiteNav from '@/components/layout/SiteNav';
+import SmoothScroll from '@/components/motion/SmoothScroll';
 import './globals.css';
 import type { Viewport } from 'next';
 import { clashDisplay, satoshi, geistMono } from '@/styles/fonts';
@@ -27,8 +28,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           suppressHydrationWarning
         />
         <div className="grain" aria-hidden />
-        <Header />
-        <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">{children}</main>
+        <SmoothScroll>
+          <SiteNav />
+          <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">{children}</main>
+        </SmoothScroll>
       </body>
     </html>
   );

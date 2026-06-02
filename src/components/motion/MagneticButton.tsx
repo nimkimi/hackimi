@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   motion,
   useMotionValue,
@@ -39,6 +39,17 @@ export default function MagneticButton({
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
 
+  // Detect touch pointers after mount only. Reading `matchMedia` during render
+  // (SSR vs. client) would desync the markup and cause a hydration mismatch, so
+  // we default to the safe, non-magnetic branch on the first paint and enable
+  // the magnetic effect once we know we're on a fine-pointer device.
+  const [magneticEnabled, setMagneticEnabled] = useState(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    setMagneticEnabled(!coarsePointer);
+  }, []);
+
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const springConfig = { stiffness: 250, damping: 18, mass: 0.4 };
@@ -48,12 +59,9 @@ export default function MagneticButton({
   const classes = `${BASE_CLASS} ${className ?? ''}`.trim();
 
   // Touch devices and reduced-motion users get a plain element — no listeners,
-  // no transforms.
-  const coarsePointer =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(pointer: coarse)').matches;
-
-  if (reduce || coarsePointer) {
+  // no transforms. `magneticEnabled` starts false (matching SSR) and only flips
+  // true after mount on a fine-pointer device.
+  if (reduce || !magneticEnabled) {
     if (href) {
       return (
         <a href={href} onClick={onClick} className={classes}>
