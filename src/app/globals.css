@@ -33,26 +33,6 @@
     opacity: 0.045;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-
-  /* Neutralized legacy classes — kept compiling for pages restyled in later tasks */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-medium transition-colors border-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40;
-  }
-  .btn-outline {
-    @apply border-accent text-inherit;
-  }
-  .btn-outline:hover {
-    @apply bg-accent text-base;
-  }
-  .btn-accent {
-    @apply bg-accent text-base border-accent;
-  }
-  .muted {
-    @apply text-muted;
-  }
-  .safe-top {
-    padding-top: env(safe-area-inset-top);
-  }
 }
 
 /* Selected Work rows — hover interactions, fine pointers only.

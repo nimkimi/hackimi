@@ -7,7 +7,7 @@ import { shouldPlayIntro } from '@/lib/intro';
 /**
  * SIGNATURE ARRIVAL ANIMATION — "Reveal through the mark" (aperture, variant B).
  *
- * Ported from the validated prototype `mockups/arrival-b-aperture/index.html`.
+ * Implements the "aperture / reveal through the mark" arrival.
  * Plays on every full page load / refresh (skipped only under reduced motion).
  * Choreography (~2.1s):
  *   1. A centered NH monogram DRAWS ON via strokeDashoffset, a glowing acid-lime

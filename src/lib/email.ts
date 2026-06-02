@@ -27,10 +27,7 @@ function getTransporter(): Transporter {
   });
 
   if (process.env.NODE_ENV !== 'production') {
-    transporter
-      .verify()
-      .then(() => console.log('SMTP verified'))
-      .catch((e) => console.warn('SMTP verify failed:', e?.message || e));
+    transporter.verify().catch((e) => console.warn('SMTP verify failed:', e?.message || e));
   }
   return transporter;
 }

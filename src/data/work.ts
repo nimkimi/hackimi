@@ -13,7 +13,7 @@ export type CaseStudy = {
   tech: string[];
   links?: CaseLink[];
   inProgress?: boolean;
-  // Real screenshots from the design mockups; first image is the cover.
+  // Real screenshots; first image is the cover.
   // Optional — cases without a built UI (e.g. internal tools) omit this.
   images?: CaseImage[];
   sections: CaseSection[]; // exactly the 5 headings, in order
