@@ -108,17 +108,17 @@ const work: CaseStudy[] = [
     images: [
       {
         src: '/work/concert-radar/dashboard.jpg',
-        alt: 'Concert Radar dashboard with oversized type reading “6 upcoming shows near Bergen”, an up-next Sigrid concert card, and source filters.',
+        alt: 'Concert Radar dashboard (dark theme) with oversized type reading “6 upcoming shows near Bergen”, an up-next Sigrid concert card, and source filters on a near-black UI with Spotify-green accents.',
         caption: 'Dashboard',
       },
       {
         src: '/work/concert-radar/landing.jpg',
-        alt: 'Concert Radar landing — “Never miss a show from an artist you actually listen to.” with a Connect with Spotify call to action.',
+        alt: 'Concert Radar landing (dark theme) — “Never miss a show from an artist you actually listen to.” with a Connect with Spotify call to action over a dim concert-crowd hero.',
         caption: 'Landing',
       },
       {
         src: '/work/concert-radar/detail.jpg',
-        alt: 'Concert detail page for Sigrid at USF Verftet in Bergen, showing date, distance, venue, and Ticketmaster ticketing source.',
+        alt: 'Concert detail page (dark theme) for Sigrid at USF Verftet in Bergen, showing date, distance, venue, and Ticketmaster ticketing source on a near-black layout with Spotify-green accents.',
         caption: 'Concert detail',
       },
     ],
