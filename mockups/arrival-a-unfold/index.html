@@ -1,0 +1,660 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Nima Hakimi — Initials Unfold (arrival variant A)</title>
+<meta name="description" content="Prototype: arrival variant A — a drawn NH monogram is the seed of the name; the initials unfold into 'Nima Hakimi.' as the spark becomes the period." />
+
+<!-- Type -->
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=satoshi@400,500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+<style>
+/* ============================================================
+   TOKENS — brand constants (shared across all variants)
+   ============================================================ */
+:root{
+  --bg:#0E0E10;
+  --bg-soft:#141417;
+  --text:#F5F5F0;
+  --muted:#8A8A82;
+  --line:rgba(245,245,240,.10);
+  --accent:#C6FF3D;
+  --accent-glow:rgba(198,255,61,.55);
+
+  --display:"Clash Display","Satoshi",system-ui,sans-serif;
+  --body:"Satoshi",system-ui,-apple-system,sans-serif;
+  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+
+  --ease:cubic-bezier(.16,1,.3,1);   /* expo.out — signature entrance curve */
+  --pad:clamp(20px,5vw,72px);
+  --maxw:1320px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--body);
+  font-weight:400;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+  min-height:100svh;
+}
+img,svg{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#0b0b0c}
+
+/* subtle atmospheric depth so the near-black isn't flat */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(198,255,61,.05), transparent 55%),
+    radial-gradient(90% 70% at 50% 120%, rgba(255,255,255,.03), transparent 60%);
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+.nav{
+  position:sticky;top:0;z-index:40;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;
+  padding:18px var(--pad);
+  backdrop-filter:saturate(120%) blur(6px);
+}
+.nav__logo-slot{
+  position:relative;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:28px;flex:0 0 auto;
+  color:var(--text);
+}
+.nav__logo-slot svg{width:28px;height:28px;overflow:visible}
+/* logo starts invisible — it settles in at the end of the sequence */
+.nav__logo-slot .logo-mono{opacity:0;transform:scale(.7)}
+
+.nav__links{
+  display:none;gap:26px;align-items:center;
+  font-family:var(--mono);font-size:13px;letter-spacing:.02em;color:var(--muted);
+}
+.nav__links a{transition:color .2s var(--ease)}
+.nav__links a:hover{color:var(--text)}
+.nav__cta{
+  font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.01em;
+  color:#0b0b0c;background:var(--accent);
+  padding:9px 16px;border-radius:999px;
+  border:1px solid rgba(198,255,61,.6);
+  box-shadow:0 0 0 0 var(--accent-glow);
+  transition:box-shadow .25s var(--ease), transform .25s var(--ease);
+}
+.nav__cta:hover{box-shadow:0 6px 24px -6px var(--accent-glow);transform:translateY(-1px)}
+
+@media(min-width:760px){.nav__links{display:flex}}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative;z-index:1;
+  max-width:var(--maxw);margin:0 auto;
+  padding:clamp(40px,9vh,120px) var(--pad) clamp(60px,12vh,140px);
+}
+.hero__eyebrow{
+  font-family:var(--mono);font-size:12px;font-weight:500;
+  letter-spacing:.26em;text-transform:uppercase;color:var(--accent);
+  display:inline-flex;align-items:center;gap:10px;
+  margin-bottom:clamp(18px,4vh,34px);
+}
+.hero__eyebrow::before{
+  content:"";width:26px;height:1px;background:var(--accent);opacity:.7;
+}
+
+.hero__title{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(52px,13vw,168px);
+  line-height:.92;letter-spacing:-.02em;
+  color:var(--text);
+  margin:0 0 clamp(22px,4vh,40px);
+  /* allow absolutely-positioned overlay glyphs to be measured against these */
+  position:relative;
+}
+.hero__title .word{display:inline-block;white-space:nowrap}
+/* measurable glyph spans */
+#g-N,#g-H{display:inline-block}
+/* the trailing fragments reveal from their left edge */
+#t-ima,#t-akimi{
+  display:inline-block;
+  clip-path:inset(0 100% 0 0);
+  will-change:clip-path;
+}
+/* the seed glyphs N & H start hidden — the monogram stands in for them
+   until the cross-fade hands off to real type */
+#g-N,#g-H{opacity:0;will-change:opacity}
+#name-period{
+  display:inline-block;color:var(--accent);
+  opacity:0;transform:scale(.2);
+  transform-origin:center bottom;
+  will-change:transform,opacity;
+}
+
+.hero__lead{
+  font-family:var(--body);font-weight:400;
+  font-size:clamp(16px,2.1vw,21px);line-height:1.55;
+  color:var(--muted);max-width:60ch;
+}
+.hero__lead b{color:var(--text);font-weight:500}
+.hero__lead .acc{color:var(--accent)}
+
+/* ============================================================
+   ARRIVAL OVERLAY — sits ABOVE hero so the whole sequence reads
+   with zero layout shift. Pointer-events none (replay handles input).
+   ============================================================ */
+.arrival{
+  position:fixed;inset:0;z-index:60;pointer-events:none;
+  /* dim veil so the centered monogram dominates at the start;
+     fades to transparent during the transition */
+  background:radial-gradient(120% 90% at 50% 42%, rgba(14,14,16,.0), rgba(14,14,16,.0));
+}
+.arrival__veil{
+  position:absolute;inset:0;
+  background:var(--bg);
+  opacity:1;will-change:opacity;
+}
+
+/* the moving monogram — positioned/scaled in JS via transform */
+.mono{
+  position:fixed;top:0;left:0;z-index:62;
+  width:120px;height:120px;
+  transform-origin:0 0;
+  pointer-events:none;
+  will-change:transform,opacity;
+}
+.mono svg{width:120px;height:120px;overflow:visible;display:block}
+.mono path{
+  fill:none;
+  stroke:var(--accent);
+  stroke-width:8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+/* the glowing spark dot that rides the drawing tip */
+.spark{
+  position:fixed;top:0;left:0;z-index:64;
+  width:9px;height:9px;border-radius:50%;
+  background:var(--accent);
+  transform:translate(-50%,-50%);
+  pointer-events:none;
+  opacity:0;
+  box-shadow:
+    0 0 6px 2px var(--accent-glow),
+    0 0 14px 5px rgba(198,255,61,.35),
+    0 0 30px 10px rgba(198,255,61,.18);
+  will-change:transform,opacity;
+}
+
+/* ============================================================
+   REPLAY
+   ============================================================ */
+.replay{
+  position:fixed;right:16px;bottom:16px;z-index:80;
+  font-family:var(--mono);font-size:12px;letter-spacing:.04em;
+  color:var(--text);background:rgba(20,20,23,.7);
+  border:1px solid var(--line);
+  padding:9px 14px;border-radius:999px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;
+  backdrop-filter:blur(8px);
+  transition:border-color .2s var(--ease), color .2s var(--ease);
+}
+.replay:hover{border-color:var(--accent);color:var(--accent)}
+.replay__dot{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+
+/* footer-ish filler so the page has body to scroll into */
+.section{
+  position:relative;z-index:1;max-width:var(--maxw);margin:0 auto;
+  padding:0 var(--pad) clamp(60px,12vh,120px);
+}
+.section__row{
+  display:flex;flex-wrap:wrap;gap:14px 28px;align-items:center;
+  padding-top:28px;border-top:1px solid var(--line);
+  font-family:var(--mono);font-size:13px;color:var(--muted);
+}
+.section__row .tag{
+  border:1px solid var(--line);border-radius:999px;padding:6px 12px;
+}
+
+/* ============================================================
+   REDUCED MOTION — resting frame, no sequence
+   ============================================================ */
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+/* class applied by JS to compose the resting frame */
+.is-resting #t-ima,
+.is-resting #t-akimi{clip-path:inset(0)!important}
+.is-resting #g-N,
+.is-resting #g-H{opacity:1!important}
+.is-resting #name-period{opacity:1!important;transform:none!important}
+.is-resting .nav__logo-slot .logo-mono{opacity:1!important;transform:none!important}
+.is-resting .arrival{display:none!important}
+.is-resting .mono{display:none!important}
+.is-resting .spark{display:none!important}
+</style>
+</head>
+<body>
+
+  <!-- ===================== NAV ===================== -->
+  <nav class="nav" aria-label="Primary">
+    <span class="nav__logo-slot" id="nav-logo-slot" aria-label="Nima Hakimi — home">
+      <!-- persistent logo monogram, fades in at the end -->
+      <svg class="logo-mono" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+        <path d="M22 96 L22 24 L74 92 L74 24" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M84 24 L84 96 M84 60 L112 60 M112 24 L112 96" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+
+    <div class="nav__links">
+      <a href="#">Work</a>
+      <a href="#">About</a>
+      <a href="#">Writing</a>
+    </div>
+
+    <a class="nav__cta" href="#">Let's talk</a>
+  </nav>
+
+  <!-- ===================== HERO ===================== -->
+  <header class="hero">
+    <span class="hero__eyebrow">Frontend Developer</span>
+
+    <h1 class="hero__title" id="hero-title" aria-label="Nima Hakimi.">
+      <span class="word"><span id="g-N">N</span><span id="t-ima">ima</span></span>
+      <span class="word"><span id="g-H">H</span><span id="t-akimi">akimi</span><span id="name-period">.</span></span>
+    </h1>
+
+    <p class="hero__lead">
+      <b>Frontend developer with a designer's eye</b> — I build
+      <span class="acc">accessible, expressive</span> interfaces.
+      Currently at NAV.
+    </p>
+  </header>
+
+  <section class="section" aria-hidden="true">
+    <div class="section__row">
+      <span class="tag">React</span>
+      <span class="tag">TypeScript</span>
+      <span class="tag">Motion</span>
+      <span class="tag">Design Systems</span>
+      <span class="tag">Accessibility</span>
+    </div>
+  </section>
+
+  <!-- ===================== ARRIVAL OVERLAY ===================== -->
+  <div class="arrival" id="arrival" aria-hidden="true">
+    <div class="arrival__veil" id="veil"></div>
+  </div>
+
+  <!-- the drawing monogram (the SEED). Two paths: N then H. -->
+  <div class="mono" id="mono" aria-hidden="true">
+    <svg id="mono-svg" viewBox="0 0 120 120" fill="none">
+      <!-- N: down the left stem, diagonal, up the right stem -->
+      <path id="mono-N" d="M22 96 L22 24 L74 92 L74 24"/>
+      <!-- H: left stem, crossbar, right stem (as one continuous-ish stroke) -->
+      <path id="mono-H" d="M84 96 L84 24 M84 60 L112 60 M112 24 L112 96"/>
+    </svg>
+  </div>
+
+  <!-- the spark -->
+  <div class="spark" id="spark" aria-hidden="true"></div>
+
+  <!-- ===================== REPLAY ===================== -->
+  <button class="replay" id="replay" type="button">
+    <span class="replay__dot"></span> Replay
+  </button>
+
+  <!-- GSAP core only -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+  <script>
+  (function(){
+    "use strict";
+
+    /* ---------- guarded lookups ---------- */
+    var $ = function(id){ return document.getElementById(id); };
+    var els = {
+      arrival:  $("arrival"),
+      veil:     $("veil"),
+      mono:     $("mono"),
+      monoSvg:  $("mono-svg"),
+      pathN:    $("mono-N"),
+      pathH:    $("mono-H"),
+      spark:    $("spark"),
+      gN:       $("g-N"),
+      gH:       $("g-H"),
+      tima:     $("t-ima"),
+      takimi:   $("t-akimi"),
+      period:   $("name-period"),
+      logoMono: document.querySelector(".nav__logo-slot .logo-mono"),
+      replay:   $("replay"),
+      title:    $("hero-title")
+    };
+
+    var prefersReduced = window.matchMedia &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    /* If a critical element is missing OR GSAP didn't load, bail to the
+       composed resting frame so the page is always usable. */
+    var critical = [els.arrival, els.veil, els.mono, els.spark,
+                    els.gN, els.gH, els.tima, els.takimi, els.period, els.title];
+    var hasAll = critical.every(function(n){ return !!n; });
+
+    function showResting(){
+      document.body.classList.add("is-resting");
+    }
+
+    if (!hasAll || typeof window.gsap === "undefined" || prefersReduced){
+      showResting();
+      // Replay still works in reduced-motion only as a no-op visual reset;
+      // wire it only if everything exists AND motion allowed.
+      if (els.replay && (!hasAll || typeof window.gsap === "undefined")){
+        els.replay.style.display = "none";
+      }
+      if (prefersReduced && els.replay) els.replay.style.display = "none";
+      return;
+    }
+
+    var gsap = window.gsap;
+
+    /* ---------- geometry helpers ---------- */
+
+    // page-space rect (includes scroll) of an element's box
+    function pageRect(el){
+      var r = el.getBoundingClientRect();
+      return {
+        left:   r.left + window.scrollX,
+        top:    r.top + window.scrollY,
+        right:  r.right + window.scrollX,
+        bottom: r.bottom + window.scrollY,
+        width:  r.width,
+        height: r.height,
+        cx:     r.left + window.scrollX + r.width/2,
+        cy:     r.top + window.scrollY + r.height/2
+      };
+    }
+
+    // Convert an SVG userspace point (in the mono's 0..120 viewBox) to a
+    // PAGE-space pixel using the LIVE rendered rect of the mono svg.
+    // This is what lets the spark ride the actual drawing tip regardless
+    // of the mono's current transform/scale.
+    function svgPointToPage(x, y){
+      var r = els.monoSvg.getBoundingClientRect();
+      // viewBox is 0 0 120 120 and svg fills its box, so map linearly.
+      var px = r.left + window.scrollX + (x/120) * r.width;
+      var py = r.top  + window.scrollY + (y/120) * r.height;
+      return { x:px, y:py };
+    }
+
+    /* ---------- combined path sampling (N then H) ---------- */
+    // We treat the two strokes as ONE continuous draw of total length
+    // lenN + lenH. Given progress p in [0,1] we find the tip point in the
+    // mono's SVG userspace, then convert to page px.
+    var lenN = els.pathN.getTotalLength();
+    var lenH = els.pathH.getTotalLength();
+    var lenTotal = lenN + lenH;
+
+    function tipAt(p){
+      var d = p * lenTotal;
+      var pt;
+      if (d <= lenN){
+        pt = els.pathN.getPointAtLength(d);
+      } else {
+        pt = els.pathH.getPointAtLength(Math.min(d - lenN, lenH));
+      }
+      return svgPointToPage(pt.x, pt.y);
+    }
+
+    // initialise dash for the "draw on" effect
+    function primeDraw(){
+      gsap.set(els.pathN, { strokeDasharray: lenN, strokeDashoffset: lenN, stroke:"#C6FF3D" });
+      gsap.set(els.pathH, { strokeDasharray: lenH, strokeDashoffset: lenH, stroke:"#C6FF3D" });
+    }
+
+    /* ---------- resting / reset of all animated props ---------- */
+    function resetAll(){
+      document.body.classList.remove("is-resting");
+
+      // overlay + veil visible (dark) at start
+      gsap.set(els.arrival, { display:"block" });
+      gsap.set(els.veil, { opacity:1 });
+
+      // monogram centered, full scale=1 (we'll compute the actual centered
+      // transform in placeMonoCentered), visible
+      gsap.set(els.mono, { opacity:1 });
+
+      // hero glyph spans: name hidden, period hidden
+      gsap.set([els.tima, els.takimi], { clipPath:"inset(0 100% 0 0)" });
+      gsap.set([els.gN, els.gH], { opacity:0 });
+      gsap.set(els.period, { opacity:0, scale:.2 });
+
+      // logo hidden
+      if (els.logoMono) gsap.set(els.logoMono, { opacity:0, scale:.7 });
+
+      // spark hidden until draw starts
+      gsap.set(els.spark, { opacity:0 });
+
+      primeDraw();
+      placeMonoCentered();
+    }
+
+    // Centre the mono on screen at a comfortable display size.
+    // Returns the transform we applied so later we can tween FROM it.
+    var centeredState = null;
+    function placeMonoCentered(){
+      // target on-screen size of the centered monogram
+      var vw = window.innerWidth, vh = window.innerHeight;
+      var displaySize = Math.min(vw, vh) * 0.34;       // px, the rendered 120x120
+      displaySize = Math.max(150, Math.min(displaySize, 320));
+      var scale = displaySize / 120;
+      // centre it in the viewport (page coords = viewport + scroll; at start scroll≈0)
+      var x = window.scrollX + vw/2 - displaySize/2;
+      var y = window.scrollY + vh*0.44 - displaySize/2;
+      centeredState = { x:x, y:y, scale:scale };
+      gsap.set(els.mono, { x:x, y:y, scale:scale });
+    }
+
+    /* ---------- compute the docked (aligned-to-headline) transform ----------
+       We want the mono's drawn N to sit over #g-N and its drawn H over #g-H.
+       Strategy:
+       - measure #g-N and #g-H page rects (the real type cap positions)
+       - the mono N stem spans userspace x≈22..74, the H spans x≈84..112
+       - choose a uniform scale so the mono cap-height (~72 userspace, y 24..96)
+         matches the text cap-height, then translate so mono-N's left/top
+         lands on #g-N's left/top.
+    */
+    function computeDockedState(){
+      var rN = pageRect(els.gN);
+      var rH = pageRect(els.gH);
+
+      // cap height of the type ≈ glyph box height * ~0.72 (descenderless caps)
+      var capH = rN.height * 0.70;
+      // mono drawn cap-height in userspace is from y=24 to y=96 => 72 units
+      var scale = capH / 72;
+
+      // mono N left stem is at userspace x=22, top of stem y=24.
+      // We want that point to land at the top-left of the #g-N cap.
+      // page x of #g-N left edge:
+      var targetNx = rN.left;
+      // baseline-ish top of caps: glyph box top + (boxH - capH)*~0.32
+      var targetNy = rN.top + (rN.height - capH) * 0.30;
+
+      // In the mono's local transform: page = monoX + (userX/120)*120*scale
+      //                                      = monoX + userX*scale
+      // we want: targetNx = monoX + 22*scale  => monoX = targetNx - 22*scale
+      //          targetNy = monoY + 24*scale  => monoY = targetNy - 24*scale
+      var monoX = targetNx - 22 * scale;
+      var monoY = targetNy - 24 * scale;
+
+      // sanity/secondary: where does mono-H land vs #g-H? (informational —
+      // we keep uniform scale + N anchor; horizontal H drift is usually tiny
+      // because letter advance ≈ proportional). We nudge X by half the
+      // discrepancy so BOTH glyphs sit close rather than only N being perfect.
+      var monoHpageLeft = monoX + 84 * scale;
+      var dx = rH.left - monoHpageLeft;
+      monoX += dx * 0.5;
+
+      return { x:monoX, y:monoY, scale:scale };
+    }
+
+    /* ---------- the sequence ---------- */
+    var tl = null;
+
+    function build(){
+      resetAll();
+
+      tl = gsap.timeline({ defaults:{ ease:"expo.out" } });
+
+      // PART 1 — NH draws on (0.0–1.0s) ----------------------------------
+      // spark appears at the start tip
+      tl.add(function(){
+        var t0 = tipAt(0);
+        gsap.set(els.spark, { x:t0.x, y:t0.y, opacity:1 });
+      }, 0);
+
+      // drive p:0->1 and on every frame: move spark to tip + reveal stroke
+      var draw = { p:0 };
+      tl.to(draw, {
+        p:1, duration:0.9, ease:"expo.out",
+        onUpdate:function(){
+          var p = draw.p;
+          // stroke reveal: N first, then H, proportional to combined length
+          var drawn = p * lenTotal;
+          var offN = Math.max(0, lenN - drawn);
+          els.pathN.style.strokeDashoffset = offN;
+          var drawnH = Math.max(0, drawn - lenN);
+          var offH = Math.max(0, lenH - drawnH);
+          els.pathH.style.strokeDashoffset = offH;
+          // spark rides the tip
+          var t = tipAt(p);
+          gsap.set(els.spark, { x:t.x, y:t.y });
+        }
+      }, 0.05);
+
+      // "ink drying": each stroke settles lime -> off-white shortly after it
+      // finishes. N finishes around when drawn passes lenN.
+      tl.to(els.pathN, { stroke:"#F5F5F0", duration:0.35, ease:"power1.out" }, 0.05 + 0.9 * (lenN/lenTotal) + 0.05);
+      tl.to(els.pathH, { stroke:"#F5F5F0", duration:0.35, ease:"power1.out" }, 0.05 + 0.9 + 0.04);
+
+      // park spark at the path end (it already is); ensure exact end point
+      tl.add(function(){
+        var tEnd = tipAt(1);
+        gsap.set(els.spark, { x:tEnd.x, y:tEnd.y });
+      }, 0.05 + 0.9);
+
+      // PART 2 — THE TRANSITION ------------------------------------------
+
+      // 1) (1.0–1.45s) Reposition the NH to the headline ------------------
+      tl.add(function(){
+        // recompute docked target at the moment we move (rects are live)
+        var docked = computeDockedState();
+        gsap.to(els.mono, {
+          x:docked.x, y:docked.y, scale:docked.scale,
+          duration:0.45, ease:"expo.out",
+          onUpdate:function(){
+            // keep the parked spark glued to the mono's path END as it flies,
+            // so it visually stays at the tip of the drawn H.
+            var tEnd = tipAt(1);
+            gsap.set(els.spark, { x:tEnd.x, y:tEnd.y });
+          }
+        });
+      }, 1.0);
+
+      // veil fades out so the hero reads, timed with the reposition
+      tl.to(els.veil, { opacity:0, duration:0.6, ease:"power2.out" }, 1.0);
+
+      // 2) (1.35–1.95s) name writes out FROM the initials -----------------
+      //    + cross-fade mono N/H into real #g-N / #g-H type
+      // reveal #t-ima (from N), slightly before #t-akimi (from H)
+      tl.to(els.tima,   { clipPath:"inset(0 0% 0 0)", duration:0.6, ease:"expo.out" }, 1.35);
+      tl.to(els.takimi, { clipPath:"inset(0 0% 0 0)", duration:0.6, ease:"expo.out" }, 1.45);
+
+      // cross-fade: real glyphs fade IN while the mono fades OUT, tightly
+      // overlapped so it reads as the SAME letters becoming type.
+      tl.to([els.gN, els.gH], { opacity:1, duration:0.45, ease:"power2.out" }, 1.40);
+      tl.to(els.mono, { opacity:0, duration:0.40, ease:"power2.inOut" }, 1.48);
+
+      // 3) (1.9–2.15s) the period lands ----------------------------------
+      // spark flies to the period's measured position, then becomes it.
+      tl.add(function(){
+        var rp = pageRect(els.period);
+        // aim at the visual centre of where the period sits (bottom-left of
+        // its box, since a period is low) — use centre x, lower-third y.
+        var px = rp.left + rp.width * 0.5;
+        var py = rp.top + rp.height * 0.80;
+        gsap.set(els.spark, { opacity:1 });
+        gsap.to(els.spark, {
+          x:px, y:py, duration:0.22, ease:"power2.in",
+          onComplete:function(){
+            gsap.set(els.spark, { opacity:0 });
+            gsap.to(els.period, {
+              opacity:1, scale:1, duration:0.5, ease:"back.out(2.4)"
+            });
+          }
+        });
+      }, 1.9);
+
+      // 4) (2.0–2.3s) logo settles into the nav slot ---------------------
+      if (els.logoMono){
+        tl.to(els.logoMono, {
+          opacity:1, scale:1, duration:0.5, ease:"back.out(1.8)"
+        }, 2.0);
+      }
+
+      // tidy: hide the overlay container after everything resolves so it
+      // never traps anything (it's pointer-events:none anyway).
+      tl.add(function(){
+        gsap.set(els.arrival, { display:"none" });
+      }, 2.35);
+
+      return tl;
+    }
+
+    /* ---------- run / replay ---------- */
+    function play(){
+      if (tl) tl.kill();
+      // if the user scrolled, bring them to top so the centered overlay aligns
+      if (window.scrollY > 4) window.scrollTo(0,0);
+      build();
+    }
+
+    els.replay.addEventListener("click", play);
+
+    // recompute centered placement on resize while overlay still showing
+    var rt;
+    window.addEventListener("resize", function(){
+      clearTimeout(rt);
+      rt = setTimeout(function(){
+        // only matters before the sequence resolves; cheap + safe
+        if (els.arrival && els.arrival.style.display !== "none" && els.mono){
+          placeMonoCentered();
+        }
+      }, 120);
+    });
+
+    // wait for fonts so glyph rects are accurate, then play
+    function start(){ play(); }
+    if (document.fonts && document.fonts.ready){
+      document.fonts.ready.then(start).catch(start);
+      // safety: don't wait forever
+      setTimeout(function(){ if(!tl) start(); }, 1200);
+    } else {
+      window.addEventListener("load", start);
+    }
+  })();
+  </script>
+</body>
+</html>
