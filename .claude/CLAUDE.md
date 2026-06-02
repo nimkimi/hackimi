@@ -58,7 +58,7 @@ In development, reCAPTCHA is bypassed when `RECAPTCHA_SECRET_KEY` is absent.
 
 **Site constants** — all personal/site metadata (name, role, employer, social links, OG image, etc.) lives in `src/lib/site.ts`. `src/lib/metadata.ts` consumes it to build Next.js `Metadata` objects and JSON-LD. When adding new pages, use `buildPageMetadata()` for the `export const metadata`.
 
-**Data layer** — static content (projects list, about info) lives in `src/data/`. Add new projects to `src/data/projects.ts`.
+**Data layer** — static content lives in `src/data/`. Case studies / projects are typed in `src/data/work.ts` (a `CaseStudy[]` with a 5-section narrative, tech, optional images, `inProgress` flag); about info is in `src/data/about.ts`. Add new projects to `src/data/work.ts`.
 
 **Styling** — Tailwind with a single dark color scheme (no light/dark theming, no `darkMode` config). The palette is a flat set of tokens in `tailwind.config.ts`: `base` (`#0E0E10`), `surface`, `ink`, `muted`, `accent` (`#C6FF3D`), `accent-dim`. The old reusable component classes (`.card`/`.btn`/`.btn-accent`/`.btn-outline`/`.muted`) and the two-theme palette have been removed. The current helper classes in `globals.css` (`@layer components`) are `.mono-label` (mono uppercase tracked label), `.measure` (62ch max-width), and `.grain` (fixed noise overlay).
 
