@@ -148,7 +148,7 @@ export default function AboutPage() {
               <div className="grid grid-cols-1 gap-y-2 border-b border-white/10 py-6 md:grid-cols-[10rem_1fr] md:gap-x-8">
                 <span className="font-mono text-xs tabular-nums tracking-tight text-muted">{edu.period}</span>
                 <div>
-                  <h3 className="text-base font-medium leading-snug sm:text-lg">
+                  <h3 className="font-medium leading-snug sm:text-lg">
                     {edu.degree} <span className="text-muted">@</span> {edu.institution}
                   </h3>
                   <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted">
