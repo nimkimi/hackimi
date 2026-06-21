@@ -125,13 +125,18 @@ test.describe('Contact form', () => {
     // to the pending/"Sending…" state. The true success path is covered by the
     // unit test for submitContact (T7).
     let actionFired = false;
+    // Hold the server-action request open until the test releases it, so the
+    // pending UI is observable without a timing race (a fixed delay is flaky on
+    // slow runners). When released we abort — the action never resolves into
+    // success and no email is ever sent.
+    let releaseAction!: () => void;
+    const held = new Promise<void>((resolve) => {
+      releaseAction = resolve;
+    });
     await page.route('**/contact', async (route) => {
       if (isServerActionPost(route.request())) {
         actionFired = true;
-        // Hold the request open briefly so the pending UI is observable, then
-        // abort — the action result never resolves into success, and no email
-        // is ever sent.
-        await new Promise((r) => setTimeout(r, 1500));
+        await held;
         await route.abort();
         return;
       }
@@ -149,9 +154,13 @@ test.describe('Contact form', () => {
     const submit = page.getByRole('button', { name: 'Send message' });
     await submit.click();
 
-    // Pending state: button shows the spinner copy and is disabled.
+    // Pending state: button shows the spinner copy and is disabled. The
+    // request stays held throughout, so this window can't close mid-assertion.
     await expect(page.getByText('Sending…')).toBeVisible();
     await expect(page.getByRole('button', { name: /Sending/ })).toBeDisabled();
     expect(actionFired).toBe(true);
+
+    // Release the held request (aborts it — still no email sent).
+    releaseAction();
   });
 });
