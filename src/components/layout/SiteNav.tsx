@@ -47,7 +47,7 @@ export default function SiteNav() {
   return (
     <nav
       aria-label="Primary"
-      className="sticky top-0 z-40 border-b border-white/10 bg-base/70 backdrop-blur"
+      className="sticky top-0 z-40 border-b border-white/10 bg-dark/70 backdrop-blur"
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-6">
         {/* Logo slot — arrival animation landing target. Visible by default. */}
@@ -55,7 +55,7 @@ export default function SiteNav() {
           id="nav-logo-slot"
           href="/"
           aria-label="Nima Hakimi — home"
-          className="relative flex items-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+          className="relative flex items-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-dark"
         >
           <Monogram
             className="h-7 w-7 text-ink"
@@ -79,11 +79,11 @@ export default function SiteNav() {
           </ul>
           <MagneticButton
             href="/contact"
-            className="mono-label !text-base"
+            className="mono-label !text-dark"
           >
             <span
               aria-hidden
-              className="h-1.5 w-1.5 rounded-full bg-base"
+              className="h-1.5 w-1.5 rounded-full bg-dark"
             />
             Let&apos;s talk
           </MagneticButton>
@@ -93,7 +93,7 @@ export default function SiteNav() {
         <div className="flex items-center gap-3 md:hidden">
           <Link
             href="/contact"
-            className="mono-label inline-flex min-h-11 items-center rounded-full bg-accent px-4 py-2.5 !text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+            className="mono-label inline-flex min-h-11 items-center rounded-full bg-accent px-4 py-2.5 !text-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-dark"
           >
             Let&apos;s talk
           </Link>
@@ -103,7 +103,7 @@ export default function SiteNav() {
             aria-controls="mobile-nav-panel"
             aria-label={open ? 'Close menu' : 'Open menu'}
             onClick={() => setOpen((v) => !v)}
-            className="flex h-11 w-11 items-center justify-center rounded-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+            className="flex h-11 w-11 items-center justify-center rounded-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-dark"
           >
             <span className="relative block h-3.5 w-5" aria-hidden>
               <span
@@ -130,7 +130,7 @@ export default function SiteNav() {
       <div
         id="mobile-nav-panel"
         hidden={!open}
-        className="border-t border-white/10 bg-base/95 backdrop-blur md:hidden"
+        className="border-t border-white/10 bg-dark/95 backdrop-blur md:hidden"
       >
         <ul className="mx-auto flex max-w-6xl flex-col px-5 py-2 sm:px-6">
           {NAV_ITEMS.map((item) => (

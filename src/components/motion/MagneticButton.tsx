@@ -34,7 +34,7 @@ type MagneticButtonProps = {
 };
 
 const BASE_CLASS =
-  'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium bg-accent text-base transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-base';
+  'inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium bg-accent text-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-dark';
 
 /**
  * A CTA that drifts toward the cursor on hover and springs back on leave.

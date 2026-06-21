@@ -7,7 +7,7 @@
     @apply antialiased;
   }
   body {
-    @apply bg-base text-ink font-sans;
+    @apply bg-dark text-ink font-sans;
   }
   ::selection {
     background: #c6ff3d;

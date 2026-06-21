@@ -24,12 +24,12 @@ export default function LoadingContactPage() {
           {Array.from({ length: 3 }).map((_, index) => (
             <div key={index} className="space-y-2">
               <div className="h-3 w-20 rounded bg-muted/20" />
-              <div className="h-11 w-full rounded-lg bg-base/60" />
+              <div className="h-11 w-full rounded-lg bg-dark/60" />
             </div>
           ))}
           <div className="space-y-2">
             <div className="h-3 w-20 rounded bg-muted/20" />
-            <div className="h-[140px] w-full rounded-lg bg-base/60" />
+            <div className="h-[140px] w-full rounded-lg bg-dark/60" />
           </div>
           <div className="h-11 w-36 rounded-full bg-accent/30" />
         </div>
