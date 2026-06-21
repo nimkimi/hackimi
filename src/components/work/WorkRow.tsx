@@ -51,7 +51,7 @@ export default function WorkRow({ c, index }: { c: CaseStudy; index: number }) {
 
         <span className="mt-4 flex flex-wrap gap-1.5">
           {c.inProgress && (
-            <span className="rounded-full border border-accent bg-accent px-[11px] py-[5px] font-mono text-[10px] uppercase tracking-[0.1em] text-base">
+            <span className="rounded-full border border-accent bg-accent px-[11px] py-[5px] font-mono text-[10px] uppercase tracking-[0.1em] text-dark">
               In progress
             </span>
           )}

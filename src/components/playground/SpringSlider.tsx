@@ -120,7 +120,7 @@ export default function SpringSlider() {
           style={{ left: thumbLeft }}
           animate={reduce ? undefined : { scale: dragging ? 1.25 : 1 }}
           transition={{ type: 'spring', stiffness: 500, damping: 28 }}
-          className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-accent bg-base shadow-[0_0_0_4px_rgba(198,255,61,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-base"
+          className="absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-accent bg-dark shadow-[0_0_0_4px_rgba(198,255,61,0.12)] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/70 focus-visible:ring-offset-2 focus-visible:ring-offset-dark"
         />
       </div>
     </div>

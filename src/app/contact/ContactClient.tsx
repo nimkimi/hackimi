@@ -20,7 +20,7 @@ function SubmitButton() {
   return (
     <button
       type="submit"
-      className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-base transition-colors hover:bg-accent-dim focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-base disabled:cursor-not-allowed disabled:opacity-70"
+      className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-dark transition-colors hover:bg-accent-dim focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-dark disabled:cursor-not-allowed disabled:opacity-70"
       disabled={pending}
       aria-busy={pending}
     >
@@ -29,7 +29,7 @@ function SubmitButton() {
           <span className="sr-only">Sending</span>
           <span
             aria-hidden="true"
-            className="h-4 w-4 animate-spin rounded-full border-2 border-base/40 border-t-base"
+            className="h-4 w-4 animate-spin rounded-full border-2 border-dark/40 border-t-dark"
           />
           <span aria-hidden="true">Sending…</span>
         </>

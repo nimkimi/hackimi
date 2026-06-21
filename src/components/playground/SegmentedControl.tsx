@@ -79,7 +79,7 @@ export default function SegmentedControl() {
                 transition={reduce ? { duration: 0 } : { type: 'spring', stiffness: 480, damping: 34 }}
               />
             )}
-            <span className={`relative z-10 ${selected ? 'text-base' : 'text-muted'}`}>{opt}</span>
+            <span className={`relative z-10 ${selected ? 'text-dark' : 'text-muted'}`}>{opt}</span>
           </button>
         );
       })}

@@ -22,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${clashDisplay.variable} ${satoshi.variable} ${geistMono.variable}`}
     >
-      <body className="min-h-screen bg-base text-ink font-sans">
+      <body className="min-h-screen bg-dark text-ink font-sans">
         <Preloader />
         <script
           type="application/ld+json"
