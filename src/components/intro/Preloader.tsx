@@ -660,7 +660,7 @@ export default function Preloader() {
 
         {/* VISIBLE lime rim/glow NH, scaled in lockstep with the aperture. */}
         <g ref={rimGRef}>
-          {/* Lime rim on the opening edge. No drop-shadow-sm filter — recomputing a
+          {/* Lime rim on the opening edge. No drop-shadow filter — recomputing a
               filter on a scaling path every frame is a major jank source; a plain
               lime stroke scales cleanly. */}
           <path
