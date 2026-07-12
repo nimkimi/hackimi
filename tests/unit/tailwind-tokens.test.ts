@@ -23,7 +23,7 @@ describe('tailwind design tokens', () => {
       ...Object.keys(config.theme?.extend?.fontSize ?? {}),
     ]);
 
-    const collisions = [...colorKeys].filter((c) => fontSizeKeys.has(c));
+    const collisions = Array.from(colorKeys).filter((c) => fontSizeKeys.has(c));
 
     expect(collisions).toEqual([]);
   });
