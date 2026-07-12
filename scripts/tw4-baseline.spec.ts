@@ -24,12 +24,18 @@ import path from 'node:path';
  * fires for what has actually scrolled into view. Reveal has a 2500ms
  * safety-net fallback that shows content regardless (see
  * src/components/motion/Reveal.tsx), so waiting past
- * fallback (2500ms) + longest stagger delay (~1s) + transition (0.8s)
- * without any scrolling is enough to settle every section for a full-page
- * shot.
+ * fallback (2500ms) + longest stagger delay (~0.2s measured) + transition
+ * (0.8s) without any scrolling is enough to settle every section for a
+ * full-page shot.
  */
 
-const OUT_DIR = path.join(process.cwd(), 'tw4-baseline', 'before');
+// TW4_BASELINE_SUBDIR lets task 3 (after-capture) point this same spec at
+// tw4-baseline/after/ instead of overwriting the before/ set.
+const OUT_DIR = path.join(
+  process.cwd(),
+  'tw4-baseline',
+  process.env.TW4_BASELINE_SUBDIR ?? 'before',
+);
 mkdirSync(OUT_DIR, { recursive: true });
 
 const VIEWPORTS = [
