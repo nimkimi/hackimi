@@ -64,7 +64,7 @@ export function Toast({ toast, onClose }: { toast: ToastState; onClose: () => vo
       >
         <button
           aria-label="Dismiss"
-          className="absolute top-2.5 right-2.5 inline-flex h-6 w-6 items-center justify-center rounded-md text-base/none text-muted transition-colors hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+          className="absolute top-2.5 right-2.5 inline-flex h-6 w-6 items-center justify-center rounded-md text-base/none text-muted transition-colors hover:text-ink focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/50"
           onClick={onClose}
         >
           ×

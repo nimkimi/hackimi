@@ -69,7 +69,7 @@ export default function SegmentedControl() {
             tabIndex={selected ? 0 : -1}
             onClick={() => setActive(opt)}
             onKeyDown={(e) => onKeyDown(e, i)}
-            className="relative rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+            className="relative rounded-full px-4 py-1.5 text-sm font-medium transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/60"
           >
             {selected && (
               <motion.span

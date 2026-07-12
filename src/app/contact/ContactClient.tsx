@@ -11,7 +11,7 @@ import { useFormStatus } from 'react-dom';
 type Props = { siteKey: string };
 
 const FIELD_CLASS =
-  'w-full min-h-11 rounded-lg border border-white/15 bg-surface px-3.5 py-2.5 text-base text-ink placeholder:text-muted/60 transition-colors focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50';
+  'w-full min-h-11 rounded-lg border border-white/15 bg-surface px-3.5 py-2.5 text-base text-ink placeholder:text-muted/60 transition-colors focus:border-accent focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/50';
 
 const LABEL_CLASS = 'mono-label';
 
@@ -20,7 +20,7 @@ function SubmitButton() {
   return (
     <button
       type="submit"
-      className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-dark transition-colors hover:bg-accent-dim focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-dark disabled:cursor-not-allowed disabled:opacity-70"
+      className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-medium text-dark transition-colors hover:bg-accent-dim focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-dark disabled:cursor-not-allowed disabled:opacity-70"
       disabled={pending}
       aria-busy={pending}
     >

@@ -47,7 +47,7 @@ export default function CopyChip() {
       type="button"
       onClick={copy}
       aria-label={copied ? 'Copied to clipboard' : `Copy ${VALUE}`}
-      className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-surface py-2 pl-4 pr-3 font-mono text-sm text-ink transition-colors hover:border-accent/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/60"
+      className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-surface py-2 pl-4 pr-3 font-mono text-sm text-ink transition-colors hover:border-accent/40 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/60"
     >
       <span className="truncate">{VALUE}</span>
       <span
