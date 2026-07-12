@@ -18,7 +18,10 @@ describe('tailwind design tokens', () => {
       ...Object.keys(defaultColors),
       ...Object.keys(config.theme?.extend?.colors ?? {}),
     ]);
-    const fontSizeKeys = new Set(Object.keys(defaultTheme.fontSize));
+    const fontSizeKeys = new Set([
+      ...Object.keys(defaultTheme.fontSize),
+      ...Object.keys(config.theme?.extend?.fontSize ?? {}),
+    ]);
 
     const collisions = [...colorKeys].filter((c) => fontSizeKeys.has(c));
 
