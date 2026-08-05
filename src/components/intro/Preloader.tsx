@@ -21,12 +21,16 @@ import { shouldPlayIntro } from '@/lib/intro';
  *      the nav logo settles in, and the parked spark flies into the name's period.
  *
  * Correctness contract (kept from v1):
- * - SSR-safe: the overlay is rendered on first paint, identical server/client.
+ * - SSR-safe: the overlay markup is identical server/client on first render.
  *   sessionStorage / matchMedia are read ONLY inside the layout effect.
  * - No CLS: the hero and nav already exist in final layout *under* the overlay.
  *   This component only animates their reveal; it never gates their existence.
- * - Skip path (reduced-motion): overlay removed before paint, hero/nav/period
- *   left in their default visible state. No GSAP, no flash.
+ * - Skip path (reduced-motion): the overlay is never painted, hero/nav/period
+ *   left in their default visible state. No GSAP, no flash. The no-paint half
+ *   of that promise is kept by CSS, not JS — `[data-arrival-overlay]` is
+ *   `display: none` under `prefers-reduced-motion: reduce` in globals.css,
+ *   because a stylesheet resolves before first paint and hydration does not.
+ *   The layout effect only unmounts the (already invisible) node afterwards.
  * - Fail-safe: every DOM lookup is guarded; the timeline build is wrapped in
  *   try/catch that restores the final visible state on any error. The page can
  *   never get stuck behind the overlay or with the hero hidden.
@@ -127,10 +131,21 @@ export default function Preloader() {
       setShow(false);
     };
 
-    // SKIP PATH — hide instantly. Hero/nav/period defaults are already final.
+    // SKIP PATH — nothing to undo: the reduced-motion rule in globals.css has
+    // already kept the overlay off the screen (see the contract note above), and
+    // the hero/nav/period defaults are final. All that is left is to unmount the
+    // node so the DOM ends up where the play path ends up. That runs on a
+    // microtask rather than inline, so the layout effect never calls setState
+    // synchronously; microtasks still drain before the browser paints, so the
+    // deferral cannot introduce a flash of its own.
     if (!play) {
-      setShow(false);
-      return;
+      let cancelled = false;
+      queueMicrotask(() => {
+        if (!cancelled) setShow(false);
+      });
+      return () => {
+        cancelled = true;
+      };
     }
 
     // PLAY PATH --------------------------------------------------------------
@@ -526,7 +541,12 @@ export default function Preloader() {
   if (!show) return null;
 
   return (
-    <div ref={arrivalRef} aria-hidden className="pointer-events-none fixed inset-0 z-60 overflow-hidden">
+    <div
+      ref={arrivalRef}
+      data-arrival-overlay
+      aria-hidden
+      className="pointer-events-none fixed inset-0 z-60 overflow-hidden"
+    >
       {/* Full-screen masked overlay. viewBox is set to px in the effect so the
           mask geometry is in real screen pixels (accurate at any size). */}
       <svg

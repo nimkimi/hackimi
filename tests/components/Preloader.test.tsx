@@ -1,17 +1,23 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { act, render } from '@testing-library/react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 
 /**
  * Characterization tests for the signature arrival animation Preloader.
  *
  * The component (`src/components/intro/Preloader.tsx`):
- * - Renders a full-screen masked overlay on first paint (SSR-safe). The
- *   skip/play decision is made in a `useLayoutEffect`, never during render.
+ * - Renders a full-screen masked overlay (SSR-safe, identical server/client).
+ *   The skip/play decision is made in a `useLayoutEffect`, never during render.
  * - Reads `window.matchMedia('(prefers-reduced-motion: reduce)')` and feeds it
  *   to `shouldPlayIntro(reduce)` (which is simply `!reduce`).
- * - SKIP path (reduced motion): `setShow(false)` immediately → overlay
- *   unmounts (`if (!show) return null`). No GSAP timeline is built. Hero / nav
- *   / period are left in their default visible state (never touched).
+ * - SKIP path (reduced motion): the overlay is kept off the screen by CSS
+ *   (`[data-arrival-overlay]` is `display: none` under reduced motion in
+ *   globals.css — the only thing that resolves before first paint). The layout
+ *   effect then unmounts the node on a microtask, so it never calls setState
+ *   synchronously. No GSAP timeline is built. Hero / nav / period are left in
+ *   their default visible state (never touched).
  * - PLAY path (motion allowed): schedules two nested `requestAnimationFrame`s;
  *   the inner one builds a `gsap.timeline(...)`. Every DOM lookup is guarded
  *   and the whole build is wrapped in try/catch; on any error (or missing
@@ -171,17 +177,52 @@ describe('Preloader — first render (SSR-safe overlay)', () => {
   });
 });
 
+/**
+ * The a11y contract: under `prefers-reduced-motion: reduce` the overlay must
+ * never be PAINTED — not "removed quickly after hydration". JavaScript cannot
+ * satisfy that on its own, because the overlay is server-rendered and the first
+ * paint can happen before React hydrates. A stylesheet rule is what actually
+ * resolves before first paint, so the contract has two halves and both are
+ * asserted here: the markup must carry a stable hook attribute from its very
+ * first render, and the stylesheet must hide that hook under reduced motion.
+ */
+describe('Preloader — reduced-motion never paints (pre-hydration contract)', () => {
+  it('carries the data-arrival-overlay hook on the server render, before any effect runs', () => {
+    // Server rendering runs no effects at all, so this is the markup a
+    // reduced-motion user's browser paints before hydration.
+    const html = renderToStaticMarkup(<Preloader />);
+
+    expect(html).toContain('data-arrival-overlay');
+    // Sanity: this really is the overlay markup, not an empty render.
+    expect(html).toContain('aperture-mask');
+  });
+
+  it('hides [data-arrival-overlay] from the stylesheet under prefers-reduced-motion', () => {
+    const css = readFileSync(join(__dirname, '..', '..', 'src/app/globals.css'), 'utf8');
+
+    // Whitespace-insensitive: only the rule's existence is the contract, not
+    // its formatting (Prettier owns that).
+    const rule =
+      /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[^]*?\[data-arrival-overlay\][^}]*\{[^}]*display:\s*none/;
+    expect(css).toMatch(rule);
+  });
+});
+
 describe('Preloader — reduced-motion (skip path)', () => {
-  it('does NOT build a gsap timeline and tears the overlay down (returns null)', () => {
+  it('does NOT build a gsap timeline and tears the overlay down (returns null)', async () => {
     setReduceMotion(true);
     const root = mountTargetDom();
     const heroLines = root.querySelectorAll('[data-hero-line]');
 
     const { container } = render(<Preloader />);
 
-    // The layout effect runs synchronously on mount: skip path → setShow(false).
-    // No gsap timeline is ever created for the animation.
+    // The layout effect runs synchronously on mount: skip path → no animation.
+    // No gsap timeline is ever created.
     expect(gsapApi.timeline).not.toHaveBeenCalled();
+
+    // The unmount is scheduled out of the layout-effect body (a microtask, which
+    // still flushes before the browser paints); flush it before asserting.
+    await act(async () => {});
 
     // Overlay unmounted: `if (!show) return null`.
     expect(container.querySelector('[aria-hidden]')).toBeNull();
@@ -195,10 +236,29 @@ describe('Preloader — reduced-motion (skip path)', () => {
     expect(window.requestAnimationFrame).not.toHaveBeenCalled();
   });
 
-  it('does not gate hero/nav existence — content remains in the DOM', () => {
+  it('does not setState during the layout effect — first render still matches SSR', async () => {
+    setReduceMotion(true);
+    mountTargetDom();
+
+    const { container } = render(<Preloader />);
+
+    // Immediately after mount (layout effects have run) the overlay is STILL
+    // in the DOM: the skip decision did not cascade a synchronous re-render.
+    // This is also what keeps the first client render identical to the server's.
+    expect(container.querySelector('[aria-hidden]')).toBeInTheDocument();
+    expect(container.querySelector('[data-arrival-overlay]')).toBeInTheDocument();
+
+    // It goes away on the very next microtask — before any paint.
+    await act(async () => {});
+
+    expect(container.querySelector('[data-arrival-overlay]')).toBeNull();
+  });
+
+  it('does not gate hero/nav existence — content remains in the DOM', async () => {
     setReduceMotion(true);
     const root = mountTargetDom();
     render(<Preloader />);
+    await act(async () => {});
 
     expect(root.querySelector('#nav-logo-slot')).toBeInTheDocument();
     expect(root.querySelector('#name-period')).toBeInTheDocument();
