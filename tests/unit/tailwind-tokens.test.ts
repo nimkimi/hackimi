@@ -14,10 +14,7 @@ import config from '../../tailwind.config';
 // colors/fontSize — it never overrides theme.colors or theme.fontSize.
 describe('tailwind design tokens', () => {
   it('no color token collides with a font-size utility key', () => {
-    const colorKeys = new Set([
-      ...Object.keys(defaultColors),
-      ...Object.keys(config.theme?.extend?.colors ?? {}),
-    ]);
+    const colorKeys = new Set([...Object.keys(defaultColors), ...Object.keys(config.theme?.extend?.colors ?? {})]);
     const fontSizeKeys = new Set([
       ...Object.keys(defaultTheme.fontSize),
       ...Object.keys(config.theme?.extend?.fontSize ?? {}),

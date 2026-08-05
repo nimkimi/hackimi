@@ -105,9 +105,7 @@ export default function Preloader() {
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const reduce = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     // Plays on every full page load / refresh; skipped only under reduced motion.
     const play = shouldPlayIntro(reduce);
 
@@ -120,8 +118,7 @@ export default function Preloader() {
     // Safe to call from the skip path, on completion, or from error handling.
     const finish = () => {
       completed = true;
-      const heroLines =
-        document.querySelectorAll<HTMLElement>('[data-hero-line]');
+      const heroLines = document.querySelectorAll<HTMLElement>('[data-hero-line]');
       const navSlot = document.querySelector<HTMLElement>('#nav-logo-slot');
       const period = document.querySelector<HTMLElement>('#name-period');
       if (heroLines.length) gsap.set(heroLines, { clearProps: 'transform' });
@@ -169,13 +166,10 @@ export default function Preloader() {
           const fillH = fillHRef.current;
           const spark = sparkRef.current;
 
-          const heroLines =
-            document.querySelectorAll<HTMLElement>('[data-hero-line]');
-          const navSlot =
-            document.querySelector<HTMLElement>('#nav-logo-slot');
+          const heroLines = document.querySelectorAll<HTMLElement>('[data-hero-line]');
+          const navSlot = document.querySelector<HTMLElement>('#nav-logo-slot');
           const navLogo = navSlot?.querySelector<SVGElement>('svg') ?? null;
-          const period =
-            document.querySelector<HTMLElement>('#name-period');
+          const period = document.querySelector<HTMLElement>('#name-period');
 
           // If anything load-bearing is missing, bail to the resting frame.
           if (
@@ -220,10 +214,7 @@ export default function Preloader() {
 
           const tipAt = (p: number) => {
             const d = p * lenTotal;
-            const pt =
-              d <= lenN
-                ? strokeN.getPointAtLength(d)
-                : strokeH.getPointAtLength(Math.min(d - lenN, lenH));
+            const pt = d <= lenN ? strokeN.getPointAtLength(d) : strokeH.getPointAtLength(Math.min(d - lenN, lenH));
             return svgPointToPage(pt.x, pt.y);
           };
 
@@ -262,43 +253,22 @@ export default function Preloader() {
             });
           };
 
-          const ptToPx = (c: Centered, x: number, y: number) =>
-            [c.x + x * c.scale, c.y + y * c.scale] as const;
+          const ptToPx = (c: Centered, x: number, y: number) => [c.x + x * c.scale, c.y + y * c.scale] as const;
 
-          const polyToD = (
-            c: Centered,
-            pts: readonly (readonly [number, number])[],
-          ) =>
+          const polyToD = (c: Centered, pts: readonly (readonly [number, number])[]) =>
             pts
               .map((p, i) => {
                 const q = ptToPx(c, p[0], p[1]);
-                return (
-                  (i === 0 ? 'M' : 'L') +
-                  q[0].toFixed(2) +
-                  ' ' +
-                  q[1].toFixed(2)
-                );
+                return (i === 0 ? 'M' : 'L') + q[0].toFixed(2) + ' ' + q[1].toFixed(2);
               })
               .join(' ');
 
-          const segsToD = (
-            c: Centered,
-            segs: readonly (readonly (readonly [number, number])[])[],
-          ) =>
+          const segsToD = (c: Centered, segs: readonly (readonly (readonly [number, number])[])[]) =>
             segs
               .map((s) => {
                 const a = ptToPx(c, s[0][0], s[0][1]);
                 const b = ptToPx(c, s[1][0], s[1][1]);
-                return (
-                  'M' +
-                  a[0].toFixed(2) +
-                  ' ' +
-                  a[1].toFixed(2) +
-                  ' L' +
-                  b[0].toFixed(2) +
-                  ' ' +
-                  b[1].toFixed(2)
-                );
+                return 'M' + a[0].toFixed(2) + ' ' + a[1].toFixed(2) + ' L' + b[0].toFixed(2) + ' ' + b[1].toFixed(2);
               })
               .join(' ');
 
@@ -392,30 +362,18 @@ export default function Preloader() {
               onUpdate: () => {
                 const p = draw.p;
                 const drawn = p * lenTotal;
-                strokeN.style.strokeDashoffset = String(
-                  Math.max(0, lenN - drawn),
-                );
-                strokeH.style.strokeDashoffset = String(
-                  Math.max(0, lenH - Math.max(0, drawn - lenN)),
-                );
+                strokeN.style.strokeDashoffset = String(Math.max(0, lenN - drawn));
+                strokeH.style.strokeDashoffset = String(Math.max(0, lenH - Math.max(0, drawn - lenN)));
                 const t = tipAt(p);
                 gsap.set(spark, { x: t.x, y: t.y });
               },
             },
-            0.05,
+            0.05
           );
 
           // "ink drying": strokes settle lime -> ink after they finish.
-          tl.to(
-            strokeN,
-            { stroke: INK, duration: 0.35, ease: 'power1.out' },
-            0.05 + 0.9 * (lenN / lenTotal) + 0.05,
-          );
-          tl.to(
-            strokeH,
-            { stroke: INK, duration: 0.35, ease: 'power1.out' },
-            0.05 + 0.9 + 0.04,
-          );
+          tl.to(strokeN, { stroke: INK, duration: 0.35, ease: 'power1.out' }, 0.05 + 0.9 * (lenN / lenTotal) + 0.05);
+          tl.to(strokeH, { stroke: INK, duration: 0.35, ease: 'power1.out' }, 0.05 + 0.9 + 0.04);
 
           // Park the spark exactly at the path end.
           tl.add(() => {
@@ -424,16 +382,8 @@ export default function Preloader() {
           }, 0.05 + 0.9);
 
           // PART 2 — stroke -> fill (the mark becomes solid, ready to be a hole).
-          tl.to(
-            [fillN, fillH],
-            { opacity: 1, duration: 0.22, ease: 'power2.out' },
-            1.0,
-          );
-          tl.to(
-            [strokeN, strokeH],
-            { opacity: 0, duration: 0.2, ease: 'power2.out' },
-            1.06,
-          );
+          tl.to([fillN, fillH], { opacity: 1, duration: 0.22, ease: 'power2.out' }, 1.0);
+          tl.to([strokeN, strokeH], { opacity: 0, duration: 0.2, ease: 'power2.out' }, 1.06);
 
           // APERTURE OPENS — apply the mask (NH becomes a transparent hole over
           // the now-hidden solid mono; pixel-aligned, so the swap is invisible),
@@ -462,31 +412,19 @@ export default function Preloader() {
                 gsap.set([apertureG, rimG], { scale: grow.k });
               },
             },
-            1.2,
+            1.2
           );
 
           // The dark overlay dissolves to complete the reveal — overlaps the scale
           // so it reads as "the mark opens and melts into the page".
-          tl.to(
-            [rimN, rimH],
-            { opacity: 0, duration: 0.3, ease: 'power1.out' },
-            1.5,
-          );
-          tl.to(
-            svg,
-            { opacity: 0, duration: 0.5, ease: 'power2.inOut' },
-            1.5,
-          );
+          tl.to([rimN, rimH], { opacity: 0, duration: 0.3, ease: 'power1.out' }, 1.5);
+          tl.to(svg, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, 1.5);
           tl.add(() => {
             gsap.set(arrival, { display: 'none' });
           }, 2.05);
 
           // HERO UNVEILED — name reveal timed to the opening aperture.
-          tl.to(
-            heroLines,
-            { yPercent: 0, duration: 0.7, ease: 'expo.out' },
-            1.6,
-          );
+          tl.to(heroLines, { yPercent: 0, duration: 0.7, ease: 'expo.out' }, 1.6);
 
           // Flourish: the parked spark glides into the name's period and lands
           // with a small lime pulse. The period is already visible (it rode in
@@ -519,7 +457,7 @@ export default function Preloader() {
                       repeat: 1,
                       transformOrigin: 'center 80%',
                       ease: 'power2.out',
-                    },
+                    }
                   );
                 },
               });
@@ -536,7 +474,7 @@ export default function Preloader() {
                 duration: 0.5,
                 ease: 'back.out(1.8)',
               },
-              2.05,
+              2.05
             );
           }
 
@@ -573,8 +511,7 @@ export default function Preloader() {
       // inline transforms so they're left VISIBLE and hide the overlay. We do
       // NOT call setShow here — the component is unmounting. All lookups guarded.
       if (!completed) {
-        const heroLines =
-          document.querySelectorAll<HTMLElement>('[data-hero-line]');
+        const heroLines = document.querySelectorAll<HTMLElement>('[data-hero-line]');
         const navSlot = document.querySelector<HTMLElement>('#nav-logo-slot');
         const period = document.querySelector<HTMLElement>('#name-period');
         if (heroLines.length) gsap.set(heroLines, { clearProps: 'transform' });
@@ -589,11 +526,7 @@ export default function Preloader() {
   if (!show) return null;
 
   return (
-    <div
-      ref={arrivalRef}
-      aria-hidden
-      className="pointer-events-none fixed inset-0 z-60 overflow-hidden"
-    >
+    <div ref={arrivalRef} aria-hidden className="pointer-events-none fixed inset-0 z-60 overflow-hidden">
       {/* Full-screen masked overlay. viewBox is set to px in the effect so the
           mask geometry is in real screen pixels (accurate at any size). */}
       <svg
@@ -604,58 +537,21 @@ export default function Preloader() {
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <mask
-            id="aperture-mask"
-            ref={maskRef}
-            maskUnits="userSpaceOnUse"
-            x="0"
-            y="0"
-            width="100"
-            height="100"
-          >
+          <mask id="aperture-mask" ref={maskRef} maskUnits="userSpaceOnUse" x="0" y="0" width="100" height="100">
             {/* WHITE = overlay is OPAQUE (covers hero). */}
-            <rect
-              ref={maskBgRef}
-              x="0"
-              y="0"
-              width="100"
-              height="100"
-              fill="#fff"
-            />
+            <rect ref={maskBgRef} x="0" y="0" width="100" height="100" fill="#fff" />
             {/* BLACK NH = transparent HOLE; lives in the scaled group so the
                 hole grows from the NH centre. The d is rewritten to screen px
                 in the effect. */}
             <g ref={apertureGRef}>
-              <path
-                ref={maskNRef}
-                d={NH.N}
-                fill="none"
-                stroke="#000"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                ref={maskHRef}
-                d={NH.H}
-                fill="none"
-                stroke="#000"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
+              <path ref={maskNRef} d={NH.N} fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" />
+              <path ref={maskHRef} d={NH.H} fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round" />
             </g>
           </mask>
         </defs>
 
         {/* The opaque overlay, with the NH punched out by the mask. */}
-        <rect
-          ref={overlayRectRef}
-          x="0"
-          y="0"
-          width="100"
-          height="100"
-          fill={BG}
-          mask="url(#aperture-mask)"
-        />
+        <rect ref={overlayRectRef} x="0" y="0" width="100" height="100" fill={BG} mask="url(#aperture-mask)" />
 
         {/* VISIBLE lime rim/glow NH, scaled in lockstep with the aperture. */}
         <g ref={rimGRef}>
@@ -688,16 +584,8 @@ export default function Preloader() {
       {/* The drawing monogram (Part 1). Strokes draw on; a solid version
           cross-fades in so the mark can become the window. Positioned/scaled
           in the effect. */}
-      <div
-        ref={monoRef}
-        className="fixed left-0 top-0 z-62 h-[120px] w-[120px] origin-top-left will-change-transform"
-      >
-        <svg
-          ref={monoSvgRef}
-          viewBox="0 0 120 120"
-          className="block h-[120px] w-[120px] overflow-visible"
-          fill="none"
-        >
+      <div ref={monoRef} className="fixed left-0 top-0 z-62 h-[120px] w-[120px] origin-top-left will-change-transform">
+        <svg ref={monoSvgRef} viewBox="0 0 120 120" className="block h-[120px] w-[120px] overflow-visible" fill="none">
           {/* Solid NH (handoff target): same geometry & thickness (9) as the
               aperture-mask NH, so the solid mark == the future transparent hole. */}
           <path

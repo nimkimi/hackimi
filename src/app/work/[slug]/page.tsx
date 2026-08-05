@@ -11,11 +11,7 @@ export function generateStaticParams() {
   return work.map((c) => ({ slug: c.slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const c = work.find((w) => w.slug === slug);
   if (!c) return {};
@@ -26,11 +22,7 @@ export async function generateMetadata({
   });
 }
 
-export default async function CasePage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+export default async function CasePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const c = work.find((w) => w.slug === slug);
   if (!c) notFound();
@@ -42,10 +34,7 @@ export default async function CasePage({
   return (
     <article className="pb-[clamp(3rem,10vh,7rem)]">
       <div className="pt-[clamp(1.5rem,5vh,3rem)]">
-        <UnderlineLink
-          href="/work"
-          className="font-mono text-xs uppercase tracking-[0.12em] text-muted"
-        >
+        <UnderlineLink href="/work" className="font-mono text-xs uppercase tracking-[0.12em] text-muted">
           ← All work
         </UnderlineLink>
       </div>
@@ -65,10 +54,7 @@ export default async function CasePage({
       {/* Foot: back + next project */}
       <Reveal className="mt-[clamp(3rem,8vh,5rem)] border-t border-white/10 pt-10">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <UnderlineLink
-            href="/work"
-            className="font-mono text-xs uppercase tracking-[0.12em] text-muted"
-          >
+          <UnderlineLink href="/work" className="font-mono text-xs uppercase tracking-[0.12em] text-muted">
             ← Back to work
           </UnderlineLink>
           {next.slug !== c.slug && (

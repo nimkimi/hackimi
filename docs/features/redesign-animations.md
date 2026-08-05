@@ -7,6 +7,7 @@ The current site is functional but not visually impressive. A portfolio targetin
 ## Scope
 
 **In scope:**
+
 - Visual overhaul of all pages (hero, about, projects, contact)
 - Scroll-triggered entrance animations (likely Framer Motion)
 - Richer micro-interactions: hover reveals, parallax, cursor effects
@@ -14,6 +15,7 @@ The current site is functional but not visually impressive. A portfolio targetin
 - Possible color palette refresh
 
 **Out of scope:**
+
 - Content changes (handled in case studies / services features)
 - Structural/routing changes
 

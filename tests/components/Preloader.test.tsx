@@ -1,13 +1,5 @@
 import { act, render } from '@testing-library/react';
-import {
-  afterEach,
-  beforeEach,
-  describe,
-  expect,
-  it,
-  vi,
-  type Mock,
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 
 /**
  * Characterization tests for the signature arrival animation Preloader.
@@ -94,8 +86,7 @@ function setReduceMotion(matches: boolean) {
     writable: true,
     configurable: true,
     value: vi.fn().mockImplementation((query: string) => ({
-      matches:
-        query === '(prefers-reduced-motion: reduce)' ? matches : false,
+      matches: query === '(prefers-reduced-motion: reduce)' ? matches : false,
       media: query,
       onchange: null,
       addListener: vi.fn(),
@@ -146,12 +137,10 @@ function mountTargetDom() {
 beforeEach(() => {
   rafQueue = [];
   rafId = 0;
-  vi.spyOn(window, 'requestAnimationFrame').mockImplementation(
-    (cb: FrameRequestCallback) => {
-      rafQueue.push(cb);
-      return ++rafId;
-    },
-  );
+  vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb: FrameRequestCallback) => {
+    rafQueue.push(cb);
+    return ++rafId;
+  });
   vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
   setReduceMotion(false);
   // Reset call history on the shared gsap mocks between tests.
@@ -200,9 +189,7 @@ describe('Preloader — reduced-motion (skip path)', () => {
 
     // The hero lines are left present and untouched (their defaults are final).
     expect(heroLines.length).toBe(2);
-    heroLines.forEach((line) =>
-      expect(line).toBeInTheDocument(),
-    );
+    heroLines.forEach((line) => expect(line).toBeInTheDocument());
 
     // Skip path also schedules no animation frames.
     expect(window.requestAnimationFrame).not.toHaveBeenCalled();
@@ -238,9 +225,10 @@ describe('Preloader — motion allowed (play path)', () => {
     // getBoundingClientRect) must be stubbed for the build to reach
     // gsap.timeline() instead of throwing into the catch → finish().
     const proto = SVGElement.prototype as unknown as Record<string, unknown>;
-    const pathProto = (
-      globalThis.SVGPathElement?.prototype ?? SVGElement.prototype
-    ) as unknown as Record<string, unknown>;
+    const pathProto = (globalThis.SVGPathElement?.prototype ?? SVGElement.prototype) as unknown as Record<
+      string,
+      unknown
+    >;
     const orig = {
       getTotalLength: pathProto.getTotalLength,
       getPointAtLength: pathProto.getPointAtLength,
@@ -276,9 +264,7 @@ describe('Preloader — motion allowed (play path)', () => {
     expect(gsapApi.timeline).toHaveBeenCalledTimes(1);
     // The timeline is configured with an onComplete handler (the `finish`
     // resting-frame restore) — part of the fail-safe contract.
-    const cfg = gsapApi.timeline.mock.calls[0]?.[0] as
-      | { onComplete?: unknown }
-      | undefined;
+    const cfg = gsapApi.timeline.mock.calls[0]?.[0] as { onComplete?: unknown } | undefined;
     expect(typeof cfg?.onComplete).toBe('function');
     // Priming uses gsap.set to stage the start/resting state.
     expect(gsapApi.set).toHaveBeenCalled();

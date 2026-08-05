@@ -7,11 +7,13 @@ A simple "Currently available for projects starting [month]" badge signals that 
 ## Scope
 
 **In scope:**
+
 - Small availability badge/indicator visible in the header and/or hero section
 - A field in `src/lib/site.ts` to control the status (available, limited, unavailable) and the "starting from" date
 - Update manually when availability changes
 
 **Out of scope:**
+
 - Dynamic/automated availability (calendar integration, etc.)
 
 ## Open Questions

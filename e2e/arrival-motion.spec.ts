@@ -16,9 +16,7 @@ const overlay = (page: import('@playwright/test').Page) =>
   page.locator('div[aria-hidden].fixed.inset-0:has(#aperture-mask)');
 
 test.describe('arrival animation (motion allowed)', () => {
-  test('plays the arrival, then reveals hero + content (nothing stuck hidden)', async ({
-    page,
-  }) => {
+  test('plays the arrival, then reveals hero + content (nothing stuck hidden)', async ({ page }) => {
     await page.goto('/');
 
     // The animated overlay mounts on a real page load and carries the aperture
@@ -50,9 +48,7 @@ test.describe('arrival animation (motion allowed)', () => {
 });
 
 test.describe('reduced motion', () => {
-  test('skips the animated preloader and shows content instantly', async ({
-    page,
-  }) => {
+  test('skips the animated preloader and shows content instantly', async ({ page }) => {
     // NOTE: in this Playwright build, `test.use({ reducedMotion })` did not
     // propagate to `window.matchMedia('(prefers-reduced-motion: reduce)')`,
     // which is exactly what the Preloader / Reveal read. An explicit
@@ -78,15 +74,11 @@ test.describe('reduced motion', () => {
 });
 
 test.describe('scroll reveal', () => {
-  test('sections further down reveal as they enter the viewport', async ({
-    page,
-  }) => {
+  test('sections further down reveal as they enter the viewport', async ({ page }) => {
     await page.goto('/');
 
     // Let the arrival settle and the hero appear.
-    await expect(
-      page.getByRole('heading', { name: 'Nima Hakimi' }),
-    ).toBeVisible({ timeout: 3000 });
+    await expect(page.getByRole('heading', { name: 'Nima Hakimi' })).toBeVisible({ timeout: 3000 });
 
     // Playground heading lives well below the fold behind a Reveal.
     const playground = page.getByRole('heading', { name: /playground/i });

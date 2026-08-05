@@ -106,9 +106,7 @@ test.describe('Contact form', () => {
 
     // Native required validation should keep focus on the first invalid field
     // and prevent submission; the name input reports invalid.
-    const nameValid = await page
-      .locator('#name')
-      .evaluate((el: HTMLInputElement) => el.validity.valid);
+    const nameValid = await page.locator('#name').evaluate((el: HTMLInputElement) => el.validity.valid);
     expect(nameValid).toBe(false);
 
     // Form is still present and no success toast appeared.

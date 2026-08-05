@@ -7,6 +7,7 @@ A newsletter builds a direct audience of potential clients over time. Visitors w
 ## Scope
 
 **In scope:**
+
 - Email capture form: name + email, a clear value proposition ("Monthly tips for small business owners building their web presence")
 - Integrate with an email platform: Resend (already used for the contact form) + a list management layer, or a dedicated newsletter tool (Buttondown, ConvertKit, Beehiiv)
 - Placement: bottom of blog articles, homepage footer, possibly a dedicated banner
@@ -14,6 +15,7 @@ A newsletter builds a direct audience of potential clients over time. Visitors w
 - Unsubscribe link in every email
 
 **Out of scope:**
+
 - Automated drip sequences (add later)
 - Paid newsletter tiers
 

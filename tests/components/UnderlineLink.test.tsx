@@ -15,7 +15,7 @@ describe('UnderlineLink', () => {
     render(
       <UnderlineLink href="/about">
         <span data-testid="child">About me</span>
-      </UnderlineLink>,
+      </UnderlineLink>
     );
 
     expect(screen.getByTestId('child')).toHaveTextContent('About me');
@@ -25,7 +25,7 @@ describe('UnderlineLink', () => {
     render(
       <UnderlineLink href="/contact" aria-label="Get in touch" data-cta="primary">
         Contact
-      </UnderlineLink>,
+      </UnderlineLink>
     );
 
     const link = screen.getByRole('link', { name: 'Get in touch' });
@@ -37,7 +37,7 @@ describe('UnderlineLink', () => {
     render(
       <UnderlineLink href="/" className="text-lg font-bold">
         Home
-      </UnderlineLink>,
+      </UnderlineLink>
     );
 
     const link = screen.getByRole('link', { name: 'Home' });

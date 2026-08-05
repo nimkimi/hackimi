@@ -7,11 +7,13 @@ Small businesses are often nervous about hiring a solo dev — fear of being gho
 ## Scope
 
 **In scope:**
+
 - Describe the engagement steps: discovery call → proposal → design/build → review cycles → handoff + optional support
 - Include what the client is responsible for at each step (content, feedback windows, etc.)
 - Clear, non-technical language aimed at business owners
 
 **Out of scope:**
+
 - Legal/contract details
 - Pricing specifics
 

@@ -31,9 +31,7 @@ export default function CaseFigure({
           className="h-auto w-full"
         />
       </div>
-      {image.caption && (
-        <figcaption className="mono-label mt-3 text-muted">{image.caption}</figcaption>
-      )}
+      {image.caption && <figcaption className="mono-label mt-3 text-muted">{image.caption}</figcaption>}
     </figure>
   );
 }

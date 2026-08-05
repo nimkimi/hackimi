@@ -39,7 +39,7 @@ describe('sendMail', () => {
     vi.stubEnv('NODEMAILER_PASSWORD', 'pw');
     const { sendMail } = await loadEmail();
     await expect(sendMail('subj', 'to@example.com', 'body')).rejects.toThrow(
-      'Missing required env var: NODEMAILER_EMAIL',
+      'Missing required env var: NODEMAILER_EMAIL'
     );
   });
 
@@ -48,7 +48,7 @@ describe('sendMail', () => {
     vi.stubEnv('NODEMAILER_PASSWORD', '');
     const { sendMail } = await loadEmail();
     await expect(sendMail('subj', 'to@example.com', 'body')).rejects.toThrow(
-      'Missing required env var: NODEMAILER_PASSWORD',
+      'Missing required env var: NODEMAILER_PASSWORD'
     );
   });
 
@@ -103,9 +103,7 @@ describe('sendMail', () => {
     const { sendMail } = await loadEmail();
     await sendMail('subj', 'to@example.com', 'body');
 
-    expect(createTransportMock).toHaveBeenCalledWith(
-      expect.objectContaining({ port: 465, secure: true }),
-    );
+    expect(createTransportMock).toHaveBeenCalledWith(expect.objectContaining({ port: 465, secure: true }));
   });
 
   it('forwards from/to/subject/text/html to transporter.sendMail', async () => {
@@ -139,7 +137,7 @@ describe('sendMail', () => {
       expect.objectContaining({
         from: { address: 'sender@example.com', name: 'Portfolio' },
         html: undefined,
-      }),
+      })
     );
   });
 

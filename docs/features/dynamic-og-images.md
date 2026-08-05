@@ -7,11 +7,13 @@ The site currently uses a single static OG image (`/bigSmile.JPEG`) for all page
 ## Scope
 
 **In scope:**
+
 - Use Next.js built-in `ImageResponse` from `next/og` to generate images at `app/opengraph-image.tsx` (or per-route)
 - Each page gets a branded image with: site name, page title, role/tagline, and a consistent visual style
 - Routes to cover: homepage, about, projects, contact, services (when built), blog posts (when built)
 
 **Out of scope:**
+
 - Animated OG images
 - Third-party OG image services
 

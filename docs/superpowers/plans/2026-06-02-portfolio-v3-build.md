@@ -24,6 +24,7 @@
 ## File Structure
 
 **New files:**
+
 - `src/styles/fonts.ts` — `next/font/local` declarations (Clash Display, Satoshi, Geist Mono) + CSS variables
 - `public/fonts/…` — self-hosted woff2 files
 - `src/lib/intro.ts` — `INTRO_KEY`, `shouldPlayIntro(storage, reduceMotion)` pure helper
@@ -41,6 +42,7 @@
 - `tests/intro.test.ts`, `tests/work.test.ts`
 
 **Modified files:**
+
 - `package.json` (add `gsap`, `lenis`)
 - `tailwind.config.ts` (palette tokens, font families)
 - `src/app/globals.css` (base dark theme, grain, component layer)
@@ -65,6 +67,7 @@
 cd /Users/Nima.Hakimi/projects/private/hackimi
 npm install gsap lenis
 ```
+
 Expected: `gsap` and `lenis` in `dependencies`. (Use `--cache /tmp/npm-cache-redesign` if EACCES on `~/.npm`.)
 
 - [ ] **Step 2: Acquire fonts.** Download woff2 for **Clash Display** (600,700) and **Satoshi** (400,500,700) from Fontshare, and **Geist Mono** (400,500) from Google Fonts / Vercel. Place under `public/fonts/`. (If download isn't possible in-environment, report BLOCKED with the list — do not ship CDN `<link>`s in production.)
@@ -105,8 +108,7 @@ export const geistMono = localFont({
 
 - [ ] **Step 4: Verify build**
 
-Run: `npm run build`
-Expected: compiles (fonts resolve). Commit.
+Run: `npm run build` Expected: compiles (fonts resolve). Commit.
 
 ```bash
 git add package.json package-lock.json src/styles/fonts.ts public/fonts
@@ -138,27 +140,55 @@ theme: {
   },
 },
 ```
+
 (Drop the old `light.*`/`dark.*` tokens and the `darkMode`/`variants` config — this design is single dark scheme.)
 
 - [ ] **Step 2: Base styles + grain + mono-label helper** in `globals.css`:
 
 ```css
-@tailwind base; @tailwind components; @tailwind utilities;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @layer base {
-  html { @apply antialiased; }
-  body { @apply bg-base text-ink font-sans; }
-  ::selection { background: #C6FF3D; color: #0E0E10; }
-  a { @apply no-underline; }
+  html {
+    @apply antialiased;
+  }
+  body {
+    @apply bg-base text-ink font-sans;
+  }
+  ::selection {
+    background: #c6ff3d;
+    color: #0e0e10;
+  }
+  a {
+    @apply no-underline;
+  }
 }
 @layer components {
-  .mono-label { @apply font-mono uppercase tracking-[0.12em] text-xs text-muted; }
-  .measure { max-width: 62ch; }
-  .grain { /* static SVG noise overlay */
-    position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.045;
+  .mono-label {
+    @apply font-mono uppercase tracking-[0.12em] text-xs text-muted;
+  }
+  .measure {
+    max-width: 62ch;
+  }
+  .grain {
+    /* static SVG noise overlay */
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.045;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  @media (prefers-reduced-motion: reduce) { *,*::before,*::after { animation: none !important; transition: none !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
 }
 ```
 
@@ -167,6 +197,7 @@ theme: {
 - [ ] **Step 4: Verify build + commit**
 
 Run: `npm run build` → compiles.
+
 ```bash
 git add tailwind.config.ts src/app/globals.css src/app/layout.tsx
 git commit --no-verify -m "feat(theme): near-black + acid-lime tokens, fonts, grain"
@@ -216,11 +247,16 @@ export const INTRO_KEY = 'intro-seen';
 /** Whether to play the arrival animation: only when unseen this session AND motion is allowed. */
 export function shouldPlayIntro(storage: Storage, reduceMotion: boolean): boolean {
   if (reduceMotion) return false;
-  try { return storage.getItem(INTRO_KEY) !== '1'; } catch { return false; }
+  try {
+    return storage.getItem(INTRO_KEY) !== '1';
+  } catch {
+    return false;
+  }
 }
 ```
 
 - [ ] **Step 4: Run → passes.** Commit.
+
 ```bash
 git add src/lib/intro.ts tests/intro.test.ts
 git commit --no-verify -m "feat(intro): once-per-session intro gate with tests"
@@ -239,8 +275,17 @@ git commit --no-verify -m "feat(intro): once-per-session intro gate with tests"
 type Props = { className?: string; title?: string };
 export default function Monogram({ className, title = 'Nima Hakimi' }: Props) {
   return (
-    <svg viewBox="0 0 120 120" className={className} role="img" aria-label={title}
-         fill="none" stroke="currentColor" strokeWidth={8} strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 120 120"
+      className={className}
+      role="img"
+      aria-label={title}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={8}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       {/* N */}
       <path d="M22 92 L22 28 L58 92 L58 28" />
       {/* H */}
@@ -249,9 +294,11 @@ export default function Monogram({ className, title = 'Nima Hakimi' }: Props) {
   );
 }
 ```
+
 (Refine path proportions during frontend-design for a balanced mark; keep it stroke-only.)
 
 - [ ] **Step 2: Verify build + commit**
+
 ```bash
 git add src/components/brand/Monogram.tsx
 git commit --no-verify -m "feat(brand): NH stroke monogram"
@@ -276,6 +323,7 @@ git commit --no-verify -m "feat(brand): NH stroke monogram"
 - [ ] **Step 3: Verify** — `npm run build`; then in `npm run dev`: first load plays the ~2s arrival with no white flash/reflow; reload in same tab skips it (sessionStorage); set OS Reduce-Motion → intro skipped, hero/logo in final state instantly. Test at 375px and 1440px (monogram scales, lands in the nav slot both sizes).
 
 - [ ] **Step 4: Commit**
+
 ```bash
 git add src/components/intro/Preloader.tsx src/app/layout.tsx
 git commit --no-verify -m "feat(intro): GSAP monogram arrival animation (once/session, reduced-motion safe)"
@@ -299,8 +347,14 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
   useEffect(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const lenis = new Lenis({ lerp: 0.1 });
-    let id = requestAnimationFrame(function raf(t) { lenis.raf(t); id = requestAnimationFrame(raf); });
-    return () => { cancelAnimationFrame(id); lenis.destroy(); };
+    let id = requestAnimationFrame(function raf(t) {
+      lenis.raf(t);
+      id = requestAnimationFrame(raf);
+    });
+    return () => {
+      cancelAnimationFrame(id);
+      lenis.destroy();
+    };
   }, []);
   return <>{children}</>;
 }
@@ -313,6 +367,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
 - [ ] **Step 4: `UnderlineLink.tsx`** — link with an acid-lime underline animated via `scaleX` on hover/focus (transform-origin left), `next/link` under the hood.
 
 - [ ] **Step 5: Verify build + commit**
+
 ```bash
 git add src/components/motion/
 git commit --no-verify -m "feat(motion): Lenis scroll + Reveal/Magnetic/UnderlineLink primitives"
@@ -328,9 +383,10 @@ git commit --no-verify -m "feat(motion): Lenis scroll + Reveal/Magnetic/Underlin
 
 > Invoke `frontend-design`. Match the prototype hero.
 
-- [ ] **Step 1: Build the hero** — mono eyebrow `FRONTEND DEVELOPER`; oversized `Nima Hakimi.` (Clash Display, tight tracking; the lime period); each line wrapped so `[data-hero-line]` children sit in `overflow:hidden` masks (the Preloader reveal targets these — under reduced motion/skip they're visible by default). Positioning line: *"Frontend developer with a designer's eye — I build accessible, expressive interfaces. Currently at NAV."* A scroll cue. Below: anchors/sections for Selected Work, Playground, Contact (added in later tasks).
+- [ ] **Step 1: Build the hero** — mono eyebrow `FRONTEND DEVELOPER`; oversized `Nima Hakimi.` (Clash Display, tight tracking; the lime period); each line wrapped so `[data-hero-line]` children sit in `overflow:hidden` masks (the Preloader reveal targets these — under reduced motion/skip they're visible by default). Positioning line: _"Frontend developer with a designer's eye — I build accessible, expressive interfaces. Currently at NAV."_ A scroll cue. Below: anchors/sections for Selected Work, Playground, Contact (added in later tasks).
 
 - [ ] **Step 2: Verify** at 375px + 1440px; hero readable, name scales with `clamp`. Commit.
+
 ```bash
 git add src/app/page.tsx
 git commit --no-verify -m "feat(home): hero with masked name + developer-first positioning"
@@ -347,6 +403,7 @@ git commit --no-verify -m "feat(home): hero with masked name + developer-first p
 Run: `grep -rn "components/Header\|NavLinks\|navigation/" src`
 
 - [ ] **Step 3: Verify** nav + intro hand-off (monogram lands in slot) at both breakpoints. Commit.
+
 ```bash
 git add src/components/layout/SiteNav.tsx src/app/layout.tsx
 git rm src/components/Header.tsx src/components/NavLinks.tsx 2>/dev/null; true
@@ -368,16 +425,20 @@ import { describe, it, expect } from 'vitest';
 import work, { type CaseStudy } from '../src/data/work';
 describe('work data', () => {
   it('has three flagship slugs', () => {
-    expect(work.map(w => w.slug).sort()).toEqual(['be-my-guide','concert-radar','nav-event-registration'].sort());
+    expect(work.map((w) => w.slug).sort()).toEqual(['be-my-guide', 'concert-radar', 'nav-event-registration'].sort());
   });
   it('each case has required fields + 5 ordered sections', () => {
-    const req = ['Context','My role','Problem','Approach','Result'];
+    const req = ['Context', 'My role', 'Problem', 'Approach', 'Result'];
     work.forEach((c: CaseStudy) => {
-      expect(c.title).toBeTruthy(); expect(c.summary).toBeTruthy(); expect(c.tech.length).toBeGreaterThan(0);
-      expect(c.sections.map(s => s.heading)).toEqual(req);
+      expect(c.title).toBeTruthy();
+      expect(c.summary).toBeTruthy();
+      expect(c.tech.length).toBeGreaterThan(0);
+      expect(c.sections.map((s) => s.heading)).toEqual(req);
     });
   });
-  it('unique slugs', () => { expect(new Set(work.map(w=>w.slug)).size).toBe(work.length); });
+  it('unique slugs', () => {
+    expect(new Set(work.map((w) => w.slug)).size).toBe(work.length);
+  });
 });
 ```
 
@@ -386,20 +447,30 @@ describe('work data', () => {
 - [ ] **Step 3: Implement `work.ts`** — type + three flagships. Each case carries BOTH a `design` and `engineering` emphasis in its section bodies (the duality is the differentiator). Sections must include real copy (fill from Be My Guide README/SPEC, Concert Radar SPEC, NAV intern experience). Include `inProgress?: boolean` (Be My Guide), `accent` hue optional, `tech: string[]`, `links?`.
 
 ```ts
-export type CaseSection = { heading: 'Context'|'My role'|'Problem'|'Approach'|'Result'; body: string };
+export type CaseSection = { heading: 'Context' | 'My role' | 'Problem' | 'Approach' | 'Result'; body: string };
 export type CaseStudy = {
-  slug: string; title: string; summary: string; year: string;
-  tech: string[]; links?: { label: string; href: string }[];
-  inProgress?: boolean; sections: CaseSection[];
+  slug: string;
+  title: string;
+  summary: string;
+  year: string;
+  tech: string[];
+  links?: { label: string; href: string }[];
+  inProgress?: boolean;
+  sections: CaseSection[];
 };
-const ORDER = ['Context','My role','Problem','Approach','Result'] as const;
-const work: CaseStudy[] = [ /* be-my-guide, concert-radar, nav-event-registration with real copy */ ];
-work.forEach(c => { if (c.sections.map(s=>s.heading).join('|') !== ORDER.join('|'))
-  throw new Error(`Case ${c.slug} sections must be: ${ORDER.join(', ')}`); });
+const ORDER = ['Context', 'My role', 'Problem', 'Approach', 'Result'] as const;
+const work: CaseStudy[] = [
+  /* be-my-guide, concert-radar, nav-event-registration with real copy */
+];
+work.forEach((c) => {
+  if (c.sections.map((s) => s.heading).join('|') !== ORDER.join('|'))
+    throw new Error(`Case ${c.slug} sections must be: ${ORDER.join(', ')}`);
+});
 export default work;
 ```
 
 - [ ] **Step 4: Run → passes.** Commit.
+
 ```bash
 git add src/data/work.ts tests/work.test.ts
 git commit --no-verify -m "feat(work): typed case-study data (3 flagships, design+eng duality)"
@@ -416,6 +487,7 @@ git commit --no-verify -m "feat(work): typed case-study data (3 flagships, desig
 - [ ] **Step 2: Render a "Selected Work" section** on `page.tsx` mapping `work` into `WorkRow`s, wrapped in `Reveal`. Section heading with mono label `SELECTED WORK`.
 
 - [ ] **Step 3: Verify** at both breakpoints (rows stack on mobile, previews hide). Commit.
+
 ```bash
 git add src/components/work/WorkRow.tsx src/app/page.tsx
 git commit --no-verify -m "feat(work): Selected Work rows on home"
@@ -436,6 +508,7 @@ git commit --no-verify -m "feat(work): Selected Work rows on home"
 - [ ] **Step 4: Remove old** `src/app/projects/page.tsx`, `src/data/projects.ts`, `src/components/ProjectCard.tsx`; grep to ensure no references remain.
 
 - [ ] **Step 5: Verify** each slug renders at both breakpoints; bad slug 404s. Commit.
+
 ```bash
 git add src/app/work src/components/work/CaseHero.tsx src/components/work/CaseSection.tsx
 git rm src/app/projects/page.tsx src/data/projects.ts src/components/ProjectCard.tsx
@@ -457,6 +530,7 @@ git commit --no-verify -m "feat(work): /work index + /work/[slug] case studies; 
 - [ ] **Step 2: Render** the section on the home page (teaser) and optionally a dedicated `/playground` route listing all demos.
 
 - [ ] **Step 3: Verify** interactions work via keyboard + touch, at both breakpoints. Commit.
+
 ```bash
 git add src/components/playground src/app/page.tsx
 git commit --no-verify -m "feat(playground): live interactive component demos"
@@ -475,6 +549,7 @@ git commit --no-verify -m "feat(playground): live interactive component demos"
 - [ ] **Step 1: Rebuild About** with the new system — lead with the developer-with-design-taste identity; experience/education/skills/languages from `src/data/about.ts`, masked `Reveal`s, mono labels, acid-lime accents. Keep copy developer-first.
 
 - [ ] **Step 2: Verify** both breakpoints. Commit.
+
 ```bash
 git add src/app/about/page.tsx
 git commit --no-verify -m "feat(about): restyle to v3 system, developer-first identity"
@@ -487,6 +562,7 @@ git commit --no-verify -m "feat(about): restyle to v3 system, developer-first id
 - [ ] **Step 1: Restyle** the contact form + add a large-type contact moment with the `MagneticButton` CTA on the home page. **Do NOT change** `actions.ts`, `state.ts`, `email.ts`, `captcha.ts`.
 
 - [ ] **Step 2: Verify** form still submits (dev bypasses reCAPTCHA without `RECAPTCHA_SECRET_KEY`); both breakpoints. Commit.
+
 ```bash
 git add src/app/contact/ContactClient.tsx src/app/page.tsx
 git commit --no-verify -m "feat(contact): restyle to v3 + big-type contact CTA (logic unchanged)"
@@ -500,6 +576,7 @@ git commit --no-verify -m "feat(contact): restyle to v3 + big-type contact CTA (
 
 - [ ] **Step 1:** Walk every page at **375px (mobile)** and **1440px (desktop)** — hero, nav, Selected Work, a case study, Playground, About, Contact. Fix overflow, spacing, type scale, tap targets, nav collapse, intro monogram landing. This is an explicit gate: the site must look genuinely good at BOTH.
 - [ ] **Step 2:** Commit fixes.
+
 ```bash
 git add -A && git commit --no-verify -m "fix(responsive): polish mobile + desktop across all pages"
 ```
@@ -510,6 +587,7 @@ git add -A && git commit --no-verify -m "fix(responsive): polish mobile + deskto
 - [ ] **Step 2:** With OS Reduce-Motion on: intro skipped, Lenis off, reveals instant, magnetic/cursor off, no animation.
 - [ ] **Step 3:** Contrast check (off-white/muted/acid-lime on near-black ≥ WCAG AA; verify acid-lime text usage passes or is used only for large/non-text).
 - [ ] **Step 4:** Commit.
+
 ```bash
 git add -A && git commit --no-verify -m "fix(a11y): keyboard, focus, contrast, reduced-motion across site"
 ```
@@ -518,17 +596,22 @@ git add -A && git commit --no-verify -m "fix(a11y): keyboard, focus, contrast, r
 
 - [ ] **Step 1:** Update `src/lib/site.ts` wording to the developer-first positioning; ensure `/work` + `/work/[slug]` (+ `/playground` if added) are in `sitemap.ts`.
 - [ ] **Step 2:** Re-enable lint-staged compatibility: ensure real app files pass the hook (the `--no-verify` was only for mockups). Run the full suite:
+
 ```bash
 npm run test
 npm run lint
 npm run build
 ```
+
 Expected: tests pass, lint clean, build succeeds.
+
 - [ ] **Step 3:** Decide on `mockups/` — keep `v3` as reference or remove all. Recommend removing the abandoned ones (`variant-a`, `variant-b`, `v2`, `cosmos`, `shared`) and keeping `v3` briefly, or delete all.
 - [ ] **Step 4:** Final commit (without `--no-verify`, so the hook runs on app files).
+
 ```bash
 git add -A && git commit -m "chore: final v3 verification, metadata, cleanup"
 ```
+
 - [ ] **Step 5:** Invoke `superpowers:finishing-a-development-branch`.
 
 ---

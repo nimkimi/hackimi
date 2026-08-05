@@ -154,9 +154,7 @@ describe('CaseSection', () => {
 
   it('renders the heading with a 1-based zero-padded number', () => {
     render(<CaseSectionComponent section={section} index={2} />);
-    expect(
-      screen.getByRole('heading', { level: 2, name: `03 / ${section.heading}` }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: `03 / ${section.heading}` })).toBeInTheDocument();
   });
 
   it('renders the body text', () => {

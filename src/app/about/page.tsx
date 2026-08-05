@@ -70,10 +70,7 @@ export default function AboutPage() {
                 {profile.platform}
               </UnderlineLink>
             ))}
-            <UnderlineLink
-              href="/cv.pdf"
-              className="font-mono text-xs uppercase tracking-[0.12em] text-muted"
-            >
+            <UnderlineLink href="/cv.pdf" className="font-mono text-xs uppercase tracking-[0.12em] text-muted">
               CV ↓
             </UnderlineLink>
           </div>
@@ -217,9 +214,7 @@ export default function AboutPage() {
                       />
                     ))}
                   </span>
-                  <span className="sr-only">
-                    Proficiency {language.proficiency} of 5
-                  </span>
+                  <span className="sr-only">Proficiency {language.proficiency} of 5</span>
                 </div>
               </Reveal>
             ))}

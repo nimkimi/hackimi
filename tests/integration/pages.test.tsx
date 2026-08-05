@@ -51,9 +51,7 @@ describe('Home page (/)', () => {
     expect(screen.getByText('Selected Work')).toBeInTheDocument();
     // Every case from the data layer gets a WorkRow link on the home page.
     for (const c of work) {
-      expect(
-        screen.getByRole('link', { name: `View case study: ${c.title}` }),
-      ).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: `View case study: ${c.title}` })).toBeInTheDocument();
     }
   });
 
@@ -86,9 +84,7 @@ describe('About page (/about)', () => {
     // heading's full textContent rather than an exact text match.
     const headings = screen.getAllByRole('heading', { level: 3 });
     for (const exp of about.experience) {
-      expect(
-        headings.some((h) => h.textContent?.includes(exp.title)),
-      ).toBe(true);
+      expect(headings.some((h) => h.textContent?.includes(exp.title))).toBe(true);
     }
   });
 
@@ -175,9 +171,7 @@ describe('Work case page (/work/[slug])', () => {
     const CasePage = (await import('@/app/work/[slug]/page')).default;
 
     // The page calls notFound() (our throwing spy) when no case matches.
-    await expect(
-      CasePage({ params: Promise.resolve({ slug: 'does-not-exist' }) }),
-    ).rejects.toThrow('NEXT_NOT_FOUND');
+    await expect(CasePage({ params: Promise.resolve({ slug: 'does-not-exist' }) })).rejects.toThrow('NEXT_NOT_FOUND');
     expect(notFound).toHaveBeenCalledTimes(1);
   });
 

@@ -12,10 +12,7 @@ import Reveal from '@/components/motion/Reveal';
  * to drive the reduced-motion branch. Both are restored in afterEach.
  */
 
-type IOCallback = (
-  entries: IntersectionObserverEntry[],
-  observer: IntersectionObserver,
-) => void;
+type IOCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => void;
 
 let capturedCallback: IOCallback | null = null;
 let disconnectSpy: ReturnType<typeof vi.fn<(...args: unknown[]) => void>>;
@@ -42,8 +39,7 @@ function setMatchMedia(reduceMatches: boolean) {
     writable: true,
     configurable: true,
     value: vi.fn().mockImplementation((query: string) => ({
-      matches:
-        query === '(prefers-reduced-motion: reduce)' ? reduceMatches : false,
+      matches: query === '(prefers-reduced-motion: reduce)' ? reduceMatches : false,
       media: query,
       onchange: null,
       addListener: vi.fn(),
@@ -59,10 +55,7 @@ function setMatchMedia(reduceMatches: boolean) {
 function fireIntersection(isIntersecting: boolean) {
   if (!capturedCallback) throw new Error('IntersectionObserver not constructed');
   act(() => {
-    capturedCallback!(
-      [{ isIntersecting } as IntersectionObserverEntry],
-      {} as IntersectionObserver,
-    );
+    capturedCallback!([{ isIntersecting } as IntersectionObserverEntry], {} as IntersectionObserver);
   });
 }
 
@@ -85,7 +78,7 @@ describe('Reveal', () => {
     render(
       <Reveal>
         <span>hello reveal</span>
-      </Reveal>,
+      </Reveal>
     );
     expect(screen.getByText('hello reveal')).toBeInTheDocument();
   });
@@ -96,7 +89,7 @@ describe('Reveal', () => {
     const { container } = render(
       <Reveal className="my-class">
         <span>reduced</span>
-      </Reveal>,
+      </Reveal>
     );
 
     expect(screen.getByText('reduced')).toBeInTheDocument();
@@ -119,7 +112,7 @@ describe('Reveal', () => {
     const { container } = render(
       <Reveal>
         <span>slide me</span>
-      </Reveal>,
+      </Reveal>
     );
 
     // Outer wrapper clips overflow; inner holds the transform.
@@ -137,11 +130,10 @@ describe('Reveal', () => {
     const { container } = render(
       <Reveal>
         <span>slide me</span>
-      </Reveal>,
+      </Reveal>
     );
 
-    const inner = (container.firstElementChild as HTMLElement)
-      .firstElementChild as HTMLElement;
+    const inner = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
     expect(inner.style.transform).toBe('translateY(110%)');
 
     fireIntersection(true);
@@ -155,13 +147,12 @@ describe('Reveal', () => {
     const { container } = render(
       <Reveal>
         <span>slide me</span>
-      </Reveal>,
+      </Reveal>
     );
 
     fireIntersection(false);
 
-    const inner = (container.firstElementChild as HTMLElement)
-      .firstElementChild as HTMLElement;
+    const inner = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
     expect(inner.style.transform).toBe('translateY(110%)');
   });
 
@@ -171,11 +162,10 @@ describe('Reveal', () => {
     const { container } = render(
       <Reveal>
         <span>slide me</span>
-      </Reveal>,
+      </Reveal>
     );
 
-    const inner = (container.firstElementChild as HTMLElement)
-      .firstElementChild as HTMLElement;
+    const inner = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
     expect(inner.style.transform).toBe('translateY(110%)');
 
     // Observer never fires; advance past the ~2.5s fallback.
@@ -191,11 +181,10 @@ describe('Reveal', () => {
     const { container } = render(
       <Reveal delay={0.3}>
         <span>delayed</span>
-      </Reveal>,
+      </Reveal>
     );
 
-    const inner = (container.firstElementChild as HTMLElement)
-      .firstElementChild as HTMLElement;
+    const inner = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
     expect(inner.style.transition).toContain('0.3s');
   });
 });

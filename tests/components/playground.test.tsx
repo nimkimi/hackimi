@@ -202,8 +202,6 @@ describe('CopyChip', () => {
     await user.click(screen.getByRole('button'));
 
     expect(writeText).toHaveBeenCalledWith(VALUE);
-    expect(
-      await screen.findByRole('button', { name: 'Copied to clipboard' }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Copied to clipboard' })).toBeInTheDocument();
   });
 });

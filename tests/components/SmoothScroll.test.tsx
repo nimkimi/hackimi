@@ -82,7 +82,7 @@ describe('SmoothScroll', () => {
     render(
       <SmoothScroll>
         <span>scrolled content</span>
-      </SmoothScroll>,
+      </SmoothScroll>
     );
     expect(screen.getByText('scrolled content')).toBeInTheDocument();
   });
@@ -91,7 +91,7 @@ describe('SmoothScroll', () => {
     render(
       <SmoothScroll>
         <span>x</span>
-      </SmoothScroll>,
+      </SmoothScroll>
     );
     expect(LenisMock).toHaveBeenCalledTimes(1);
     expect(LenisMock).toHaveBeenCalledWith({ lerp: 0.1 });
@@ -101,7 +101,7 @@ describe('SmoothScroll', () => {
     render(
       <SmoothScroll>
         <span>x</span>
-      </SmoothScroll>,
+      </SmoothScroll>
     );
     // The rAF callback calls lenis.raf(time); give the loop a frame to run.
     await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
@@ -112,7 +112,7 @@ describe('SmoothScroll', () => {
     const { unmount } = render(
       <SmoothScroll>
         <span>x</span>
-      </SmoothScroll>,
+      </SmoothScroll>
     );
     expect(lenisInstance.destroy).not.toHaveBeenCalled();
     unmount();
@@ -124,7 +124,7 @@ describe('SmoothScroll', () => {
     const { unmount } = render(
       <SmoothScroll>
         <span>x</span>
-      </SmoothScroll>,
+      </SmoothScroll>
     );
     unmount();
     expect(removeSpy).toHaveBeenCalledWith('click', expect.any(Function));
@@ -135,7 +135,7 @@ describe('SmoothScroll', () => {
     const { unmount } = render(
       <SmoothScroll>
         <span>native scroll</span>
-      </SmoothScroll>,
+      </SmoothScroll>
     );
     expect(screen.getByText('native scroll')).toBeInTheDocument();
     expect(LenisMock).not.toHaveBeenCalled();
@@ -151,7 +151,7 @@ describe('SmoothScroll', () => {
           jump
         </a>
         <section id="target">target section</section>
-      </SmoothScroll>,
+      </SmoothScroll>
     );
 
     const link = screen.getByTestId('hash-link');
@@ -161,9 +161,7 @@ describe('SmoothScroll', () => {
 
     expect(lenisInstance.scrollTo).toHaveBeenCalledTimes(1);
     // Called with the resolved target element.
-    expect(lenisInstance.scrollTo).toHaveBeenCalledWith(
-      container.querySelector('#target'),
-    );
+    expect(lenisInstance.scrollTo).toHaveBeenCalledWith(container.querySelector('#target'));
   });
 
   it('ignores anchor clicks whose hash target does not exist', () => {
@@ -172,11 +170,9 @@ describe('SmoothScroll', () => {
         <a href="#missing" data-testid="dead-link">
           nowhere
         </a>
-      </SmoothScroll>,
+      </SmoothScroll>
     );
-    screen
-      .getByTestId('dead-link')
-      .dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0 }));
+    screen.getByTestId('dead-link').dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0 }));
     expect(lenisInstance.scrollTo).not.toHaveBeenCalled();
   });
 });

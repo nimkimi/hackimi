@@ -1,11 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  buildRootMetadata,
-  buildPageMetadata,
-  buildPersonJsonLd,
-  resolveUrl,
-  METADATA_BASE,
-} from '@/lib/metadata';
+import { buildRootMetadata, buildPageMetadata, buildPersonJsonLd, resolveUrl, METADATA_BASE } from '@/lib/metadata';
 import {
   SITE_URL,
   SITE_AUTHOR,

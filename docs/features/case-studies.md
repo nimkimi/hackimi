@@ -7,11 +7,13 @@ The current `/projects` page lists what was built. Business clients care about o
 ## Scope
 
 **In scope:**
+
 - Redesign projects section or add a `/work` route with case study format
 - Each entry: client/context, problem statement, approach, result (metrics where possible), tech used in plain language
 - Photography/screenshots of the work
 
 **Out of scope:**
+
 - Blog-style long-form writing (separate feature)
 
 ## Open Questions

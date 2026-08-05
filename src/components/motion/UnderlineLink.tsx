@@ -17,12 +17,7 @@ type UnderlineLinkProps = {
  * it automatically becomes instant under the global `prefers-reduced-motion`
  * backstop in `globals.css`. Text stays `ink`; the underline is `accent`.
  */
-export default function UnderlineLink({
-  href,
-  children,
-  className,
-  ...rest
-}: UnderlineLinkProps) {
+export default function UnderlineLink({ href, children, className, ...rest }: UnderlineLinkProps) {
   return (
     <Link
       href={href}

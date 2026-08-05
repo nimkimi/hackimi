@@ -117,9 +117,7 @@ describe('SiteNav', () => {
       const workLink = within(panel).getByRole('link', { name: 'Work' });
       await user.click(workLink);
 
-      expect(
-        screen.getByRole('button', { name: 'Open menu' }),
-      ).toHaveAttribute('aria-expanded', 'false');
+      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
       expect(panel).toHaveAttribute('hidden');
     });
 
@@ -133,9 +131,7 @@ describe('SiteNav', () => {
 
       await user.keyboard('{Escape}');
 
-      expect(
-        screen.getByRole('button', { name: 'Open menu' }),
-      ).toHaveAttribute('aria-expanded', 'false');
+      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
     });
   });
 

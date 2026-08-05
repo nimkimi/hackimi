@@ -7,12 +7,14 @@ The current contact form is generic — it accepts any message with no context. 
 ## Scope
 
 **In scope:**
+
 - Replace or extend the contact form at `/contact` (or add a new `/hire` route)
 - Additional fields: project type (dropdown: landing page, web app, e-commerce, maintenance, other), rough budget range (radio: under €1k, €1–5k, €5–15k, €15k+), desired start date (month picker or text), brief description of the project
 - Keep the existing Zod validation + reCAPTCHA + nodemailer flow
 - Update the email template to include the new fields
 
 **Out of scope:**
+
 - CRM integration
 - Auto-responder sequences
 

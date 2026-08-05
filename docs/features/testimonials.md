@@ -7,11 +7,13 @@ Social proof is disproportionately persuasive for non-technical buyers. A busine
 ## Scope
 
 **In scope:**
+
 - Testimonials section on the homepage (high visibility) and/or services page
 - Design for 3–6 cards initially, built to scale
 - Each card: quote, person's name, role/company, optional photo
 
 **Out of scope:**
+
 - Third-party review integrations (Google, Clutch)
 
 ## Open Questions

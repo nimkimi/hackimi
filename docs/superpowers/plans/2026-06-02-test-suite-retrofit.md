@@ -1,6 +1,6 @@
 # Test Suite Retrofit — Implementation Plan
 
-> **For agentic workers:** Execution model is **subagent-driven**. The controller (main session) dispatches **one Claude Opus 4.8 agent per task** to write the tests, then the controller **reviews** the produced tests. If the review finds problems, the controller **adds a fix task** to the task list and dispatches a follow-up agent. This is a *characterization / regression* effort (writing tests for already-shipped code), not TDD — TDD begins for all work created *after* this suite lands.
+> **For agentic workers:** Execution model is **subagent-driven**. The controller (main session) dispatches **one Claude Opus 4.8 agent per task** to write the tests, then the controller **reviews** the produced tests. If the review finds problems, the controller **adds a fix task** to the task list and dispatches a follow-up agent. This is a _characterization / regression_ effort (writing tests for already-shipped code), not TDD — TDD begins for all work created _after_ this suite lands.
 
 **Goal:** Bring the existing `hackimi` portfolio under automated test coverage — pure logic, server code, React components, page integration, and real-browser end-to-end — so future changes are safe and TDD can be adopted going forward.
 
@@ -40,7 +40,7 @@ e2e/            # Playwright specs
 ## Coverage map (one task per row unless noted)
 
 | # | Unit(s) under test | Env | Key cases |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Infra | test tooling + config | — | RTL+jsdom+plugin-react, `test.projects`, `server-only` stub, global mocks, Playwright, npm scripts, branch |
 | Logic | `lib/validation.ts` | node | valid parse, trim, min/max boundaries (name 100, subject 120, message 5000), bad email, empty fields |
 | Logic | `lib/metadata.ts` + `lib/site.ts` | node | `resolveUrl` (`/`, relative, absolute), title suffix, `toOgImage` string vs object vs default, keyword merge dedupe, `buildPersonJsonLd` shape, site constants sanity |
@@ -71,7 +71,7 @@ e2e/            # Playwright specs
 Each agent receives: the exact file(s) to test, the cases from the row above, the env (node/jsdom), required mocks, and the "confirm-API-via-docs" instruction. Each agent must:
 
 1. Write tests in the correct `tests/<dir>/` location, matching existing style (`describe`/`it`, explicit assertions).
-2. **Run the tests** (`npm test -- <path>` or the project filter) and confirm they pass against current behavior. Tests describe what the code *does* today; if a test reveals a real bug, flag it as `DONE_WITH_CONCERNS` rather than silently asserting buggy behavior.
+2. **Run the tests** (`npm test -- <path>` or the project filter) and confirm they pass against current behavior. Tests describe what the code _does_ today; if a test reveals a real bug, flag it as `DONE_WITH_CONCERNS` rather than silently asserting buggy behavior.
 3. Not modify `src/` except where a test genuinely cannot be written without a tiny, behavior-preserving testability seam — and if so, call it out for review.
 4. Report status: `DONE` / `DONE_WITH_CONCERNS` / `BLOCKED` / `NEEDS_CONTEXT`, with the list of files added and the pass count.
 

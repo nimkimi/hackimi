@@ -7,6 +7,7 @@ An interactive calculator where potential clients select their project type, num
 ## Scope
 
 **In scope:**
+
 - New `/estimate` route or embedded widget on the services/pricing page
 - Inputs: project type (landing page, web app, e-commerce), number of pages/screens, feature checklist (contact form, CMS, auth, animations, i18n, etc.), timeline urgency
 - Output: estimated price range + estimated duration range + CTA to book a call / start inquiry
@@ -14,6 +15,7 @@ An interactive calculator where potential clients select their project type, num
 - Disclaimer: "This is a rough estimate — book a call for an accurate quote"
 
 **Out of scope:**
+
 - Saved/shareable estimates
 - PDF export
 

@@ -65,12 +65,7 @@ describe('submitContact', () => {
 
     expect(result.status).toBe('error');
     expect(result.fieldErrors).toBeDefined();
-    expect(Object.keys(result.fieldErrors ?? {}).sort()).toEqual([
-      'email',
-      'message',
-      'name',
-      'subject',
-    ]);
+    expect(Object.keys(result.fieldErrors ?? {}).sort()).toEqual(['email', 'message', 'name', 'subject']);
     // No formErrors for these field-level issues -> falls back to default message.
     expect(result.message).toBe('Please correct the highlighted fields and resend your message.');
     expect(result.values).toEqual({ name: '', email: '', subject: '', message: '' });
