@@ -17,7 +17,7 @@ Note: earlier `docs/features/` specs and `docs/ROADMAP.md` were written around a
 ```bash
 npm run dev        # Start dev server at localhost:3000
 npm run build      # Production build
-npm run lint       # ESLint via next lint
+npm run lint       # ESLint CLI, flat config (eslint.config.mjs)
 npm run test       # Vitest (vitest run) — unit/component/integration
 npm run test:e2e   # Playwright end-to-end (boots next dev; specs in e2e/)
 npm run format     # Prettier write (ts, tsx, js, jsx, md, css, yaml)
@@ -56,7 +56,7 @@ In development, reCAPTCHA is bypassed when `RECAPTCHA_SECRET_KEY` is absent.
 
 ## Architecture
 
-**Next.js 15 App Router** with React 19 Server Components and Server Actions.
+**Next.js 16 App Router** with React 19 Server Components and Server Actions. Turbopack is the bundler for both `next dev` and `next build` (the default since 16 — there is no `--turbopack` flag to pass and no webpack config here).
 
 ### Key Patterns
 
