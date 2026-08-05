@@ -1,5 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { setMediaQuery } from '../setup/match-media';
 import MagneticButton from '@/components/motion/MagneticButton';
 
 /**
@@ -12,21 +13,24 @@ import MagneticButton from '@/components/motion/MagneticButton';
  *   - no href                       -> <button type="button">
  *
  * Motion behaviour:
- *   The magnetic branch only activates AFTER mount on a fine-pointer device
- *   (`magneticEnabled` flips true in an effect when `(pointer: coarse)` does
- *   NOT match) and when the user has not requested reduced motion. In that
- *   branch the component wires up onMouseMove / onMouseLeave handlers and a
- *   motion `style={{ x, y }}` which framer-motion renders as a CSS transform.
- *   Under reduced motion (or coarse pointer) a plain element with NO listeners
- *   and NO transform style is rendered instead.
+ *   The magnetic branch is active on a fine-pointer device — `(pointer: coarse)`
+ *   does NOT match — and when the user has not requested reduced motion. The
+ *   pointer capability is a live `useMediaQuery` subscription, so it is read on
+ *   the first client render (no post-mount flip) and re-read whenever the device
+ *   changes, e.g. a 2-in-1 folding into tablet mode. In that branch the
+ *   component wires up onMouseMove / onMouseLeave handlers and a motion
+ *   `style={{ x, y }}` which framer-motion renders as a CSS transform. Under
+ *   reduced motion (or coarse pointer) a plain element with NO listeners and NO
+ *   transform style is rendered instead.
  *
- * matchMedia is controlled per-test to drive the pointer/reduced-motion
- * branches; the jsdom default (`matches:false`) yields the magnetic branch.
+ * matchMedia is driven through the shared fake in tests/setup/match-media.ts;
+ * unset queries default to `matches:false`, which yields the magnetic branch.
  */
 
 /**
- * Build a matchMedia stub. `reduce` controls prefers-reduced-motion,
- * `coarse` controls (pointer: coarse). Everything else matches false.
+ * Point the shared matchMedia fake at a device profile. `reduce` controls
+ * prefers-reduced-motion, `coarse` controls (pointer: coarse).
+ * Safe to call mid-test: subscribed components react synchronously.
  */
 function setMatchMedia({
   reduce = false,
@@ -35,25 +39,46 @@ function setMatchMedia({
   reduce?: boolean;
   coarse?: boolean;
 } = {}) {
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    configurable: true,
-    value: vi.fn().mockImplementation((query: string) => {
-      let matches = false;
-      if (query === '(prefers-reduced-motion: reduce)') matches = reduce;
-      else if (query === '(pointer: coarse)') matches = coarse;
-      return {
-        matches,
-        media: query,
-        onchange: null,
-        addListener: vi.fn(),
-        removeListener: vi.fn(),
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-        dispatchEvent: vi.fn(),
-      };
-    }),
+  setMediaQuery('(prefers-reduced-motion: reduce)', reduce);
+  setMediaQuery('(pointer: coarse)', coarse);
+}
+
+const BOX = {
+  left: 0,
+  top: 0,
+  width: 100,
+  height: 40,
+  right: 100,
+  bottom: 40,
+  x: 0,
+  y: 0,
+  toJSON: () => {},
+} as DOMRect;
+
+/**
+ * Does this element actually behave magnetically?
+ *
+ * Asserting on the rendered element type would not distinguish the branches —
+ * both render a <button>. So drive the real thing: give it a non-zero box
+ * (jsdom measures everything as 0), move the cursor to its right edge, and let
+ * several real animation frames run so framer-motion's spring has left its 0,0
+ * rest. A translate in the inline style means the handlers and motion values
+ * are wired; nothing means the plain branch rendered.
+ */
+async function isMagnetic(el: HTMLElement): Promise<boolean> {
+  el.getBoundingClientRect = () => BOX;
+
+  act(() => {
+    el.dispatchEvent(new MouseEvent('mousemove', { bubbles: true, clientX: 100, clientY: 20 }));
   });
+
+  await act(async () => {
+    for (let i = 0; i < 8; i++) {
+      await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+    }
+  });
+
+  return el.style.transform.includes('translate');
 }
 
 /** Render inside act so the post-mount magneticEnabled effect flushes. */
@@ -276,5 +301,49 @@ describe('MagneticButton — reduced motion / coarse pointer (no magnetism)', ()
     const t = el.style.transform;
     expect(t === '' || t === 'none').toBe(true);
     expect(container.querySelector('[style*="translate"]')).toBeNull();
+  });
+});
+
+describe('MagneticButton — pointer capability', () => {
+  it('is magnetic on a fine pointer', async () => {
+    setMatchMedia({ coarse: false });
+
+    renderMagnetic(<MagneticButton>Fine</MagneticButton>);
+
+    expect(await isMagnetic(screen.getByRole('button', { name: 'Fine' }))).toBe(true);
+  });
+
+  it('is not magnetic on a coarse pointer', async () => {
+    setMatchMedia({ coarse: true });
+
+    renderMagnetic(<MagneticButton>Coarse</MagneticButton>);
+
+    expect(await isMagnetic(screen.getByRole('button', { name: 'Coarse' }))).toBe(false);
+  });
+
+  it('drops the magnetism when the pointer becomes coarse after mount', async () => {
+    setMatchMedia({ coarse: false });
+    renderMagnetic(<MagneticButton>Switch</MagneticButton>);
+    expect(await isMagnetic(screen.getByRole('button', { name: 'Switch' }))).toBe(true);
+
+    act(() => {
+      setMediaQuery('(pointer: coarse)', true);
+    });
+
+    // The branch swap remounts the element, so re-query rather than reusing the
+    // node the magnetic branch left behind.
+    expect(await isMagnetic(screen.getByRole('button', { name: 'Switch' }))).toBe(false);
+  });
+
+  it('gains the magnetism when the pointer becomes fine after mount', async () => {
+    setMatchMedia({ coarse: true });
+    renderMagnetic(<MagneticButton>Switch</MagneticButton>);
+    expect(await isMagnetic(screen.getByRole('button', { name: 'Switch' }))).toBe(false);
+
+    act(() => {
+      setMediaQuery('(pointer: coarse)', false);
+    });
+
+    expect(await isMagnetic(screen.getByRole('button', { name: 'Switch' }))).toBe(true);
   });
 });

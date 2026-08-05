@@ -1,5 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { setMediaQuery } from '../setup/match-media';
 import Reveal from '@/components/motion/Reveal';
 
 /**
@@ -8,9 +9,15 @@ import Reveal from '@/components/motion/Reveal';
  * fallback timer, and respects `prefers-reduced-motion`.
  *
  * We override the global IntersectionObserver with a controllable mock that
- * captures the callback so we can fire it manually, and we control matchMedia
- * to drive the reduced-motion branch. Both are restored in afterEach.
+ * captures the callback so we can fire it manually, and we drive the
+ * reduced-motion branch through the shared matchMedia fake. IntersectionObserver
+ * is restored in afterEach; the media-query registry is reset globally.
+ *
+ * `prefers-reduced-motion` is a live subscription (useMediaQuery), not a
+ * mount-time read, so `setReducedMotion` works mid-test as well as before mount.
  */
+
+const REDUCED_MOTION = '(prefers-reduced-motion: reduce)';
 
 type IOCallback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => void;
 
@@ -33,22 +40,9 @@ class ControllableIO {
   }
 }
 
-/** Build a matchMedia stub whose `matches` is true only for the given query. */
-function setMatchMedia(reduceMatches: boolean) {
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    configurable: true,
-    value: vi.fn().mockImplementation((query: string) => ({
-      matches: query === '(prefers-reduced-motion: reduce)' ? reduceMatches : false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
-  });
+/** Point the shared matchMedia fake at a prefers-reduced-motion answer. */
+function setReducedMotion(reduceMatches: boolean) {
+  setMediaQuery(REDUCED_MOTION, reduceMatches);
 }
 
 /** Fire the captured IntersectionObserver callback with a single entry. */
@@ -64,7 +58,7 @@ beforeEach(() => {
   disconnectSpy = vi.fn<(...args: unknown[]) => void>();
   observeSpy = vi.fn<(...args: unknown[]) => void>();
   vi.stubGlobal('IntersectionObserver', ControllableIO);
-  setMatchMedia(false); // default: normal motion
+  setReducedMotion(false); // default: normal motion
 });
 
 afterEach(() => {
@@ -84,7 +78,7 @@ describe('Reveal', () => {
   });
 
   it('shows content immediately under prefers-reduced-motion (no hold state, no IO)', () => {
-    setMatchMedia(true);
+    setReducedMotion(true);
 
     const { container } = render(
       <Reveal className="my-class">
@@ -186,5 +180,68 @@ describe('Reveal', () => {
 
     const inner = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
     expect(inner.style.transition).toContain('0.3s');
+  });
+});
+
+describe('Reveal — live prefers-reduced-motion changes', () => {
+  it('drops to the static branch when reduced motion is turned on after mount', () => {
+    const { container } = render(
+      <Reveal className="my-class">
+        <span>live switch</span>
+      </Reveal>
+    );
+
+    // Starts in the animated branch: clipping wrapper + translated inner.
+    expect((container.firstElementChild as HTMLElement).className).toContain('overflow-hidden');
+    expect(container.querySelector('[style*="translateY"]')).not.toBeNull();
+
+    act(() => {
+      setReducedMotion(true);
+    });
+
+    // Now the plain, untransformed element — same as mounting with it already on.
+    const outer = container.firstElementChild as HTMLElement;
+    expect(outer.className).toBe('my-class');
+    expect(container.querySelector('[style*="translateY"]')).toBeNull();
+    expect(screen.getByText('live switch')).toBeInTheDocument();
+  });
+
+  it('returns to the animated branch when reduced motion is turned back off', () => {
+    setReducedMotion(true);
+
+    const { container } = render(
+      <Reveal className="my-class">
+        <span>back again</span>
+      </Reveal>
+    );
+    expect((container.firstElementChild as HTMLElement).className).toBe('my-class');
+
+    act(() => {
+      setReducedMotion(false);
+    });
+
+    expect((container.firstElementChild as HTMLElement).className).toContain('overflow-hidden');
+    // The observer is set up on the way back, so content is never stranded.
+    expect(observeSpy).toHaveBeenCalled();
+  });
+});
+
+describe('Reveal — IntersectionObserver unavailable', () => {
+  it('still reveals the content rather than stranding it translated off-screen', () => {
+    vi.useFakeTimers();
+    vi.stubGlobal('IntersectionObserver', undefined);
+
+    const { container } = render(
+      <Reveal>
+        <span>no observer</span>
+      </Reveal>
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(0);
+    });
+
+    const inner = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
+    expect(inner.style.transform).toBe('translateY(0)');
   });
 });
