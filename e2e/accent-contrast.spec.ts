@@ -1,4 +1,5 @@
 import { test, expect, type Locator } from '@playwright/test';
+import { contrast, maxChannel, parseColorChannels } from './support/color';
 
 // Regression guard for issue #3. The dark-on-lime sites (accent buttons, the
 // nav CTA, the selected segmented-control label) used to get their dark text
@@ -19,34 +20,24 @@ test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
 });
 
-function relLuminance([r, g, b]: number[]): number {
-  const lin = [r, g, b].map((c) => {
-    const s = c / 255;
-    return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * lin[0] + 0.7152 * lin[1] + 0.0722 * lin[2];
-}
-function contrast(fg: number[], bg: number[]): number {
-  const l1 = relLuminance(fg);
-  const l2 = relLuminance(bg);
-  const [hi, lo] = l1 >= l2 ? [l1, l2] : [l2, l1];
-  return (hi + 0.05) / (lo + 0.05);
-}
-
 async function assertDarkOnLime(el: Locator, label: string) {
   // Re-resolve via expect.poll: motion-wrapped elements (the nav CTA, the
   // segmented pill) re-render while their layout animation settles, which can
   // detach a held handle. evaluate() needs the node attached but not in view —
-  // computed color is viewport-independent, so we never scroll.
-  let fg = [255, 255, 255];
+  // computed color is viewport-independent, so we never scroll. The parsing
+  // itself runs in Node (not inside evaluate) so a degenerate computed color
+  // throws a clear error from `parseColorChannels`/`maxChannel` rather than
+  // silently feeding `Math.max(...[])` (`-Infinity`, always `< 80`) into the
+  // assertion. expect.poll retries on a thrown error the same way it retries
+  // a failed comparison, so a transiently-detached handle still gets re-read.
+  let fg: number[] = [255, 255, 255];
   await expect
     .poll(
       async () => {
-        fg = await el.evaluate((node) =>
-          (getComputedStyle(node).color.match(/\d+(\.\d+)?/g) || []).slice(0, 3).map(Number)
-        );
+        const raw = await el.evaluate((node) => getComputedStyle(node).color);
+        fg = parseColorChannels(raw);
         // Text must be dark (every channel low), not the light `ink` fallback.
-        return Math.max(...fg);
+        return maxChannel(fg);
       },
       { message: `${label} text should be dark` }
     )
