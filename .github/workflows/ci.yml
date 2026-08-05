@@ -31,6 +31,12 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      # Prettier is pinned exactly in package.json, so this compares against one
+      # known formatter version. It went unrun for long enough that a caret bump
+      # left 69 files unformatted without anything going red.
+      - name: Format check
+        run: npm run check
+
       - name: Type-check
         run: npx tsc --noEmit
 
