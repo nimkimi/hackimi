@@ -38,7 +38,7 @@ export default function PlaygroundSection() {
             delay={i * 0.06}
             className="border-b border-white/10 lg:border-b-0 lg:border-r lg:last:border-r-0"
           >
-            <div className="flex min-h-[12rem] flex-col justify-between gap-6 py-8 lg:px-8 lg:first:pl-0 lg:last:pr-0">
+            <div className="flex min-h-48 flex-col justify-between gap-6 py-8 lg:px-8 lg:first:pl-0 lg:last:pr-0">
               <div className="flex flex-1 items-center">{demo.node}</div>
               <p className="mono-label">{demo.caption}</p>
             </div>

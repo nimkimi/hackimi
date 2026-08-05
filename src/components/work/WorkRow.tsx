@@ -28,15 +28,15 @@ export default function WorkRow({ c, index }: { c: CaseStudy; index: number }) {
     <Link
       href={`/work/${c.slug}`}
       aria-label={`View case study: ${c.title}`}
-      className="work-row group relative grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 border-b border-white/10 py-[clamp(1.6rem,4vh,2.6rem)] outline-none transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:grid-cols-[auto_1fr_auto] sm:gap-x-[clamp(14px,3vw,40px)]"
+      className="work-row group relative grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 border-b border-white/10 py-[clamp(1.6rem,4vh,2.6rem)] outline-hidden transition-opacity duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:grid-cols-[auto_1fr_auto] sm:gap-x-[clamp(14px,3vw,40px)]"
     >
       {/* visible focus ring on keyboard focus */}
       <span
         aria-hidden
-        className="pointer-events-none absolute -inset-x-2 inset-y-1 rounded-md ring-2 ring-accent/0 transition-[--tw-ring-color] duration-200 group-focus-visible:ring-accent/70"
+        className="pointer-events-none absolute -inset-x-2 inset-y-1 rounded-md ring-2 ring-accent/0 transition-(--tw-ring-color) duration-200 group-focus-visible:ring-accent/70"
       />
 
-      <span className="self-start pt-2 font-mono text-xs tabular-nums tracking-[0.1em] text-muted">
+      <span className="self-start pt-2 font-mono text-xs tabular-nums tracking-widest text-muted">
         {num}
       </span>
 
@@ -51,14 +51,14 @@ export default function WorkRow({ c, index }: { c: CaseStudy; index: number }) {
 
         <span className="mt-4 flex flex-wrap gap-1.5">
           {c.inProgress && (
-            <span className="rounded-full border border-accent bg-accent px-[11px] py-[5px] font-mono text-[10px] uppercase tracking-[0.1em] text-dark">
+            <span className="rounded-full border border-accent bg-accent px-[11px] py-[5px] font-mono text-[10px] uppercase tracking-widest text-dark">
               In progress
             </span>
           )}
           {tags.map((t) => (
             <span
               key={t}
-              className="rounded-full border border-white/10 px-[11px] py-[5px] font-mono text-[10px] uppercase tracking-[0.1em] text-muted"
+              className="rounded-full border border-white/10 px-[11px] py-[5px] font-mono text-[10px] uppercase tracking-widest text-muted"
             >
               {t}
             </span>
@@ -69,7 +69,7 @@ export default function WorkRow({ c, index }: { c: CaseStudy; index: number }) {
       {/* Preview tile — desktop only, reveals on hover/focus. Decorative. */}
       <span
         aria-hidden
-        className="work-row__preview relative hidden aspect-[4/3] w-[clamp(118px,16vw,230px)] justify-self-end overflow-hidden rounded-[10px] border border-white/10 bg-[linear-gradient(135deg,#1a1a1e,#101013)] opacity-0 [clip-path:inset(0_0_100%_0)] transition-[clip-path,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:block"
+        className="work-row__preview relative hidden aspect-4/3 w-[clamp(118px,16vw,230px)] justify-self-end overflow-hidden rounded-[10px] border border-white/10 bg-[linear-gradient(135deg,#1a1a1e,#101013)] opacity-0 [clip-path:inset(0_0_100%_0)] transition-[clip-path,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] sm:block"
       >
         {cover ? (
           <Image
@@ -82,9 +82,9 @@ export default function WorkRow({ c, index }: { c: CaseStudy; index: number }) {
           />
         ) : (
           <>
-            <span className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-[size:22px_22px] opacity-50" />
+            <span className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.06)_1px,transparent_1px)] bg-size-[22px_22px] opacity-50" />
             <span className="absolute bottom-3.5 left-3.5 h-7 w-7 rounded-full bg-accent opacity-80 blur-[2px]" />
-            <span className="absolute inset-0 grid place-items-center px-3 text-center font-display text-[13px] font-bold uppercase leading-tight tracking-[0.05em] text-ink/[0.12]">
+            <span className="absolute inset-0 grid place-items-center px-3 text-center font-display text-[13px] font-bold uppercase leading-tight tracking-wider text-ink/12">
               {c.title}
             </span>
           </>

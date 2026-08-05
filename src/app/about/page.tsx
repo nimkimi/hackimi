@@ -98,7 +98,7 @@ export default function AboutPage() {
                 </div>
 
                 <div>
-                  <h3 className="font-display text-xl font-semibold leading-snug sm:text-2xl">
+                  <h3 className="font-display text-xl font-semibold leading-snug sm:text-2xl sm:leading-8">
                     {exp.title}
                     {exp.company ? (
                       <>
@@ -148,7 +148,7 @@ export default function AboutPage() {
               <div className="grid grid-cols-1 gap-y-2 border-b border-white/10 py-6 md:grid-cols-[10rem_1fr] md:gap-x-8">
                 <span className="font-mono text-xs tabular-nums tracking-tight text-muted">{edu.period}</span>
                 <div>
-                  <h3 className="font-medium leading-snug sm:text-lg">
+                  <h3 className="font-medium leading-snug sm:text-lg sm:leading-7">
                     {edu.degree} <span className="text-muted">@</span> {edu.institution}
                   </h3>
                   <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-muted">
@@ -246,7 +246,7 @@ export default function AboutPage() {
       {/* Closing contact nudge */}
       <section className="mt-[clamp(4rem,12vh,7rem)] border-t border-white/10 pt-12">
         <Reveal>
-          <p className="measure text-lg leading-relaxed text-muted sm:text-xl">
+          <p className="measure text-lg leading-relaxed text-muted sm:text-xl sm:leading-7">
             Want to know more about my work, or talk about a role?{' '}
             <UnderlineLink href="/contact" className="text-ink">
               Send me a message

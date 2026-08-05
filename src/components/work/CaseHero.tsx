@@ -14,7 +14,7 @@ export default function CaseHero({ c }: { c: CaseStudy }) {
           {c.role} · {c.year}
         </span>
         {c.inProgress && (
-          <span className="rounded-full border border-accent bg-accent px-[11px] py-[5px] font-mono text-[10px] uppercase tracking-[0.1em] text-dark">
+          <span className="rounded-full border border-accent bg-accent px-[11px] py-[5px] font-mono text-[10px] uppercase tracking-widest text-dark">
             In progress
           </span>
         )}
@@ -32,7 +32,7 @@ export default function CaseHero({ c }: { c: CaseStudy }) {
         {c.tech.map((t) => (
           <li
             key={t}
-            className="rounded-full border border-white/10 px-[11px] py-[5px] font-mono text-[10px] uppercase tracking-[0.1em] text-muted"
+            className="rounded-full border border-white/10 px-[11px] py-[5px] font-mono text-[10px] uppercase tracking-widest text-muted"
           >
             {t}
           </li>

@@ -26,7 +26,7 @@ export default function UnderlineLink({
   return (
     <Link
       href={href}
-      className={`group relative inline-block text-ink no-underline after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 after:ease-[cubic-bezier(0.16,1,0.3,1)] after:content-[''] hover:after:scale-x-100 focus-visible:outline-none focus-visible:after:scale-x-100 ${className ?? ''}`.trim()}
+      className={`group relative inline-block text-ink no-underline after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-300 after:ease-[cubic-bezier(0.16,1,0.3,1)] after:content-[''] hover:after:scale-x-100 focus-visible:outline-hidden focus-visible:after:scale-x-100 ${className ?? ''}`.trim()}
       {...rest}
     >
       {children}

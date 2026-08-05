@@ -593,7 +593,7 @@ export default function Preloader() {
     <div
       ref={arrivalRef}
       aria-hidden
-      className="pointer-events-none fixed inset-0 z-[60] overflow-hidden"
+      className="pointer-events-none fixed inset-0 z-60 overflow-hidden"
     >
       {/* Full-screen masked overlay. viewBox is set to px in the effect so the
           mask geometry is in real screen pixels (accurate at any size). */}
@@ -691,7 +691,7 @@ export default function Preloader() {
           in the effect. */}
       <div
         ref={monoRef}
-        className="fixed left-0 top-0 z-[62] h-[120px] w-[120px] origin-top-left will-change-transform"
+        className="fixed left-0 top-0 z-62 h-[120px] w-[120px] origin-top-left will-change-transform"
       >
         <svg
           ref={monoSvgRef}
@@ -746,7 +746,7 @@ export default function Preloader() {
       {/* The glowing spark dot that rides the drawing tip. */}
       <div
         ref={sparkRef}
-        className="fixed left-0 top-0 z-[64] h-[9px] w-[9px] rounded-full opacity-0 will-change-transform"
+        className="fixed left-0 top-0 z-64 h-[9px] w-[9px] rounded-full opacity-0 will-change-transform"
         style={{
           background: ACCENT,
           boxShadow:
