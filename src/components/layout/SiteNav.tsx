@@ -29,10 +29,14 @@ export default function SiteNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
-  // Close the mobile menu on route change.
-  useEffect(() => {
+  // Close the mobile menu on route change. Adjusting state during render
+  // (React's documented alternative to an effect for this exact case) avoids
+  // an extra render pass and a synchronous setState-in-effect.
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname);
     setOpen(false);
-  }, [pathname]);
+  }
 
   // Close on Escape for keyboard users.
   useEffect(() => {
