@@ -149,3 +149,38 @@ None. All five scope/sequencing decisions were settled before this spec was writ
 3. Sequencing → two batches; the format sweep is serialised ahead of everything.
 4. `eslint-config-prettier` → dropped.
 5. React Compiler → explicitly out of scope.
+
+## Test-coverage constraints (surveyed 2026-08-05, before Batch 2 started)
+
+The existing suite was read in full for the six components. Four findings change how Batch 2 must be implemented — they are recorded here because they are not obvious from the components themselves.
+
+### 1. The jsdom `matchMedia` stub cannot notify — upgrading it is a shared prerequisite for #C
+
+`tests/setup/jsdom-setup.ts` hard-codes `matches: false` for every query, and `addListener` / `removeListener` / `addEventListener` / `removeEventListener` / `dispatchEvent` are all bare `vi.fn()` spies. They record calls and **store nothing**, so there is no mechanism anywhere to fire a change at a registered listener. The same inert shape is re-implemented locally in `Reveal.test.tsx`, `MagneticButton.test.tsx` and `Preloader.test.tsx`.
+
+Consequence: switching to `useSyncExternalStore` is safe against the _existing_ tests — their `subscribe` callback simply never fires. But the acceptance criterion "must react to live media-query changes" **cannot be tested until the stub stores listeners and can invoke them.** That stub upgrade is the first RED step of #C, not an afterthought.
+
+### 2. `Preloader.test.tsx` asserts on effect _mechanism_, not just output — #D will break tests
+
+Unlike the other five, this file reaches deep into implementation. The assertions most at risk:
+
+- `expect(gsapApi.timeline).not.toHaveBeenCalled()` and `expect(window.requestAnimationFrame).not.toHaveBeenCalled()` on the skip path — both require the skip decision to resolve **synchronously with render**.
+- `expect(window.requestAnimationFrame).toHaveBeenCalled()` immediately after `render()` on the play path — requires rAF scheduling to stay inside a mount-time effect.
+- `flushRaf(); flushRaf();` — binds to the exact **two-level nested rAF** structure.
+- `expect(window.cancelAnimationFrame).toHaveBeenCalled()` and `expect(tl.kill).toHaveBeenCalled()` on `unmount()` — require teardown to stay in an effect's cleanup return.
+
+This file deliberately does **not** use fake timers for rAF (jsdom's rAF is not reliably driven by them across versions); it spies on `requestAnimationFrame` with a manual queue plus a `flushRaf()` helper. Keep that approach. Any assertion this issue modifies must be justified in the PR as testing mechanism rather than behaviour.
+
+### 3. #F has zero unit coverage today — a genuine RED is available
+
+`SiteNav.test.tsx` never changes `pathname` mid-test. The close-on-route-change behaviour is covered **only** by `e2e/navigation-contact.spec.ts` (`// Route change closes the menu.`). So #F should start by writing the missing unit test that re-renders with a changed `usePathname()` and asserts the panel closes. Every other assertion in that file is pure DOM-after-interaction and is refactor-safe.
+
+### 4. #E has no transition coverage — every test mounts already in its target state
+
+`ContactClient.test.tsx` mocks `useActionState` at the `react` module level, returning a **static** tuple. No test re-renders with a changed state, so nothing exercises the effect's reactivity. The existing assertions will survive an effect-to-render refactor without proving anything about it. The real regression risk — does the toast update correctly on a **second** submission — is untested, and that is the test to write first.
+
+`Toast.test.tsx` does have one genuine lifecycle test (`vi.useFakeTimers()`, prop cleared, content stays mounted, unmounts after exactly 200 ms). Whatever replaces the effect must remain drivable by `vi.advanceTimersByTime(200)`.
+
+### Refactor-safe by inspection
+
+`MagneticButton.test.tsx` and `SiteNav.test.tsx` assert only on final DOM after `act()`-wrapped render or `userEvent` interaction. A `useEffect` flip and a synchronous `useSyncExternalStore` read both resolve before their assertions run. `MagneticButton.test.tsx`'s explanatory header comment about `magneticEnabled` flipping in an effect will go stale and should be updated with the code.
