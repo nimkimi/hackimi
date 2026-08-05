@@ -584,7 +584,6 @@ export default function Preloader() {
       }
     };
     // Run once on mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (!show) return null;
