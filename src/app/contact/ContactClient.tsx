@@ -1,11 +1,11 @@
 'use client';
 
 import { submitContact } from '@/app/contact/actions';
-import { initialContactState } from '@/app/contact/state';
+import { initialContactState, type ContactFormState } from '@/app/contact/state';
 import { Toast, type ToastState } from '@/components/Toast';
 import Reveal from '@/components/motion/Reveal';
 import Script from 'next/script';
-import { useActionState, useEffect, useRef, useState } from 'react';
+import { useActionState, useEffect, useMemo, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
 type Props = { siteKey: string };
@@ -55,25 +55,43 @@ function resetRecaptcha() {
   maybeGrecaptcha?.reset?.();
 }
 
+function toastForResult(state: ContactFormState): ToastState {
+  if (state.status === 'success') {
+    return { type: 'success', title: 'Message sent', desc: state.message ?? 'Thanks! I’ll get back to you soon.' };
+  }
+  if (state.status === 'error' && state.message) {
+    return { type: 'error', title: 'Something went wrong', desc: state.message };
+  }
+  return null;
+}
+
 export default function ContactClient({ siteKey }: Props) {
   const formRef = useRef<HTMLFormElement | null>(null);
-  const [toast, setToast] = useState<ToastState>(null);
   const [state, formAction, pending] = useActionState(submitContact, initialContactState);
 
-  useEffect(() => {
-    if (state.status === 'success') {
-      setToast({ type: 'success', title: 'Message sent', desc: state.message ?? 'Thanks! I’ll get back to you soon.' });
-      formRef.current?.reset();
-      resetRecaptcha();
-    } else if (state.status === 'error' && state.message) {
-      setToast({ type: 'error', title: 'Something went wrong', desc: state.message });
-    }
+  // The toast is derived from the action result, not stored: every submission
+  // hands back a fresh `ContactFormState`, so "which result has already been
+  // dismissed" is the only thing worth keeping in state. Memoised because
+  // `Toast` detects a new toast by identity, and an unstable object would look
+  // like a brand-new toast on every unrelated re-render.
+  const [dismissedResult, setDismissedResult] = useState<ContactFormState | null>(null);
+  const resultToast = useMemo(() => toastForResult(state), [state]);
+  const toast = dismissedResult === state ? null : resultToast;
 
-    if (state.status === 'success' || state.status === 'error') {
-      const timeout = setTimeout(() => setToast(null), 4000);
-      return () => clearTimeout(timeout);
-    }
-    return undefined;
+  // Auto-dismiss after 4s. setState lives in the timer callback, which is what
+  // effects are for — unlike deriving the toast itself.
+  useEffect(() => {
+    if (state.status !== 'success' && state.status !== 'error') return undefined;
+    const timeout = setTimeout(() => setDismissedResult(state), 4000);
+    return () => clearTimeout(timeout);
+  }, [state]);
+
+  // External-system sync on success: the uncontrolled form and the reCAPTCHA
+  // widget both live outside React and have to be told to clear themselves.
+  useEffect(() => {
+    if (state.status !== 'success') return;
+    formRef.current?.reset();
+    resetRecaptcha();
   }, [state]);
 
   const fieldErrors = state.fieldErrors ?? {};
@@ -222,7 +240,7 @@ export default function ContactClient({ siteKey }: Props) {
         </Reveal>
       </div>
 
-      <Toast toast={toast} onClose={() => setToast(null)} />
+      <Toast toast={toast} onClose={() => setDismissedResult(state)} />
     </section>
   );
 }
