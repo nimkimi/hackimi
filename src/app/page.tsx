@@ -122,12 +122,7 @@ export default function Home() {
             <UnderlineLink href={`mailto:${SITE_EMAIL}`} className="text-muted">
               {SITE_EMAIL}
             </UnderlineLink>
-            <UnderlineLink
-              href={SITE_SOCIAL_LINKS.github}
-              target="_blank"
-              rel="noreferrer"
-              className="text-muted"
-            >
+            <UnderlineLink href={SITE_SOCIAL_LINKS.github} target="_blank" rel="noreferrer" className="text-muted">
               GitHub
             </UnderlineLink>
           </div>

@@ -30,9 +30,7 @@ function contrast(fg: number[], bg: number[]): number {
   return (hi + 0.05) / (lo + 0.05);
 }
 
-test('Education degree/institution headings are readable against the page background', async ({
-  page,
-}) => {
+test('Education degree/institution headings are readable against the page background', async ({ page }) => {
   await page.goto('/about');
   await expect(page.locator('main')).toBeVisible();
 
@@ -48,8 +46,7 @@ test('Education degree/institution headings are readable against the page backgr
     await h.scrollIntoViewIfNeeded();
 
     const { fg, bg, text } = await h.evaluate((el) => {
-      const parse = (c: string) =>
-        (c.match(/\d+(\.\d+)?/g) || []).slice(0, 3).map(Number);
+      const parse = (c: string) => (c.match(/\d+(\.\d+)?/g) || []).slice(0, 3).map(Number);
       // Resolve the first opaque background walking up from the heading.
       let node: HTMLElement | null = el as HTMLElement;
       let bgRgb = [14, 14, 16]; // page <body> bg-base fallback

@@ -7,12 +7,14 @@ Potential clients have the same questions before they reach out: "Do you work ou
 ## Scope
 
 **In scope:**
+
 - FAQ section — likely on the services page or as a standalone section at the bottom of the homepage
 - 6–10 questions covering: process, pricing, timeline, tech stack, maintenance, geographic availability, communication style
 - Accordion UI (expand/collapse) to keep the page scannable
 - Schema markup (`FAQPage` JSON-LD) for Google rich results
 
 **Out of scope:**
+
 - Dynamic CMS-managed FAQ (static is fine, update as needed)
 
 ## Open Questions

@@ -7,12 +7,14 @@ Visitors from small businesses don't know if Nima is available for hire or what 
 ## Scope
 
 **In scope:**
+
 - New `/services` route
 - Sections: what's offered (web apps, landing pages, e-commerce, maintenance/support), who it's for (small businesses, local companies, early-stage startups), engagement types (project-based, retainer)
 - Clear CTA at the bottom → contact / book a call
 - Add "Services" to the main navigation
 
 **Out of scope:**
+
 - Detailed case studies (separate feature)
 - Legal/contract terms
 

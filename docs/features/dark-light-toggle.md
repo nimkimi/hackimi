@@ -7,6 +7,7 @@ The site currently follows system preference only (`darkMode: 'media'` in Tailwi
 ## Scope
 
 **In scope:**
+
 - Toggle button in the header (sun/moon icon)
 - Persist preference to `localStorage`
 - Override system preference when the user has set one explicitly
@@ -14,6 +15,7 @@ The site currently follows system preference only (`darkMode: 'media'` in Tailwi
 - Switch Tailwind from `darkMode: 'media'` to `darkMode: 'class'` — apply `dark` class on `<html>`
 
 **Out of scope:**
+
 - System preference sync after user overrides (user's manual choice wins until they reset)
 
 ## Technical Notes

@@ -7,6 +7,7 @@ A CI/CD pipeline runs tests automatically on every push and deploys to productio
 ## Scope
 
 **In scope:**
+
 - GitHub Actions workflow: `.github/workflows/ci.yml`
 - On every push / PR: install deps, run `npm run lint`, run `npm run check` (prettier), run Vitest unit tests
 - On push to `main`: trigger Vercel deployment (Vercel's GitHub integration handles this automatically — just confirm it's set up)
@@ -14,6 +15,7 @@ A CI/CD pipeline runs tests automatically on every push and deploys to productio
 - Add CI status badge to `README.md`
 
 **Out of scope:**
+
 - Self-hosted runners
 - Preview deployments per PR (Vercel handles this automatically)
 

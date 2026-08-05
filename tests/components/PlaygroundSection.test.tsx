@@ -23,26 +23,20 @@ describe('PlaygroundSection', () => {
 
     const heading = screen.getByRole('heading', { level: 2 });
     expect(heading).toHaveTextContent('Playground');
-    expect(
-      screen.getByText('Small interactions, built to feel right.'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Small interactions, built to feel right.')).toBeInTheDocument();
   });
 
   it('composes all three interactive demos', () => {
     render(<PlaygroundSection />);
 
     // SegmentedControl — its ARIA radiogroup.
-    expect(
-      screen.getByRole('radiogroup', { name: 'Workflow stage' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('radiogroup', { name: 'Workflow stage' })).toBeInTheDocument();
 
     // SpringSlider — its ARIA slider thumb.
     expect(screen.getByRole('slider', { name: 'Value' })).toBeInTheDocument();
 
     // CopyChip — its copy button.
-    expect(
-      screen.getByRole('button', { name: /^Copy / }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Copy / })).toBeInTheDocument();
   });
 
   it('renders a caption for each demo', () => {

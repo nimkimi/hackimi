@@ -74,9 +74,7 @@ describe('work data — section heading order contract', () => {
     };
     expect(() => guard(bad)).toThrow(/sections must be/);
     // Sanity: a correctly-ordered object does not throw.
-    expect(() =>
-      guard({ slug: 'ok', sections: ORDER.map((h) => ({ heading: h })) })
-    ).not.toThrow();
+    expect(() => guard({ slug: 'ok', sections: ORDER.map((h) => ({ heading: h })) })).not.toThrow();
   });
 });
 

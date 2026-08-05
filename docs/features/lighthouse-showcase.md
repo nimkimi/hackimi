@@ -7,11 +7,13 @@
 ## Scope
 
 **In scope:**
+
 - Display Lighthouse scores (Performance, Accessibility, Best Practices, SEO) prominently — likely on the homepage or services page
 - Scores should be real, kept up to date (manual or automated)
 - Visual treatment: the four circular score indicators styled to match the site's design
 
 **Out of scope:**
+
 - Automated Lighthouse CI (can add later via `lighthouse-ci` GitHub Action)
 - Real-time score fetching (static is fine — update when deploying major changes)
 

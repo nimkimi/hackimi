@@ -6,13 +6,7 @@ import Reveal from '@/components/motion/Reveal';
  * (e.g. `01 / CONTEXT`) above a body constrained to `.measure`, wrapped in a
  * masked Reveal. Pass the zero-based index for the number.
  */
-export default function CaseSection({
-  section,
-  index,
-}: {
-  section: CaseSectionType;
-  index: number;
-}) {
+export default function CaseSection({ section, index }: { section: CaseSectionType; index: number }) {
   const num = String(index + 1).padStart(2, '0');
 
   return (
@@ -21,9 +15,7 @@ export default function CaseSection({
         <h2 className="mono-label whitespace-nowrap text-muted sm:pt-1.5">
           {num} / {section.heading}
         </h2>
-        <p className="measure text-[clamp(1rem,1.9vw,1.1875rem)] leading-relaxed text-ink/90">
-          {section.body}
-        </p>
+        <p className="measure text-[clamp(1rem,1.9vw,1.1875rem)] leading-relaxed text-ink/90">{section.body}</p>
       </div>
     </Reveal>
   );

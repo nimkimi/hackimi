@@ -36,9 +36,7 @@ export default function WorkRow({ c, index }: { c: CaseStudy; index: number }) {
         className="pointer-events-none absolute -inset-x-2 inset-y-1 rounded-md ring-2 ring-accent/0 transition-(--tw-ring-color) duration-200 group-focus-visible:ring-accent/70"
       />
 
-      <span className="self-start pt-2 font-mono text-xs tabular-nums tracking-widest text-muted">
-        {num}
-      </span>
+      <span className="self-start pt-2 font-mono text-xs tabular-nums tracking-widest text-muted">{num}</span>
 
       <span className="min-w-0">
         <span className="relative inline-block font-display font-semibold leading-none tracking-[-0.02em] text-ink text-[clamp(1.9rem,6vw,4.5rem)] work-row__name transition-[transform,color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] after:absolute after:bottom-[0.06em] after:left-0 after:h-[0.06em] after:w-full after:origin-left after:scale-x-0 after:bg-accent after:transition-transform after:duration-500 after:ease-[cubic-bezier(0.16,1,0.3,1)] after:content-['']">

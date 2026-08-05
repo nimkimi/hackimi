@@ -2,12 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useReducedMotion,
-} from 'motion/react';
+import { motion, useMotionValue, useSpring, useReducedMotion } from 'motion/react';
 import type { MouseEvent, ReactNode } from 'react';
 
 // A motion-enabled next/link so internal navigation stays client-side (no full
@@ -45,13 +40,7 @@ const BASE_CLASS =
  * internal app routes (client-side nav, prefetch) and a plain `<a>` for hash
  * and external links; without `href`, a `<button>`.
  */
-export default function MagneticButton({
-  children,
-  href,
-  onClick,
-  className,
-  strength = 8,
-}: MagneticButtonProps) {
+export default function MagneticButton({ children, href, onClick, className, strength = 8 }: MagneticButtonProps) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
 
@@ -106,8 +95,7 @@ export default function MagneticButton({
     const relX = e.clientX - (rect.left + rect.width / 2);
     const relY = e.clientY - (rect.top + rect.height / 2);
     // Normalise against half-size and clamp the pull to `strength` px.
-    const cap = (v: number, half: number) =>
-      Math.max(-1, Math.min(1, v / half)) * strength;
+    const cap = (v: number, half: number) => Math.max(-1, Math.min(1, v / half)) * strength;
     x.set(cap(relX, rect.width / 2));
     y.set(cap(relY, rect.height / 2));
   };

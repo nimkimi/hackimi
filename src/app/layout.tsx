@@ -18,10 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const jsonLd = buildPersonJsonLd();
 
   return (
-    <html
-      lang="en"
-      className={`${clashDisplay.variable} ${satoshi.variable} ${geistMono.variable}`}
-    >
+    <html lang="en" className={`${clashDisplay.variable} ${satoshi.variable} ${geistMono.variable}`}>
       <body className="min-h-screen bg-dark text-ink font-sans">
         <Preloader />
         <script

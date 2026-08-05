@@ -109,8 +109,8 @@ export default function ContactClient({ siteKey }: Props) {
 
           <Reveal delay={0.12} className="mt-[clamp(1.5rem,5vh,2.5rem)]">
             <p className="measure text-[clamp(1rem,2vw,1.1875rem)] leading-relaxed text-muted">
-              Open to frontend roles and collaborations. Have a question about my work, or a team I’d be a fit for?
-              Drop a line — I read everything and reply.
+              Open to frontend roles and collaborations. Have a question about my work, or a team I’d be a fit for? Drop
+              a line — I read everything and reply.
             </p>
           </Reveal>
         </header>

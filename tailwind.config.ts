@@ -9,11 +9,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        dark: '#0E0E10',
-        surface: '#141417',
-        ink: '#F5F5F0',
-        muted: '#8A8A82',
-        accent: '#C6FF3D',
+        'dark': '#0E0E10',
+        'surface': '#141417',
+        'ink': '#F5F5F0',
+        'muted': '#8A8A82',
+        'accent': '#C6FF3D',
         'accent-dim': '#A6DC2A',
       },
       fontFamily: {

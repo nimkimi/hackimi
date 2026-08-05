@@ -19,9 +19,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
  * the spy/import wiring clean and isolated).
  */
 
-const contactClientSpy = vi.fn(
-  (_props: { siteKey: string }) => <div data-testid="contact-client" />,
-);
+const contactClientSpy = vi.fn((_props: { siteKey: string }) => <div data-testid="contact-client" />);
 vi.mock('@/app/contact/ContactClient', () => ({
   default: (props: { siteKey: string }) => contactClientSpy(props),
 }));
@@ -51,9 +49,7 @@ describe('Contact page (/contact)', () => {
 
     expect(screen.getByTestId('contact-client')).toBeInTheDocument();
     expect(contactClientSpy).toHaveBeenCalledTimes(1);
-    expect(contactClientSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ siteKey: 'public-site-key' }),
-    );
+    expect(contactClientSpy).toHaveBeenCalledWith(expect.objectContaining({ siteKey: 'public-site-key' }));
   });
 
   it('falls back to RECAPTCHA_SITE_KEY when the public key is absent', async () => {
@@ -62,9 +58,7 @@ describe('Contact page (/contact)', () => {
 
     await renderContactPage();
 
-    expect(contactClientSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ siteKey: 'fallback-key' }),
-    );
+    expect(contactClientSpy).toHaveBeenCalledWith(expect.objectContaining({ siteKey: 'fallback-key' }));
   });
 
   it('passes an empty string when no site key env is set', async () => {
@@ -73,9 +67,7 @@ describe('Contact page (/contact)', () => {
 
     await renderContactPage();
 
-    expect(contactClientSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ siteKey: '' }),
-    );
+    expect(contactClientSpy).toHaveBeenCalledWith(expect.objectContaining({ siteKey: '' }));
   });
 
   it('prefers the public key over the fallback when both are set', async () => {
@@ -84,9 +76,7 @@ describe('Contact page (/contact)', () => {
 
     await renderContactPage();
 
-    expect(contactClientSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ siteKey: 'public-key' }),
-    );
+    expect(contactClientSpy).toHaveBeenCalledWith(expect.objectContaining({ siteKey: 'public-key' }));
   });
 
   it('exports static contact metadata', async () => {

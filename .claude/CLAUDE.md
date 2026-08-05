@@ -31,6 +31,7 @@ Node version is pinned to `24` (see `.nvmrc`); `engines` requires `>=22.12.0`. C
 **TDD is the standard for all new work** (features and bugfixes): write the failing test first, then the implementation. The existing suite was retrofitted as characterization tests; from here, no behavior change ships without a test.
 
 Two runners, configured in `vitest.config.ts` via `test.projects`:
+
 - **`node` project** — pure logic + server code. Specs in `tests/unit/` (lib, data) and `tests/server/` (server action, captcha, email, sitemap, robots). `server-only` is aliased to a no-op stub; `@/` resolves to `src/`.
 - **`jsdom` project** — React (RTL + `@testing-library/jest-dom` + user-event). Specs in `tests/components/` and `tests/integration/` (App Router pages + ContactClient). Global `matchMedia`/`IntersectionObserver`/`ResizeObserver` stubs live in `tests/setup/jsdom-setup.ts`.
 - **Playwright** — real-browser E2E in `e2e/` (arrival animation, reduced-motion, scroll reveal, nav/work/contact flows, axe a11y smoke). Reduced-motion in E2E must use `page.emulateMedia({ reducedMotion: 'reduce' })` — `test.use({ reducedMotion })` does NOT propagate to `window.matchMedia`, which `Preloader`/`Reveal` read.
@@ -41,16 +42,16 @@ All test tooling is `devDependencies` only — zero production-bundle/runtime im
 
 Required at runtime for contact form functionality:
 
-| Variable | Purpose |
-|---|---|
-| `NODEMAILER_EMAIL` | SMTP sender address (required) |
-| `NODEMAILER_PASSWORD` | SMTP password (required) |
-| `NODEMAILER_HOST` | SMTP host (default: `smtp.hostinger.com`) |
-| `NODEMAILER_PORT` | SMTP port (default: `465`) |
-| `NODEMAILER_SECURE` | TLS (default: `true` when port is 465) |
-| `NODEMAILER_NAME` | Sender display name (default: `Portfolio`) |
-| `RECAPTCHA_SECRET_KEY` | Google reCAPTCHA v2 secret — optional in dev, required in prod |
-| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | reCAPTCHA public site key for the client widget |
+| Variable                         | Purpose                                                        |
+| -------------------------------- | -------------------------------------------------------------- |
+| `NODEMAILER_EMAIL`               | SMTP sender address (required)                                 |
+| `NODEMAILER_PASSWORD`            | SMTP password (required)                                       |
+| `NODEMAILER_HOST`                | SMTP host (default: `smtp.hostinger.com`)                      |
+| `NODEMAILER_PORT`                | SMTP port (default: `465`)                                     |
+| `NODEMAILER_SECURE`              | TLS (default: `true` when port is 465)                         |
+| `NODEMAILER_NAME`                | Sender display name (default: `Portfolio`)                     |
+| `RECAPTCHA_SECRET_KEY`           | Google reCAPTCHA v2 secret — optional in dev, required in prod |
+| `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | reCAPTCHA public site key for the client widget                |
 
 In development, reCAPTCHA is bypassed when `RECAPTCHA_SECRET_KEY` is absent.
 
@@ -61,6 +62,7 @@ In development, reCAPTCHA is bypassed when `RECAPTCHA_SECRET_KEY` is absent.
 ### Key Patterns
 
 **Server/Client split for the contact form** — `src/app/contact/` is the clearest example of the pattern used throughout:
+
 - `page.tsx` is a Server Component that reads env vars and passes them as props
 - `ContactClient.tsx` is the `'use client'` component that owns form state via `useActionState`
 - `actions.ts` is `'use server'` — validates with Zod, verifies reCAPTCHA, sends two emails (auto-reply to sender + notification to site owner)

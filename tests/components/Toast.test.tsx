@@ -52,15 +52,11 @@ describe('Toast', () => {
 
   it('renders a distinct status icon per type (success vs error)', () => {
     // Icons differ by class: success -> text-accent, error -> text-red-500.
-    const { container: successContainer } = render(
-      <Toast toast={successToast} onClose={() => {}} />,
-    );
+    const { container: successContainer } = render(<Toast toast={successToast} onClose={() => {}} />);
     const successIcon = successContainer.querySelector('svg.shrink-0');
     expect(successIcon).toHaveClass('text-accent');
 
-    const { container: errorContainer } = render(
-      <Toast toast={errorToast} onClose={() => {}} />,
-    );
+    const { container: errorContainer } = render(<Toast toast={errorToast} onClose={() => {}} />);
     const errorIcon = errorContainer.querySelector('svg.shrink-0');
     expect(errorIcon).toHaveClass('text-red-500');
   });
@@ -84,9 +80,7 @@ describe('Toast', () => {
     vi.useFakeTimers();
     try {
       const onClose = vi.fn();
-      const { rerender, container } = render(
-        <Toast toast={successToast} onClose={onClose} />,
-      );
+      const { rerender, container } = render(<Toast toast={successToast} onClose={onClose} />);
 
       expect(screen.getByText('Saved')).toBeInTheDocument();
 

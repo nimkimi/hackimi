@@ -27,7 +27,7 @@ _No planned items yet._
 Raw ideas, no commitment. See `docs/ideas.md` for even rougher captures.
 
 | Feature | Spec | Notes |
-|---|---|---|
+| --- | --- | --- |
 | Design system doc | [spec](features/design-system-doc.md) | Define visual language before executing redesign |
 | Redesign & animations | [spec](features/redesign-animations.md) | Do after design system doc |
 | Services page | [spec](features/services-page.md) | Highest priority for freelance conversion |
@@ -54,9 +54,9 @@ Raw ideas, no commitment. See `docs/ideas.md` for even rougher captures.
 
 ## Done
 
-| Feature | Shipped |
-|---|---|
-| Contact form with reCAPTCHA | 2025 |
-| Projects section | 2025 |
-| Dark mode (system preference) | 2025 |
+| Feature                                   | Shipped |
+| ----------------------------------------- | ------- |
+| Contact form with reCAPTCHA               | 2025    |
+| Projects section                          | 2025    |
+| Dark mode (system preference)             | 2025    |
 | `.claude/` project config + prettier hook | 2026-05 |

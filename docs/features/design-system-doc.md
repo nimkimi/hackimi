@@ -7,10 +7,12 @@ As new features are added, design decisions get made inconsistently across sessi
 ## Scope
 
 **In scope:**
+
 - Create `docs/DESIGN.md` covering: color tokens (light/dark), typography (font, scale, weights), spacing conventions, animation philosophy, component patterns (card, btn, muted, etc.), dark mode rules, accessibility baseline
 - Add a pointer to it in `.claude/CLAUDE.md`
 
 **Out of scope:**
+
 - No code changes — document only
 - Not a Figma file or visual mockup
 

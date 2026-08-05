@@ -7,6 +7,7 @@ Transparent pricing (even rough ranges) is one of the most effective ways to pre
 ## Scope
 
 **In scope:**
+
 - New `/pricing` route or section within services page
 - Present 2–3 engagement tiers or project type ranges:
   - Landing page / brochure site (e.g. €1–3k)
@@ -17,6 +18,7 @@ Transparent pricing (even rough ranges) is one of the most effective ways to pre
 - CTA → inquiry form or book a call
 
 **Out of scope:**
+
 - Real-time quotes or calculators (separate feature)
 - Fixed prices — ranges only
 

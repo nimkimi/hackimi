@@ -22,10 +22,7 @@ describe('Monogram', () => {
   it('uses a custom title prop as the accessible label', () => {
     render(<Monogram title="NH Logo" />);
 
-    expect(screen.getByRole('img', { name: 'NH Logo' })).toHaveAttribute(
-      'aria-label',
-      'NH Logo',
-    );
+    expect(screen.getByRole('img', { name: 'NH Logo' })).toHaveAttribute('aria-label', 'NH Logo');
   });
 
   it('applies a passed className to the svg', () => {

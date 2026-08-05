@@ -25,6 +25,7 @@ This is primarily visual/frontend work. TDD is applied to the two pieces with re
 ## File Structure
 
 **New files:**
+
 - `mockups/variant-a/index.html`, `mockups/variant-a/work.html`, `mockups/variant-a/about.html` — multi-page mockup
 - `mockups/variant-b/index.html` — single long-scroll mockup
 - `mockups/shared/case.html` — shared case-page mockup (used by both variants)
@@ -42,6 +43,7 @@ This is primarily visual/frontend work. TDD is applied to the two pieces with re
 - `vitest.config.ts` — test runner config
 
 **Modified files:**
+
 - `package.json` — add `motion`, `vitest`; add `test` script
 - `tailwind.config.ts` — `darkMode: 'class'`, coral/warm token palette
 - `src/app/globals.css` — refreshed component layer for new palette
@@ -58,6 +60,7 @@ This is primarily visual/frontend work. TDD is applied to the two pieces with re
 ### Task 1: Branch, dependencies, and test runner
 
 **Files:**
+
 - Modify: `package.json`
 - Create: `vitest.config.ts`
 
@@ -101,8 +104,7 @@ export default defineConfig({
 
 - [ ] **Step 5: Verify the runner works (no tests yet is OK)**
 
-Run: `npm run test`
-Expected: Vitest runs and reports "No test files found" or exits 0. (If it errors on "no tests", that is acceptable for this step.)
+Run: `npm run test` Expected: Vitest runs and reports "No test files found" or exits 0. (If it errors on "no tests", that is acceptable for this step.)
 
 - [ ] **Step 6: Commit**
 
@@ -120,6 +122,7 @@ git commit -m "chore: add motion + vitest, create redesign branch"
 ### Task 2: Shared mockup palette + reveal styles
 
 **Files:**
+
 - Create: `mockups/shared/theme.css`
 
 - [ ] **Step 1: Define coral light/dark CSS variables and reveal styles**
@@ -127,30 +130,50 @@ git commit -m "chore: add motion + vitest, create redesign branch"
 ```css
 /* mockups/shared/theme.css — throwaway mockup styling */
 :root {
-  --bg: #FBF7F2;          /* warm paper */
-  --surface: #FFFFFFAA;
-  --ink: #1F1A17;         /* near-black warm */
-  --muted: #6F635B;       /* warm gray */
-  --accent: #E2674A;      /* coral */
-  --accent-strong: #C9502F;
-  --ring: #E2674A55;
+  --bg: #fbf7f2; /* warm paper */
+  --surface: #ffffffaa;
+  --ink: #1f1a17; /* near-black warm */
+  --muted: #6f635b; /* warm gray */
+  --accent: #e2674a; /* coral */
+  --accent-strong: #c9502f;
+  --ring: #e2674a55;
 }
 :root.dark {
-  --bg: #17120F;          /* warm charcoal */
-  --surface: #221B16AA;
-  --ink: #F2E9E2;         /* soft sand */
-  --muted: #A89C92;
-  --accent: #F07A5C;      /* brighter coral */
-  --accent-strong: #F49379;
-  --ring: #F07A5C55;
+  --bg: #17120f; /* warm charcoal */
+  --surface: #221b16aa;
+  --ink: #f2e9e2; /* soft sand */
+  --muted: #a89c92;
+  --accent: #f07a5c; /* brighter coral */
+  --accent-strong: #f49379;
+  --ring: #f07a5c55;
 }
-body { background: var(--bg); color: var(--ink); }
-.muted { color: var(--muted); }
-.accent { color: var(--accent); }
-.reveal { opacity: 0; transform: translateY(12px); transition: opacity .6s ease, transform .6s ease; }
-.reveal.in { opacity: 1; transform: none; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+}
+.muted {
+  color: var(--muted);
+}
+.accent {
+  color: var(--accent);
+}
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
 @media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; transform: none; transition: none; }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 ```
 
@@ -164,6 +187,7 @@ git commit -m "feat(mockups): shared coral palette + reveal styles"
 ### Task 3: Shared case-page mockup
 
 **Files:**
+
 - Create: `mockups/shared/case.html`
 
 - [ ] **Step 1: Build the case page mockup**
@@ -175,41 +199,59 @@ Minimum skeleton (expand with real layout/spacing during frontend-design):
 ```html
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Case — Be My Guide</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="theme.css" />
-</head>
-<body class="font-sans">
-  <header class="max-w-3xl mx-auto px-6 py-6 flex justify-between">
-    <a href="#" class="accent">← Back to work</a>
-    <button id="t" class="border rounded px-3 py-1">Theme</button>
-  </header>
-  <main class="max-w-3xl mx-auto px-6 py-10 space-y-12">
-    <section class="reveal">
-      <span class="inline-block text-xs rounded-full px-2 py-1 border accent">In progress</span>
-      <h1 class="text-4xl sm:text-5xl font-extrabold mt-4">Be My Guide</h1>
-      <p class="muted text-lg mt-3">Matching visually-impaired runners with sighted volunteer guides.</p>
-      <ul class="flex flex-wrap gap-2 mt-4 text-sm muted">
-        <li class="border rounded-full px-3 py-1">Next.js</li>
-        <li class="border rounded-full px-3 py-1">Auth.js</li>
-        <li class="border rounded-full px-3 py-1">Postgres/Prisma</li>
-        <li class="border rounded-full px-3 py-1">Web Push</li>
-      </ul>
-    </section>
-    <section class="reveal"><h2 class="text-xl font-bold mb-2">Context</h2><p class="muted">…</p></section>
-    <section class="reveal"><h2 class="text-xl font-bold mb-2">My role</h2><p class="muted">…</p></section>
-    <section class="reveal"><h2 class="text-xl font-bold mb-2">Problem</h2><p class="muted">…</p></section>
-    <section class="reveal"><h2 class="text-xl font-bold mb-2">Approach</h2><p class="muted">…</p></section>
-    <section class="reveal"><h2 class="text-xl font-bold mb-2">Result</h2><p class="muted">…</p></section>
-  </main>
-  <script>
-    const io = new IntersectionObserver((es) => es.forEach(e => e.isIntersecting && e.target.classList.add('in')), { threshold: .15 });
-    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-    document.getElementById('t').onclick = () => document.documentElement.classList.toggle('dark');
-  </script>
-</body>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Case — Be My Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="theme.css" />
+  </head>
+  <body class="font-sans">
+    <header class="max-w-3xl mx-auto px-6 py-6 flex justify-between">
+      <a href="#" class="accent">← Back to work</a>
+      <button id="t" class="border rounded px-3 py-1">Theme</button>
+    </header>
+    <main class="max-w-3xl mx-auto px-6 py-10 space-y-12">
+      <section class="reveal">
+        <span class="inline-block text-xs rounded-full px-2 py-1 border accent">In progress</span>
+        <h1 class="text-4xl sm:text-5xl font-extrabold mt-4">Be My Guide</h1>
+        <p class="muted text-lg mt-3">Matching visually-impaired runners with sighted volunteer guides.</p>
+        <ul class="flex flex-wrap gap-2 mt-4 text-sm muted">
+          <li class="border rounded-full px-3 py-1">Next.js</li>
+          <li class="border rounded-full px-3 py-1">Auth.js</li>
+          <li class="border rounded-full px-3 py-1">Postgres/Prisma</li>
+          <li class="border rounded-full px-3 py-1">Web Push</li>
+        </ul>
+      </section>
+      <section class="reveal">
+        <h2 class="text-xl font-bold mb-2">Context</h2>
+        <p class="muted">…</p>
+      </section>
+      <section class="reveal">
+        <h2 class="text-xl font-bold mb-2">My role</h2>
+        <p class="muted">…</p>
+      </section>
+      <section class="reveal">
+        <h2 class="text-xl font-bold mb-2">Problem</h2>
+        <p class="muted">…</p>
+      </section>
+      <section class="reveal">
+        <h2 class="text-xl font-bold mb-2">Approach</h2>
+        <p class="muted">…</p>
+      </section>
+      <section class="reveal">
+        <h2 class="text-xl font-bold mb-2">Result</h2>
+        <p class="muted">…</p>
+      </section>
+    </main>
+    <script>
+      const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add('in')), {
+        threshold: 0.15,
+      });
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+      document.getElementById('t').onclick = () => document.documentElement.classList.toggle('dark');
+    </script>
+  </body>
 </html>
 ```
 
@@ -227,6 +269,7 @@ git commit -m "feat(mockups): shared case-page mockup"
 ### Task 4: Variant A — streamlined multi-page mockup
 
 **Files:**
+
 - Create: `mockups/variant-a/index.html`, `mockups/variant-a/work.html`, `mockups/variant-a/about.html`
 
 - [ ] **Step 1: Build `index.html`** — hero (name, role, one-liner, photo placeholder, CTAs: Work/Contact/GitHub), a "Featured work" teaser row linking to `work.html` and `../shared/case.html`, and a condensed skills strip. Reuse the Tailwind CDN + `theme.css` + reveal/toggle script pattern from Task 3. Top nav links: Home / Work / About / Contact.
@@ -249,6 +292,7 @@ git commit -m "feat(mockups): variant A — streamlined multi-page"
 ### Task 5: Variant B — single long-scroll mockup
 
 **Files:**
+
 - Create: `mockups/variant-b/index.html`
 
 - [ ] **Step 1: Build the long-scroll page** — one page with anchor nav (Home/About/Work/Contact scroll to `#about`, `#work`, `#contact`) flowing hero → about → work (3 case cards linking to `../shared/case.html`) → contact form mock. Heavier scroll-reveal/parallax feel than Variant A. Same `theme.css` + toggle pattern.
@@ -284,6 +328,7 @@ git commit -m "docs: record chosen portfolio structure"
 ### Task 7: Theme resolution helper (TDD)
 
 **Files:**
+
 - Create: `src/lib/theme.ts`
 - Test: `tests/theme.test.ts`
 
@@ -314,8 +359,7 @@ describe('resolveTheme', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `npm run test -- tests/theme.test.ts`
-Expected: FAIL — cannot find module `../src/lib/theme`.
+Run: `npm run test -- tests/theme.test.ts` Expected: FAIL — cannot find module `../src/lib/theme`.
 
 - [ ] **Step 3: Write minimal implementation**
 
@@ -334,8 +378,7 @@ export function resolveTheme(choice: ThemeChoice, systemPrefersDark: boolean): R
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `npm run test -- tests/theme.test.ts`
-Expected: PASS (4 tests).
+Run: `npm run test -- tests/theme.test.ts` Expected: PASS (4 tests).
 
 - [ ] **Step 5: Commit**
 
@@ -347,6 +390,7 @@ git commit -m "feat(theme): theme resolution helper with tests"
 ### Task 8: Tailwind coral palette + class dark mode
 
 **Files:**
+
 - Modify: `tailwind.config.ts`
 
 - [ ] **Step 1: Switch dark mode and replace the color tokens**
@@ -389,8 +433,7 @@ variants: {
 
 - [ ] **Step 3: Verify the build compiles**
 
-Run: `npm run build`
-Expected: build succeeds (pages may still look teal-less; that's fine).
+Run: `npm run build` Expected: build succeeds (pages may still look teal-less; that's fine).
 
 - [ ] **Step 4: Commit**
 
@@ -402,6 +445,7 @@ git commit -m "feat(theme): coral palette + class-based dark mode"
 ### Task 9: No-flash inline theme script
 
 **Files:**
+
 - Create: `src/components/ThemeScript.tsx`
 - Modify: `src/app/layout.tsx`
 
@@ -446,6 +490,7 @@ git commit -m "feat(theme): no-flash inline theme script"
 ### Task 10: ThemeToggle component
 
 **Files:**
+
 - Create: `src/components/ThemeToggle.tsx`
 - Modify: `src/components/Header.tsx`
 
@@ -518,6 +563,7 @@ git commit -m "feat(theme): manual theme toggle in header"
 ### Task 11: Reveal + Stagger components
 
 **Files:**
+
 - Create: `src/components/motion/Reveal.tsx`, `src/components/motion/Stagger.tsx`
 
 - [ ] **Step 1: Build `Reveal`** (scroll-triggered fade/slide; reduced-motion safe — Motion auto-respects `useReducedMotion`)
@@ -528,7 +574,15 @@ git commit -m "feat(theme): manual theme toggle in header"
 import { motion, useReducedMotion } from 'motion/react';
 import type { ReactNode } from 'react';
 
-export default function Reveal({ children, delay = 0, className }: { children: ReactNode; delay?: number; className?: string }) {
+export default function Reveal({
+  children,
+  delay = 0,
+  className,
+}: {
+  children: ReactNode;
+  delay?: number;
+  className?: string;
+}) {
   const reduce = useReducedMotion();
   return (
     <motion.div
@@ -574,8 +628,7 @@ export const staggerItem = {
 
 - [ ] **Step 3: Verify build**
 
-Run: `npm run build`
-Expected: compiles; no type errors.
+Run: `npm run build` Expected: compiles; no type errors.
 
 - [ ] **Step 4: Commit**
 
@@ -591,6 +644,7 @@ git commit -m "feat(motion): Reveal + Stagger primitives (reduced-motion safe)"
 ### Task 12: Typed work data (TDD on integrity)
 
 **Files:**
+
 - Create: `src/data/work.ts`
 - Test: `tests/work.test.ts`
 
@@ -603,9 +657,7 @@ import work, { type CaseStudy } from '../src/data/work';
 
 describe('work data', () => {
   it('has the three flagship cases', () => {
-    expect(work.map((w) => w.slug).sort()).toEqual(
-      ['be-my-guide', 'concert-radar', 'nav-event-registration'].sort()
-    );
+    expect(work.map((w) => w.slug).sort()).toEqual(['be-my-guide', 'concert-radar', 'nav-event-registration'].sort());
   });
   it('every case has required fields and the five narrative sections', () => {
     const required = ['Context', 'My role', 'Problem', 'Approach', 'Result'];
@@ -624,8 +676,7 @@ describe('work data', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `npm run test -- tests/work.test.ts`
-Expected: FAIL — cannot find module `../src/data/work`.
+Run: `npm run test -- tests/work.test.ts` Expected: FAIL — cannot find module `../src/data/work`.
 
 - [ ] **Step 3: Implement `work.ts`** with the type and three flagship entries (fill `sections` body copy from the real projects; placeholders shown for body text only — headings must match exactly)
 
@@ -636,12 +687,12 @@ export type CaseLink = { label: string; href: string };
 export type CaseStudy = {
   slug: string;
   title: string;
-  summary: string;          // one-line impact
-  heroImage?: string;       // optional; degrade to text-only
+  summary: string; // one-line impact
+  heroImage?: string; // optional; degrade to text-only
   tech: string[];
   links?: CaseLink[];
   inProgress?: boolean;
-  sections: CaseSection[];  // exactly the 5 narrative sections, in order
+  sections: CaseSection[]; // exactly the 5 narrative sections, in order
 };
 
 const SECTION_ORDER = ['Context', 'My role', 'Problem', 'Approach', 'Result'] as const;
@@ -651,7 +702,17 @@ const work: CaseStudy[] = [
     slug: 'be-my-guide',
     title: 'Be My Guide',
     summary: 'Matching visually-impaired Norwegians with sighted volunteer guides for running, hiking, and skiing.',
-    tech: ['Next.js 16', 'TypeScript', 'Auth.js v5', 'Neon Postgres', 'Prisma', 'Upstash Redis', 'Web Push', 'Vercel BotID', 'Vitest'],
+    tech: [
+      'Next.js 16',
+      'TypeScript',
+      'Auth.js v5',
+      'Neon Postgres',
+      'Prisma',
+      'Upstash Redis',
+      'Web Push',
+      'Vercel BotID',
+      'Vitest',
+    ],
     links: [{ label: 'GitHub', href: 'https://github.com/nimkimi' }],
     inProgress: true,
     sections: [
@@ -704,8 +765,7 @@ export default work;
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `npm run test -- tests/work.test.ts`
-Expected: PASS (3 tests).
+Run: `npm run test -- tests/work.test.ts` Expected: PASS (3 tests).
 
 - [ ] **Step 5: Replace real case body copy** in each `body: '…'` using the source projects (Be My Guide README/SPEC, Concert Radar SPEC, NAV intern experience in `src/data/about.ts`). Re-run the test to confirm still green.
 
@@ -719,6 +779,7 @@ git commit -m "feat(work): typed case-study data for three flagships"
 ### Task 13: Case UI components
 
 **Files:**
+
 - Create: `src/components/work/CaseHero.tsx`, `src/components/work/CaseSection.tsx`, `src/components/work/CaseCard.tsx`
 
 > Invoke `frontend-design` before styling these.
@@ -731,8 +792,7 @@ git commit -m "feat(work): typed case-study data for three flagships"
 
 - [ ] **Step 4: Verify build**
 
-Run: `npm run build`
-Expected: compiles.
+Run: `npm run build` Expected: compiles.
 
 - [ ] **Step 5: Commit**
 
@@ -744,6 +804,7 @@ git commit -m "feat(work): case hero, section, and card components"
 ### Task 14: Work index route
 
 **Files:**
+
 - Create: `src/app/work/page.tsx`
 
 - [ ] **Step 1: Build the index page** — `export const metadata = buildPageMetadata({ title: 'Work', description: 'Selected engineering work by Nima Hakimi.', path: '/work' })`. Map `work` into a `Stagger` grid of `CaseCard`s.
@@ -787,6 +848,7 @@ git commit -m "feat(work): /work case index route"
 ### Task 15: Case page route with static params + metadata
 
 **Files:**
+
 - Create: `src/app/work/[slug]/page.tsx`
 
 - [ ] **Step 1: Build the dynamic case route**
@@ -840,12 +902,12 @@ git commit -m "feat(work): /work/[slug] case page route"
 ### Task 16: Retire the old projects route + data
 
 **Files:**
+
 - Delete: `src/app/projects/page.tsx`, `src/data/projects.ts`, `src/components/ProjectCard.tsx`
 
 - [ ] **Step 1: Grep for references** to make sure nothing else imports them.
 
-Run: `grep -rn "data/projects\|ProjectCard\|app/projects" src`
-Expected: only the files being deleted (and nav links, handled in Task 18).
+Run: `grep -rn "data/projects\|ProjectCard\|app/projects" src` Expected: only the files being deleted (and nav links, handled in Task 18).
 
 - [ ] **Step 2: Delete the files**
 
@@ -872,6 +934,7 @@ git commit -m "refactor: retire /projects in favor of /work"
 ### Task 17: Restyle the home/hero
 
 **Files:**
+
 - Modify: `src/app/page.tsx`
 
 - [ ] **Step 1:** Rebuild the hero with the coral palette, the shimmer/gradient signature treatment, a featured-work teaser (map first 3 from `work`), condensed skills, and CTAs (Work, Contact, GitHub). Wrap entrance content in `Reveal`. For Variant B, append `#about`, `#work`, `#contact` sections on this page.
@@ -888,6 +951,7 @@ git commit -m "feat(home): coral hero redesign with motion"
 ### Task 18: Update navigation (Work link, remove Projects)
 
 **Files:**
+
 - Modify: `src/components/NavLinks.tsx`, `src/components/navigation/NavLinksClient.tsx`, `src/components/navigation/types.ts` (as applicable)
 
 - [ ] **Step 1:** Replace the `/projects` nav entry with `/work` ("Work"). For Variant B, point top nav at anchors (`/#work`) while keeping a real `/work` index if desired.
@@ -906,6 +970,7 @@ git commit -m "feat(nav): replace Projects with Work"
 ### Task 19: Restyle the About page
 
 **Files:**
+
 - Modify: `src/app/about/page.tsx`
 
 - [ ] **Step 1:** Apply coral palette + `Reveal`/`Stagger` to the experience timeline, education, skills, languages from `src/data/about.ts`. Sharpen the summary's positioning for recruiters.
@@ -922,6 +987,7 @@ git commit -m "feat(about): coral redesign with scroll reveals"
 ### Task 20: Restyle the Contact page (logic untouched)
 
 **Files:**
+
 - Modify: `src/app/contact/ContactClient.tsx` (presentation only)
 
 - [ ] **Step 1:** Restyle inputs/buttons/toast to the coral palette and refreshed `.btn`/`.card` classes. **Do not change** `actions.ts`, `state.ts`, `email.ts`, or `captcha.ts`.
@@ -938,6 +1004,7 @@ git commit -m "feat(contact): restyle to coral palette (logic unchanged)"
 ### Task 21: Refresh global component layer + background
 
 **Files:**
+
 - Modify: `src/app/globals.css`, `src/app/layout.tsx`
 
 - [ ] **Step 1:** Update `@layer components` (`.card`, `.btn`, `.btn-accent`, `.btn-outline`, `.muted`) to the coral tokens; update the fixed background-gradient blobs in `layout.tsx` from teal to coral (keep them subtle/warm). Update `<body>` background/text classes if needed.
@@ -977,11 +1044,13 @@ git commit -m "fix(a11y): keyboard, focus, contrast, reduced-motion pass"
 - [ ] **Step 2: Run the full check suite**
 
 Run:
+
 ```bash
 npm run test
 npm run lint
 npm run build
 ```
+
 Expected: tests pass, lint clean, build succeeds.
 
 - [ ] **Step 3: Decide on mockups** — either delete `mockups/` or keep it. Recommended: keep only the chosen variant for reference, or remove entirely.

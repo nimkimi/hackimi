@@ -1,8 +1,6 @@
 # Portfolio Redesign — Design Spec
 
-**Date:** 2026-06-02
-**Status:** ✅ APPROVED DESIGN (validated via prototype `mockups/v3/index.html`). See "FINAL APPROVED DIRECTION" below. Earlier sections retained for history only.
-**Repo:** `projects/private/hackimi`
+**Date:** 2026-06-02 **Status:** ✅ APPROVED DESIGN (validated via prototype `mockups/v3/index.html`). See "FINAL APPROVED DIRECTION" below. Earlier sections retained for history only. **Repo:** `projects/private/hackimi`
 
 ---
 
@@ -10,21 +8,25 @@
 
 Validated by the user against the built prototype **`mockups/v3/index.html`** ("I like the design, let's go for that"). Build THIS for real in Next.js.
 
-**Identity / positioning (important nuance):** Nima is a **frontend developer with a designer's eye** — position him as a **developer**, NOT a designer ("a developer with designer taste, not a designer"). Copy leads with developer identity; the design-forward execution is the differentiator. Hero eyebrow `FRONTEND DEVELOPER`; positioning line e.g. *"Frontend developer with a designer's eye — I build accessible, expressive interfaces. Currently at NAV."*
+**Identity / positioning (important nuance):** Nima is a **frontend developer with a designer's eye** — position him as a **developer**, NOT a designer ("a developer with designer taste, not a designer"). Copy leads with developer identity; the design-forward execution is the differentiator. Hero eyebrow `FRONTEND DEVELOPER`; positioning line e.g. _"Frontend developer with a designer's eye — I build accessible, expressive interfaces. Currently at NAV."_
 
 **The signature arrival animation (~2s, once per session, the centerpiece):**
+
 1. An **"NH" SVG monogram strokes itself on** (draw-on via `stroke-dashoffset`, expo.out).
 2. It **flies up + scales into the nav** to become the persistent header logo (measured-rect tween).
 3. **"Nima Hakimi"** reveals line/word-by-word behind `overflow:hidden` masks (stagger, expo.out).
 4. One **acid-lime accent pop** on settle, then hands off — never blocks past ~2s.
+
 - Once-per-session via `sessionStorage`; `prefers-reduced-motion` → skip intro entirely (instant final state). Overlay is fixed/inset over a hero that already exists in final layout (no reflow/CLS).
 
 **Art direction:**
+
 - Palette: near-black base `#0E0E10`, off-white text `#F5F5F0` / muted `#8A8A82`, ONE committed accent **acid lime `#C6FF3D`** (arrival pop, link/hover underlines, magnetic CTA, cursor). Subtle STATIC grain.
 - Type: **Clash Display** (expressive hero/titles), **Satoshi** (body/UI), **Geist Mono** (uppercase letter-spaced labels, section numbers, metadata — the "engineer" tell).
 - Motion is expressive but PURPOSEFUL: masked scroll reveals (not fade-up-everything), lime animated underlines, magnetic CTA, optional contextual cursor, Lenis smooth scroll. All reduced-motion-safe.
 
 **Structure:**
+
 - Sticky nav (NH monogram logo + Work / About / Playground / Contact + magnetic "Let's talk" CTA).
 - Hero (eyebrow, masked name reveal, positioning line, scroll cue).
 - **Selected Work** as expressive rows (not cards): mono index · name · outcome · tech tags; hover draws lime underline + reveals preview + dims siblings. Links to case studies.
@@ -33,6 +35,7 @@ Validated by the user against the built prototype **`mockups/v3/index.html`** ("
 - About (developer-with-design-taste duality) and a big-type Contact with the magnetic CTA.
 
 **Hard requirements:**
+
 - **Mobile-first AND verified beautiful on both mobile and desktop** (explicitly checked at multiple breakpoints — not just "built responsive").
 - **Accessibility** (a11y specialist): reduced-motion fallback for the intro + all motion, keyboard nav, visible focus, sufficient contrast, semantic markup.
 - Reuse the existing contact server-action + reCAPTCHA flow; keep typed data (`work.ts`); recruiter audience.
@@ -48,6 +51,7 @@ Everything below this section (Direction Change #2/#1 and the original refined-m
 The interactive 3D "Developer Cosmos" below was also **rejected** ("felt random / gimmicky / not me"). The key realization: the client is a **developer AND a designer** (design-engineer hybrid), so the site should read like a strong **designer's portfolio backed by developer substance** — expressive, art-directed, slick color, with **purposeful** motion (nothing random/decorative).
 
 **Current locked direction:**
+
 - A **design-forward "designer × developer" portfolio**: designer-grade typography, color, and layout creativity + real engineering credibility (the three flagship case studies).
 - A signature **~2-second arrival/intro animation** on first load that creates a positive, uplifting feeling (e.g. masked text reveal / curtain wipe / monogram draw — TBD from research). Once per session; `prefers-reduced-motion` → instant. Mobile-first.
 - Motion is expressive but INTENTIONAL — every element earns its place.
@@ -142,7 +146,7 @@ A reusable case template:
 
 Three deep cases — quality over quantity:
 
-1. **Be My Guide** *(badge: In progress)* — request-broadcast matching connecting visually-impaired Norwegians with sighted volunteer guides (running/hiking/skiing). Auth.js v5, Neon Postgres + Prisma, Upstash rate-limiting, web-push, Vercel BotID, TS strict, Vitest. Lead case: mission + accessibility + serious architecture. Path: `projects/private/be-my-guide`.
+1. **Be My Guide** _(badge: In progress)_ — request-broadcast matching connecting visually-impaired Norwegians with sighted volunteer guides (running/hiking/skiing). Auth.js v5, Neon Postgres + Prisma, Upstash rate-limiting, web-push, Vercel BotID, TS strict, Vitest. Lead case: mission + accessibility + serious architecture. Path: `projects/private/be-my-guide`.
 2. **Concert Radar** — Spotify-connected concert discovery aggregating Ticketmaster, Bandsintown, Songkick & Billetto; alerts when followed artists play within a chosen radius. Spotify OAuth, daily Vercel Cron syncs, Resend email, Prisma + Turso/libSQL, Next.js 16, Vitest. Systems-integration story; live-demo potential. Path: `projects/private/concert-radar`.
 3. **NAV event-registration app** — internal event registration platform led end-to-end during the 2023 NAV internship; replaced a manual process and became NAV's primary tool for internal events. Next.js, Kotlin/Ktor, PostgreSQL. Work credibility; text + limited non-sensitive screenshots only.
 

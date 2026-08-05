@@ -45,10 +45,7 @@ export default function SiteNav() {
   }, [open]);
 
   return (
-    <nav
-      aria-label="Primary"
-      className="sticky top-0 z-40 border-b border-white/10 bg-dark/70 backdrop-blur-sm"
-    >
+    <nav aria-label="Primary" className="sticky top-0 z-40 border-b border-white/10 bg-dark/70 backdrop-blur-sm">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-6">
         {/* Logo slot — arrival animation landing target. Visible by default. */}
         <Link
@@ -57,10 +54,7 @@ export default function SiteNav() {
           aria-label="Nima Hakimi — home"
           className="relative flex items-center rounded-xs focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-dark"
         >
-          <Monogram
-            className="h-7 w-7 text-ink"
-            title="Nima Hakimi — home"
-          />
+          <Monogram className="h-7 w-7 text-ink" title="Nima Hakimi — home" />
         </Link>
 
         {/* Desktop links + CTA */}
@@ -68,23 +62,14 @@ export default function SiteNav() {
           <ul className="flex items-center gap-7">
             {NAV_ITEMS.map((item) => (
               <li key={item.href}>
-                <UnderlineLink
-                  href={item.href}
-                  className="mono-label transition-colors hover:text-ink"
-                >
+                <UnderlineLink href={item.href} className="mono-label transition-colors hover:text-ink">
                   {item.label}
                 </UnderlineLink>
               </li>
             ))}
           </ul>
-          <MagneticButton
-            href="/contact"
-            className="mono-label text-dark!"
-          >
-            <span
-              aria-hidden
-              className="h-1.5 w-1.5 rounded-full bg-dark"
-            />
+          <MagneticButton href="/contact" className="mono-label text-dark!">
+            <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-dark" />
             Let&apos;s talk
           </MagneticButton>
         </div>

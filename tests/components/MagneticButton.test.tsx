@@ -96,18 +96,14 @@ describe('MagneticButton — element choice', () => {
   });
 
   it('renders a plain anchor for an external https href', () => {
-    renderMagnetic(
-      <MagneticButton href="https://example.com">Ext</MagneticButton>,
-    );
+    renderMagnetic(<MagneticButton href="https://example.com">Ext</MagneticButton>);
     const link = screen.getByRole('link', { name: 'Ext' });
     expect(link).toHaveAttribute('href', 'https://example.com');
     expect(link.tagName).toBe('A');
   });
 
   it('renders a plain anchor for a mailto href', () => {
-    renderMagnetic(
-      <MagneticButton href="mailto:a@b.com">Mail</MagneticButton>,
-    );
+    renderMagnetic(<MagneticButton href="mailto:a@b.com">Mail</MagneticButton>);
     const link = screen.getByRole('link', { name: 'Mail' });
     expect(link).toHaveAttribute('href', 'mailto:a@b.com');
   });
@@ -123,7 +119,7 @@ describe('MagneticButton — element choice', () => {
     renderMagnetic(
       <MagneticButton>
         <span data-testid="child">child content</span>
-      </MagneticButton>,
+      </MagneticButton>
     );
     expect(screen.getByTestId('child')).toHaveTextContent('child content');
   });
@@ -148,9 +144,7 @@ describe('MagneticButton — element choice', () => {
 
 describe('MagneticButton — magnetic transform (motion allowed)', () => {
   it('applies a transform on mouse move and resets it on mouse leave', async () => {
-    const { container } = renderMagnetic(
-      <MagneticButton strength={8}>Pull</MagneticButton>,
-    );
+    const { container } = renderMagnetic(<MagneticButton strength={8}>Pull</MagneticButton>);
     const el = container.firstElementChild as HTMLElement;
 
     // getBoundingClientRect is 0-sized in jsdom; stub a real box so the
@@ -181,7 +175,7 @@ describe('MagneticButton — magnetic transform (motion allowed)', () => {
           bubbles: true,
           clientX: 100,
           clientY: 20,
-        }),
+        })
       );
     });
 
@@ -216,9 +210,7 @@ describe('MagneticButton — reduced motion / coarse pointer (no magnetism)', ()
     setMatchMedia({ reduce: true });
     const onMove = vi.fn();
 
-    const { container } = renderMagnetic(
-      <MagneticButton>Static</MagneticButton>,
-    );
+    const { container } = renderMagnetic(<MagneticButton>Static</MagneticButton>);
     const el = container.firstElementChild as HTMLElement;
 
     el.getBoundingClientRect = () =>
@@ -240,7 +232,7 @@ describe('MagneticButton — reduced motion / coarse pointer (no magnetism)', ()
           bubbles: true,
           clientX: 100,
           clientY: 20,
-        }),
+        })
       );
     });
 
@@ -255,9 +247,7 @@ describe('MagneticButton — reduced motion / coarse pointer (no magnetism)', ()
   it('on a coarse pointer device the magnetic branch never activates', () => {
     setMatchMedia({ coarse: true });
 
-    const { container } = renderMagnetic(
-      <MagneticButton>Touch</MagneticButton>,
-    );
+    const { container } = renderMagnetic(<MagneticButton>Touch</MagneticButton>);
     const el = container.firstElementChild as HTMLElement;
 
     el.getBoundingClientRect = () =>
@@ -279,7 +269,7 @@ describe('MagneticButton — reduced motion / coarse pointer (no magnetism)', ()
           bubbles: true,
           clientX: 100,
           clientY: 20,
-        }),
+        })
       );
     });
 

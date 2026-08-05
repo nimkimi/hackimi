@@ -7,12 +7,14 @@ Content marketing compounds over time. Articles like "5 things small businesses 
 ## Scope
 
 **In scope:**
+
 - New `/blog` route with list view + article view
 - MDX-based (content lives in the repo, no external CMS to maintain)
 - Start with 2–3 articles targeted at small business owners
 - Add "Blog" or "Articles" to main navigation
 
 **Out of scope:**
+
 - Comments, subscriptions, or newsletter integration (separate feature if desired)
 - Headless CMS (unless MDX feels too limiting after starting)
 

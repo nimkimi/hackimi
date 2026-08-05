@@ -3,13 +3,7 @@ import work from '@/data/work';
 
 const baseUrl = 'https://hackimi.dev';
 
-const routes = [
-  '/',
-  '/about',
-  '/work',
-  '/contact',
-  ...work.map((c) => `/work/${c.slug}`),
-] as const;
+const routes = ['/', '/about', '/work', '/contact', ...work.map((c) => `/work/${c.slug}`)] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();

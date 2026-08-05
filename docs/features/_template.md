@@ -9,17 +9,19 @@ _Why does this feature belong on the portfolio? What problem does it solve or wh
 _What's in, what's explicitly out._
 
 **In scope:**
-- 
+
+- _replace me_
 
 **Out of scope:**
-- 
+
+- _replace me_
 
 ## Acceptance Criteria
 
 _How do we know it's done? Be specific enough that Claude can implement without asking._
 
-- [ ] 
-- [ ] 
+- [ ] _replace me_
+- [ ] _replace me_
 
 ## Design Notes
 
@@ -30,10 +32,11 @@ _Wireframes, color/layout decisions, copy, animations. Paste screenshots or desc
 _Relevant files, patterns to follow, constraints (e.g. "must be a Server Component", "reuse `.card` class")._
 
 Relevant files:
-- 
+
+- _replace me_
 
 ## Open Questions
 
 _Things to decide before or during implementation._
 
-- 
+- _replace me_
