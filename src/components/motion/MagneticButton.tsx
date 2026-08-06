@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import Link from 'next/link';
 import { motion, useMotionValue, useSpring, useReducedMotion } from 'motion/react';
 import type { MouseEvent, ReactNode } from 'react';
+import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 // A motion-enabled next/link so internal navigation stays client-side (no full
 // reload, no re-firing the Preloader) while still receiving the magnetic spring
@@ -41,19 +42,22 @@ const BASE_CLASS =
  * and external links; without `href`, a `<button>`.
  */
 export default function MagneticButton({ children, href, onClick, className, strength = 8 }: MagneticButtonProps) {
+  // Deliberately motion's own hook, not `useMediaQuery`: it also honours a
+  // <MotionConfig reducedMotion> override, and it is a mount-time snapshot by
+  // design (see its TODO upstream). Routing it through the live subscription
+  // would silently change motion semantics, which this refactor must not do.
   const reduce = useReducedMotion();
   const ref = useRef<HTMLElement>(null);
 
-  // Detect touch pointers after mount only. Reading `matchMedia` during render
-  // (SSR vs. client) would desync the markup and cause a hydration mismatch, so
-  // we default to the safe, non-magnetic branch on the first paint and enable
-  // the magnetic effect once we know we're on a fine-pointer device.
-  const [magneticEnabled, setMagneticEnabled] = useState(false);
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
-    setMagneticEnabled(!coarsePointer);
-  }, []);
+  // Touch devices get no magnetism. The server cannot know the pointer type, so
+  // the subscription's server snapshot is `true` (assume coarse): the first
+  // client render therefore matches the SSR markup on the safe, non-magnetic
+  // branch, and React re-reads the real value straight after hydration. Unlike
+  // the mount-effect this replaced, it also follows the device live — a 2-in-1
+  // folding into tablet mode drops the magnetism instead of keeping it until
+  // the next full page load.
+  const coarsePointer = useMediaQuery('(pointer: coarse)', true);
+  const magneticEnabled = !coarsePointer;
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -64,8 +68,7 @@ export default function MagneticButton({ children, href, onClick, className, str
   const classes = `${BASE_CLASS} ${className ?? ''}`.trim();
 
   // Touch devices and reduced-motion users get a plain element — no listeners,
-  // no transforms. `magneticEnabled` starts false (matching SSR) and only flips
-  // true after mount on a fine-pointer device.
+  // no transforms.
   if (reduce || !magneticEnabled) {
     if (href) {
       if (isInternalRoute(href)) {

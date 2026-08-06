@@ -33,7 +33,7 @@ Node version is pinned to `24` (see `.nvmrc`); `engines` requires `>=22.12.0`. C
 Two runners, configured in `vitest.config.ts` via `test.projects`:
 
 - **`node` project** — pure logic + server code. Specs in `tests/unit/` (lib, data) and `tests/server/` (server action, captcha, email, sitemap, robots). `server-only` is aliased to a no-op stub; `@/` resolves to `src/`.
-- **`jsdom` project** — React (RTL + `@testing-library/jest-dom` + user-event). Specs in `tests/components/` and `tests/integration/` (App Router pages + ContactClient). Global `matchMedia`/`IntersectionObserver`/`ResizeObserver` stubs live in `tests/setup/jsdom-setup.ts`.
+- **`jsdom` project** — React (RTL + `@testing-library/jest-dom` + user-event). Specs in `tests/components/`, `tests/hooks/` (shared hooks such as `useMediaQuery`) and `tests/integration/` (App Router pages + ContactClient). `tests/setup/jsdom-setup.ts` is the setup file: it stubs `IntersectionObserver`/`ResizeObserver` globally and installs the controllable `matchMedia` fake that lives in `tests/setup/match-media.ts`. That fake stores its listeners, so `setMediaQuery(query, matches)` drives a real change at anything subscribed through `useMediaQuery`; wrap the call in `act()`.
 - **Playwright** — real-browser E2E in `e2e/` (arrival animation, reduced-motion, scroll reveal, nav/work/contact flows, axe a11y smoke). Reduced-motion in E2E must use `page.emulateMedia({ reducedMotion: 'reduce' })` — `test.use({ reducedMotion })` does NOT propagate to `window.matchMedia`, which `Preloader`/`Reveal` read.
 
 All test tooling is `devDependencies` only — zero production-bundle/runtime impact.

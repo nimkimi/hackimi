@@ -31,7 +31,11 @@ export default defineConfig({
         test: {
           name: 'jsdom',
           environment: 'jsdom',
-          include: ['tests/components/**/*.test.{ts,tsx}', 'tests/integration/**/*.test.{ts,tsx}'],
+          include: [
+            'tests/components/**/*.test.{ts,tsx}',
+            'tests/hooks/**/*.test.{ts,tsx}',
+            'tests/integration/**/*.test.{ts,tsx}',
+          ],
           setupFiles: ['./tests/setup/jsdom-setup.ts'],
         },
       },
