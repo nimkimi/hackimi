@@ -31,6 +31,9 @@ import { shouldPlayIntro } from '@/lib/intro';
  *   `display: none` under `prefers-reduced-motion: reduce` in globals.css,
  *   because a stylesheet resolves before first paint and hydration does not.
  *   The layout effect only unmounts the (already invisible) node afterwards.
+ * - Live flip: switching reduced motion ON mid-intro is the one case the
+ *   stylesheet cannot serve (gsap's inline display outranks it by then), so the
+ *   play path listens for it and settles the page at once via `finish()`.
  * - Fail-safe: every DOM lookup is guarded; the timeline build is wrapped in
  *   try/catch that restores the final visible state on any error. The page can
  *   never get stuck behind the overlay or with the hero hidden.
@@ -109,7 +112,9 @@ export default function Preloader() {
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // One-shot read: the skip/play decision is made here and never revisited.
+    const reduce = motionQuery.matches;
     // Plays on every full page load / refresh; skipped only under reduced motion.
     const play = shouldPlayIntro(reduce);
 
@@ -157,10 +162,31 @@ export default function Preloader() {
     let resizeHandler: (() => void) | null = null;
     let resizeTimer: ReturnType<typeof setTimeout> | undefined;
 
+    // MID-INTRO FLIP TO REDUCED MOTION — the one case the stylesheet cannot
+    // serve. By now the timeline has parked the hero at `yPercent: 110` and
+    // gsap has written an inline `display: block` onto the overlay, which
+    // outranks the `[data-arrival-overlay]` rule; the user would get either a
+    // blank hero or a still-running animation for the rest of the ~2.1s. So we
+    // stop the motion and jump straight to the resting frame via the same
+    // `finish()` fail-safe the onComplete and error paths use. This subscribes
+    // only to that live edge case — the skip/play decision above stays a
+    // one-shot read.
+    const handleReduceFlip = (event: MediaQueryListEvent) => {
+      if (!event.matches || completed) return;
+      tl?.kill();
+      if (arrivalEl) gsap.set(arrivalEl, { display: 'none' });
+      finish();
+    };
+    motionQuery.addEventListener('change', handleReduceFlip);
+
     let raf1 = 0;
     let raf2 = 0;
     raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => {
+        // Reduced motion may have arrived between the effect running and this
+        // frame; `finish()` has already settled the page, so building the
+        // timeline now would only re-park the hero behind the user's back.
+        if (completed) return;
         try {
           const arrival = arrivalRef.current;
           const svg = svgRef.current;
@@ -516,6 +542,7 @@ export default function Preloader() {
     return () => {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
+      motionQuery.removeEventListener('change', handleReduceFlip);
       if (resizeHandler) window.removeEventListener('resize', resizeHandler);
       clearTimeout(resizeTimer);
       tl?.kill();

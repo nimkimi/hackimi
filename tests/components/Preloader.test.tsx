@@ -87,21 +87,98 @@ const gsapApi = gsapDefault as unknown as {
 const tl = gsapApi.__timeline;
 
 // ---- matchMedia helper ---------------------------------------------------
+// The stub stores the `change` listeners registered against the reduced-motion
+// query so a test can flip the preference LIVE, the way the OS setting does
+// mid-session. The global stub in tests/setup/jsdom-setup.ts records calls but
+// stores nothing, so it cannot notify anybody.
+const REDUCE_QUERY = '(prefers-reduced-motion: reduce)';
+
+type ReduceListener = (event: MediaQueryListEvent) => void;
+
+let reduceListeners: ReduceListener[] = [];
+let reduceQueries: { matches: boolean }[] = [];
+
 function setReduceMotion(matches: boolean) {
+  reduceListeners = [];
+  reduceQueries = [];
   Object.defineProperty(window, 'matchMedia', {
     writable: true,
     configurable: true,
-    value: vi.fn().mockImplementation((query: string) => ({
-      matches: query === '(prefers-reduced-motion: reduce)' ? matches : false,
-      media: query,
-      onchange: null,
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    })),
+    value: vi.fn().mockImplementation((query: string) => {
+      const isReduceQuery = query === REDUCE_QUERY;
+      const mql = {
+        matches: isReduceQuery ? matches : false,
+        media: query,
+        onchange: null,
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn((type: string, listener: ReduceListener) => {
+          if (isReduceQuery && type === 'change') reduceListeners.push(listener);
+        }),
+        removeEventListener: vi.fn((type: string, listener: ReduceListener) => {
+          if (isReduceQuery && type === 'change') {
+            reduceListeners = reduceListeners.filter((registered) => registered !== listener);
+          }
+        }),
+        dispatchEvent: vi.fn(),
+      };
+      if (isReduceQuery) reduceQueries.push(mql);
+      return mql;
+    }),
   });
+}
+
+/**
+ * Flip the live reduced-motion preference and notify every registered `change`
+ * listener, exactly as a real MediaQueryList does when the OS setting changes
+ * while the page is open.
+ */
+function flipReduceMotion(matches: boolean) {
+  reduceQueries.forEach((mql) => {
+    mql.matches = matches;
+  });
+  const event = { matches, media: REDUCE_QUERY } as unknown as MediaQueryListEvent;
+  act(() => {
+    reduceListeners.slice().forEach((listener) => listener(event));
+  });
+}
+
+/**
+ * jsdom implements neither SVG path measurement (`getTotalLength`,
+ * `getPointAtLength`) nor real layout (`getBoundingClientRect` returns zeros),
+ * so the play path's geometry helpers must be stubbed for the build to reach
+ * `gsap.timeline()` instead of throwing into the catch → `finish()`. Returns a
+ * restore function.
+ */
+function stubSvgMeasurement() {
+  const proto = SVGElement.prototype as unknown as Record<string, unknown>;
+  const pathProto = (globalThis.SVGPathElement?.prototype ?? SVGElement.prototype) as unknown as Record<
+    string,
+    unknown
+  >;
+  const orig = {
+    getTotalLength: pathProto.getTotalLength,
+    getPointAtLength: pathProto.getPointAtLength,
+    gbcr: proto.getBoundingClientRect,
+  };
+  pathProto.getTotalLength = () => 100;
+  pathProto.getPointAtLength = () => ({ x: 10, y: 10 });
+  proto.getBoundingClientRect = () => ({
+    left: 0,
+    top: 0,
+    width: 120,
+    height: 120,
+    right: 120,
+    bottom: 120,
+    x: 0,
+    y: 0,
+    toJSON: () => ({}),
+  });
+  return () => {
+    pathProto.getTotalLength = orig.getTotalLength;
+    pathProto.getPointAtLength = orig.getPointAtLength;
+    proto.getBoundingClientRect = orig.gbcr;
+  };
 }
 
 // ---- requestAnimationFrame control --------------------------------------
@@ -340,6 +417,87 @@ describe('Preloader — motion allowed (play path)', () => {
     expect(container.querySelector('[aria-hidden]')).toBeNull();
     // No timeline was built because the guard returned before timeline().
     expect(gsapApi.timeline).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * The stylesheet keeps the overlay off the screen for anyone who ALREADY has
+ * reduced motion on. It cannot serve the user who switches it on halfway
+ * through the intro: by then the timeline has the hero parked at
+ * `yPercent: 110` and gsap has written an inline `display: block` onto the
+ * overlay that outranks the reduced-motion rule. Left alone, that user gets
+ * either a blank hero or a still-running animation until the timeline ends —
+ * up to ~2s. The intro must instead jump to its settled resting frame at once.
+ */
+describe('Preloader — reduced motion switched on mid-intro', () => {
+  it('settles the hero at once instead of leaving it parked until the timeline ends', () => {
+    const restoreSvgMeasurement = stubSvgMeasurement();
+    mountTargetDom();
+    const { container } = render(<Preloader />);
+
+    flushRaf(); // outer
+    flushRaf(); // inner — timeline built, hero parked off-screen
+    restoreSvgMeasurement();
+
+    // Precondition: the hero really is parked, so "blank hero" is the state we
+    // are rescuing the user from.
+    expect(gsapApi.set).toHaveBeenCalledWith(expect.anything(), { yPercent: 110 });
+    gsapApi.set.mockClear();
+
+    flipReduceMotion(true);
+
+    // The hero's parked transform is cleared right away — the resting frame,
+    // not two seconds of nothing.
+    const clearedHeroTransform = gsapApi.set.mock.calls.some(([targets, vars]) => {
+      const nodes = Array.from((targets ?? []) as ArrayLike<Element>);
+      return (
+        (vars as { clearProps?: string } | undefined)?.clearProps === 'transform' &&
+        nodes.length > 0 &&
+        nodes.every((node) => node.hasAttribute?.('data-hero-line'))
+      );
+    });
+    expect(clearedHeroTransform).toBe(true);
+
+    // The motion is stopped, not merely fast-forwarded.
+    expect(tl.kill).toHaveBeenCalled();
+
+    // And the overlay is gone, so nothing is left covering the settled page.
+    expect(container.querySelector('[data-arrival-overlay]')).toBeNull();
+  });
+
+  it('never starts the timeline when the flip lands before the first frame', () => {
+    const restoreSvgMeasurement = stubSvgMeasurement();
+    mountTargetDom();
+    const { container } = render(<Preloader />);
+
+    // Flip while the two nested rAFs are still queued.
+    flipReduceMotion(true);
+
+    // Frames that were already scheduled must not resurrect the intro — a
+    // timeline built now would re-park the hero after the page had settled.
+    flushRaf(); // outer
+    flushRaf(); // inner
+    restoreSvgMeasurement();
+
+    expect(gsapApi.timeline).not.toHaveBeenCalled();
+    expect(container.querySelector('[data-arrival-overlay]')).toBeNull();
+  });
+
+  it('stops listening once the component is unmounted', () => {
+    const restoreSvgMeasurement = stubSvgMeasurement();
+    mountTargetDom();
+    const { unmount } = render(<Preloader />);
+
+    flushRaf(); // outer
+    flushRaf(); // inner
+    restoreSvgMeasurement();
+
+    unmount();
+    gsapApi.set.mockClear();
+
+    // No listener survives the unmount to touch the DOM or setState afterwards.
+    expect(() => flipReduceMotion(true)).not.toThrow();
+    expect(gsapApi.set).not.toHaveBeenCalled();
   });
 });
 
