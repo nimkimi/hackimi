@@ -81,7 +81,16 @@ async function isMagnetic(el: HTMLElement): Promise<boolean> {
   return el.style.transform.includes('translate');
 }
 
-/** Render inside act so the post-mount magneticEnabled effect flushes. */
+/**
+ * Render inside `act`, then hand back the RTL result.
+ *
+ * The name is historical: `magneticEnabled` used to arrive from a post-mount
+ * effect and this wrapper existed to flush that second render. It is a
+ * `useMediaQuery` subscription read during the first render now, so there is
+ * nothing left to flush; the wrapper stays only so every test in this file
+ * mounts through one path, next to the explicit `act()` calls that the
+ * transform assertions step through frame by frame.
+ */
 function renderMagnetic(ui: React.ReactElement) {
   let result!: ReturnType<typeof render>;
   act(() => {
