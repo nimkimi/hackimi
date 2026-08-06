@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { act } from 'react';
 
 import SiteNav from '@/components/layout/SiteNav';
 
@@ -132,6 +133,28 @@ describe('SiteNav', () => {
       await user.keyboard('{Escape}');
 
       expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('closes the menu when usePathname() reports a route change', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(<SiteNav />);
+
+      const toggle = screen.getByRole('button', { name: 'Open menu' });
+      const panel = document.getElementById('mobile-nav-panel') as HTMLElement;
+
+      await user.click(toggle);
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
+      expect(panel).not.toHaveAttribute('hidden');
+
+      // Simulate a route change: usePathname() now returns a new path, and the
+      // component re-renders (as it would after Next.js navigation).
+      pathname.mockReturnValue('/work');
+      act(() => {
+        rerender(<SiteNav />);
+      });
+
+      expect(screen.getByRole('button', { name: 'Open menu' })).toHaveAttribute('aria-expanded', 'false');
+      expect(panel).toHaveAttribute('hidden');
     });
   });
 
