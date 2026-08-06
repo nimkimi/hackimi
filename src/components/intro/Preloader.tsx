@@ -123,16 +123,33 @@ export default function Preloader() {
     // unmount mid-play).
     let completed = false;
 
+    // Clears every inline style the intro applies, leaving hero, nav logo and
+    // period in the visible state the markup already ships with. ONE definition
+    // shared by `finish()` and the unmount cleanup: the two used to be separate
+    // copies and drifted out of step with what the timeline actually primes.
+    //
+    // The nav logo is the inner <svg>, NOT the `#nav-logo-slot` <a> that the
+    // timeline's landing target names — the intro hides and reveals the child
+    // (`gsap.set(navLogo, { opacity: 0, scale: 0.7 })`), and `clearProps` on a
+    // parent does not reach it. Clearing only the slot left the header monogram
+    // at inline `opacity: 0` for the rest of the session on every path that
+    // restores before the 2.05s reveal. All lookups guarded.
+    const restoreRestingFrame = () => {
+      const heroLines = document.querySelectorAll<HTMLElement>('[data-hero-line]');
+      const navSlot = document.querySelector<HTMLElement>('#nav-logo-slot');
+      const navLogo = navSlot?.querySelector<SVGElement>('svg') ?? null;
+      const period = document.querySelector<HTMLElement>('#name-period');
+      if (heroLines.length) gsap.set(heroLines, { clearProps: 'transform' });
+      if (navSlot) gsap.set(navSlot, { clearProps: 'opacity,transform' });
+      if (navLogo) gsap.set(navLogo, { clearProps: 'opacity,transform' });
+      if (period) gsap.set(period, { clearProps: 'opacity,transform' });
+    };
+
     // Restores the final, visible resting frame and tears down the overlay.
     // Safe to call from the skip path, on completion, or from error handling.
     const finish = () => {
       completed = true;
-      const heroLines = document.querySelectorAll<HTMLElement>('[data-hero-line]');
-      const navSlot = document.querySelector<HTMLElement>('#nav-logo-slot');
-      const period = document.querySelector<HTMLElement>('#name-period');
-      if (heroLines.length) gsap.set(heroLines, { clearProps: 'transform' });
-      if (navSlot) gsap.set(navSlot, { clearProps: 'opacity,transform' });
-      if (period) gsap.set(period, { clearProps: 'opacity,transform' });
+      restoreRestingFrame();
       setShow(false);
     };
 
@@ -141,8 +158,19 @@ export default function Preloader() {
     // the hero/nav/period defaults are final. All that is left is to unmount the
     // node so the DOM ends up where the play path ends up. That runs on a
     // microtask rather than inline, so the layout effect never calls setState
-    // synchronously; microtasks still drain before the browser paints, so the
-    // deferral cannot introduce a flash of its own.
+    // synchronously.
+    //
+    // The deferral is safe because the node is INVISIBLE while it waits — not
+    // because it is fast. A `setShow` from a microtask is not a discrete-event
+    // update, so React 19 schedules the re-render through the Scheduler (a
+    // MessageChannel macrotask); the unmount is NOT guaranteed to land before
+    // the next paint. What makes that harmless is that this branch is reachable
+    // ONLY when `reduce` is true — `shouldPlayIntro` is exactly `!reduce` (see
+    // src/lib/intro.ts) — and whenever `reduce` is true the stylesheet rule is
+    // active and the overlay is already `display: none`. If a once-per-session
+    // check were ever restored to `shouldPlayIntro`, the skip path would become
+    // reachable with motion allowed, and then this deferral WOULD paint a flash
+    // of the overlay. Re-check this comment if that function changes.
     if (!play) {
       let cancelled = false;
       queueMicrotask(() => {
@@ -174,6 +202,16 @@ export default function Preloader() {
     const handleReduceFlip = (event: MediaQueryListEvent) => {
       if (!event.matches || completed) return;
       tl?.kill();
+      // `tl.kill()` cannot reach the 2.0s flourish: it fires `gsap.to(spark)`
+      // and, on that tween's completion, `gsap.fromTo(period)` as STANDALONE
+      // tweens rather than timeline children. The period one matters most — it
+      // animates `#name-period` in the hero, not in the overlay, so it would
+      // both keep moving after the user asked for no motion and re-apply an
+      // inline transform over the resting frame restored below.
+      const spark = sparkRef.current;
+      const period = document.querySelector<HTMLElement>('#name-period');
+      if (spark) gsap.killTweensOf(spark);
+      if (period) gsap.killTweensOf(period);
       if (arrivalEl) gsap.set(arrivalEl, { display: 'none' });
       finish();
     };
@@ -553,12 +591,7 @@ export default function Preloader() {
       // inline transforms so they're left VISIBLE and hide the overlay. We do
       // NOT call setShow here — the component is unmounting. All lookups guarded.
       if (!completed) {
-        const heroLines = document.querySelectorAll<HTMLElement>('[data-hero-line]');
-        const navSlot = document.querySelector<HTMLElement>('#nav-logo-slot');
-        const period = document.querySelector<HTMLElement>('#name-period');
-        if (heroLines.length) gsap.set(heroLines, { clearProps: 'transform' });
-        if (navSlot) gsap.set(navSlot, { clearProps: 'opacity,transform' });
-        if (period) gsap.set(period, { clearProps: 'opacity,transform' });
+        restoreRestingFrame();
         if (arrivalEl) gsap.set(arrivalEl, { display: 'none' });
       }
     };

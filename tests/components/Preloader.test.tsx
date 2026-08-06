@@ -62,6 +62,9 @@ vi.mock('gsap', () => {
     set: vi.fn(),
     to: vi.fn(),
     fromTo: vi.fn(),
+    // The 2.0s flourish fires tweens OUTSIDE the timeline, so stopping the
+    // intro early needs `killTweensOf` as well as `timeline.kill()`.
+    killTweensOf: vi.fn(),
     registerPlugin: vi.fn(),
     // Expose the timeline instance so tests can assert on it.
     __timeline: timeline,
@@ -79,6 +82,7 @@ const gsapApi = gsapDefault as unknown as {
   set: Mock;
   to: Mock;
   fromTo: Mock;
+  killTweensOf: Mock;
   registerPlugin: Mock;
   __timeline: {
     to: Mock;
@@ -273,6 +277,7 @@ beforeEach(() => {
   gsapApi.timeline.mockClear();
   gsapApi.set.mockClear();
   gsapApi.to.mockClear();
+  gsapApi.killTweensOf.mockClear();
   tl.to.mockClear();
   tl.set.mockClear();
   tl.add.mockClear();
@@ -518,6 +523,50 @@ describe('Preloader — reduced motion switched on mid-intro', () => {
     expect(container.querySelector('[data-arrival-overlay]')).toBeNull();
   });
 
+  it('restores the nav LOGO, not just its slot', () => {
+    const restoreSvgMeasurement = stubSvgMeasurement();
+    const root = mountTargetDom();
+    render(<Preloader />);
+
+    flushRaf(); // outer
+    flushRaf(); // inner
+    restoreSvgMeasurement();
+
+    // Precondition: the intro hides the inner <svg>, NOT the #nav-logo-slot
+    // <a> that the timeline's landing target names.
+    const navLogo = root.querySelector('#nav-logo-slot svg');
+    expect(gsapApi.set).toHaveBeenCalledWith(navLogo, { opacity: 0, scale: 0.7 });
+    gsapApi.set.mockClear();
+
+    flipReduceMotion(true);
+
+    // `clearProps` on the parent slot does not reach the child, so the logo
+    // itself must be cleared — otherwise the header monogram stays at inline
+    // `opacity: 0` for the rest of the session.
+    expect(gsapApi.set).toHaveBeenCalledWith(navLogo, { clearProps: 'opacity,transform' });
+  });
+
+  it('kills the flourish tweens the timeline does not own', () => {
+    const restoreSvgMeasurement = stubSvgMeasurement();
+    const root = mountTargetDom();
+    render(<Preloader />);
+
+    flushRaf(); // outer
+    flushRaf(); // inner
+    restoreSvgMeasurement();
+
+    flipReduceMotion(true);
+
+    // The 2.0s flourish fires `gsap.to(spark)` / `gsap.fromTo(period)` outside
+    // the timeline, so `tl.kill()` cannot reach them. The period tween lives in
+    // the hero rather than the overlay: left running it keeps animating after
+    // the user asked for no motion, and re-applies an inline transform over the
+    // resting frame that was just restored.
+    const period = root.querySelector('#name-period');
+    expect(gsapApi.killTweensOf).toHaveBeenCalledWith(period);
+    expect(gsapApi.killTweensOf).toHaveBeenCalledTimes(2); // spark + period
+  });
+
   it('never starts the timeline when the flip lands before the first frame', () => {
     const restoreSvgMeasurement = stubSvgMeasurement();
     mountTargetDom();
@@ -579,6 +628,25 @@ describe('Preloader — cleanup / fail-safe on unmount', () => {
     // The target DOM nodes still exist (the component never removes them).
     expect(root.querySelectorAll('[data-hero-line]').length).toBe(2);
     expect(container).toBeTruthy();
+  });
+
+  it('restores the nav LOGO when torn down mid-play', () => {
+    const restoreSvgMeasurement = stubSvgMeasurement();
+    const root = mountTargetDom();
+    const { unmount } = render(<Preloader />);
+
+    flushRaf(); // outer
+    flushRaf(); // inner — the intro hid the nav logo
+    restoreSvgMeasurement();
+
+    const navLogo = root.querySelector('#nav-logo-slot svg');
+    gsapApi.set.mockClear();
+
+    unmount();
+
+    // Same gap as the mid-intro flip: the cleanup's `clearProps` on the slot
+    // does not reach the <svg> the intro actually hid.
+    expect(gsapApi.set).toHaveBeenCalledWith(navLogo, { clearProps: 'opacity,transform' });
   });
 
   it('unmounting from the skip path is a clean no-op for animation teardown', () => {
