@@ -18,11 +18,26 @@ import { initialContactState } from '@/app/contact/state';
 const actionState: { current: ContactFormState } = { current: initialContactState };
 const formAction = vi.fn();
 
+/**
+ * React documents `useMemo` as a discardable performance hint: it may throw the
+ * cached value away and recompute (it already does on Suspense/Offscreen paths).
+ * Flipping this on makes every `useMemo` in the tree recompute on every render,
+ * which is the worst case React is allowed to hand a component. Nothing derived
+ * from a memo may change behaviour under it.
+ */
+const discardMemo = { current: false };
+
 vi.mock('react', async () => {
   const actual = await vi.importActual<typeof import('react')>('react');
   return {
     ...actual,
     useActionState: vi.fn(() => [actionState.current, formAction, false] as const),
+    // `actual.useMemo` is always called so hook order never shifts; only the
+    // returned value differs when the cache is treated as discarded.
+    useMemo: <T,>(factory: () => T, deps: unknown[]): T => {
+      const cached = actual.useMemo(factory, deps);
+      return discardMemo.current ? factory() : cached;
+    },
   };
 });
 
@@ -48,6 +63,7 @@ function setState(partial: Partial<ContactFormState>) {
 afterEach(() => {
   actionState.current = initialContactState;
   formAction.mockClear();
+  discardMemo.current = false;
 });
 
 describe('ContactClient — form fields', () => {
@@ -347,6 +363,51 @@ describe('ContactClient — toast across successive submissions', () => {
       expect(screen.queryByRole('status')).not.toBeInTheDocument();
     } finally {
       vi.useRealTimers();
+    }
+  });
+
+  /**
+   * `Toast` detects a new toast by object identity, so the derived toast must
+   * keep the same identity for as long as the action result does — including
+   * across a render where React has thrown the memo cache away. A fresh object
+   * for an unchanged result reads as a brand-new toast: it re-runs the enter
+   * effect, which cancels the pending reveal frame and queues another one. One
+   * re-render only delays the reveal; a parent re-rendering every frame (scroll,
+   * a live region, a hovering sibling) would hold the toast invisible for good.
+   */
+  it('keeps the pending enter frame when an unchanged result is re-derived from a discarded memo', () => {
+    const frames: FrameRequestCallback[] = [];
+    const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb: FrameRequestCallback) => {
+      frames.push(cb);
+      return frames.length;
+    });
+    const cafSpy = vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+    discardMemo.current = true;
+
+    try {
+      setState({});
+      const { rerender } = render(<ContactClient siteKey="test-site-key" />);
+
+      // The result arrives: the toast commits hidden with one frame queued to
+      // reveal it.
+      setState({ status: 'success', message: 'Thanks! I’ll get back to you soon.' });
+      rerender(<ContactClient siteKey="test-site-key" />);
+      expect(screen.getByRole('status')).toHaveClass('opacity-0', 'translate-y-3');
+      expect(frames).toHaveLength(1);
+
+      // A re-render for an unrelated reason, with the memo cache discarded. The
+      // action result has not changed, so the queued reveal must survive it.
+      rerender(<ContactClient siteKey="test-site-key" />);
+      expect(cafSpy).not.toHaveBeenCalled();
+      expect(frames).toHaveLength(1);
+
+      act(() => {
+        frames.splice(0).forEach((cb) => cb(0));
+      });
+      expect(screen.getByRole('status')).toHaveClass('opacity-100', 'translate-y-0');
+    } finally {
+      rafSpy.mockRestore();
+      cafSpy.mockRestore();
     }
   });
 

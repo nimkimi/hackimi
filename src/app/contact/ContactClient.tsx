@@ -5,7 +5,7 @@ import { initialContactState, type ContactFormState } from '@/app/contact/state'
 import { Toast, type ToastState } from '@/components/Toast';
 import Reveal from '@/components/motion/Reveal';
 import Script from 'next/script';
-import { useActionState, useEffect, useMemo, useRef, useState } from 'react';
+import { useActionState, useEffect, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 
 type Props = { siteKey: string };
@@ -71,12 +71,24 @@ export default function ContactClient({ siteKey }: Props) {
 
   // The toast is derived from the action result, not stored: every submission
   // hands back a fresh `ContactFormState`, so "which result has already been
-  // dismissed" is the only thing worth keeping in state. Memoised because
-  // `Toast` detects a new toast by identity, and an unstable object would look
-  // like a brand-new toast on every unrelated re-render.
+  // dismissed" is the only thing worth keeping in state.
   const [dismissedResult, setDismissedResult] = useState<ContactFormState | null>(null);
-  const resultToast = useMemo(() => toastForResult(state), [state]);
-  const toast = dismissedResult === state ? null : resultToast;
+
+  // `Toast` detects a new toast by object identity, so each action result needs
+  // exactly one toast object for as long as it is the current result. `useMemo`
+  // cannot promise that — React documents it as a discardable performance hint
+  // and may recompute — and a fresh object for an unchanged result reads to
+  // `Toast` as a brand-new toast, restarting its enter transition. `useState`
+  // is a real guarantee: React never throws it away. Result and toast are kept
+  // in one object so they cannot drift apart, and the swap happens during
+  // render rather than in an effect, so the toast lands in the same commit as
+  // the result banner.
+  const [derived, setDerived] = useState(() => ({ result: state, toast: toastForResult(state) }));
+  const currentDerived = derived.result === state ? derived : { result: state, toast: toastForResult(state) };
+  if (currentDerived !== derived) {
+    setDerived(currentDerived);
+  }
+  const toast = dismissedResult === state ? null : currentDerived.toast;
 
   // Auto-dismiss after 4s. setState lives in the timer callback, which is what
   // effects are for — unlike deriving the toast itself.
