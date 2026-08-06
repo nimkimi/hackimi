@@ -23,6 +23,9 @@ const OBSERVER_FALLBACK_MS = 2500;
  *    it follows that preference live, not only as it stood at mount;
  *  - a live preference change never un-reveals: content already on screen stays
  *    on screen when the query flips, in either direction;
+ *  - both states render the same two wrappers, so a flip never remounts the
+ *    children and never drops their DOM state — the contact form is an
+ *    uncontrolled <form> sitting inside a Reveal;
  *  - SSR-safe: first render is identical server/client (starts hidden, animated
  *    branch), because `useMediaQuery`'s server snapshot is "not reduced".
  */
@@ -63,8 +66,8 @@ export default function Reveal({
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    // The static branch renders no transform to undo, so there is nothing to
-    // observe and nothing to reveal.
+    // Under reduced motion nothing carries a transform to undo, so there is
+    // nothing to observe and nothing to reveal.
     if (reduce) return;
 
     const el = ref.current;
@@ -100,17 +103,25 @@ export default function Reveal({
     };
   }, [reduce]);
 
-  if (reduce) {
-    return <div className={className}>{children}</div>;
-  }
-
+  // One tree in both states, differing only by a class and an inline style.
+  // These used to be two returns of different shape — children at depth 1 under
+  // reduced motion, at depth 2 under the transform div otherwise. That was
+  // harmless while the branch was fixed for the life of the page, but now that
+  // `reduce` follows the query live, React sees a type mismatch on every flip
+  // and remounts the subtree, discarding any DOM state inside it. ContactClient
+  // wraps an uncontrolled <form> directly in a Reveal, so that cost a visitor
+  // their half-written message and their focus, in both directions.
   return (
-    <div ref={ref} className={`overflow-hidden ${className ?? ''}`}>
+    <div ref={ref} className={reduce ? className : `overflow-hidden ${className ?? ''}`}>
       <div
-        style={{
-          transform: shown ? 'translateY(0)' : 'translateY(110%)',
-          transition: `transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`,
-        }}
+        style={
+          reduce
+            ? undefined
+            : {
+                transform: shown ? 'translateY(0)' : 'translateY(110%)',
+                transition: `transform 0.8s cubic-bezier(0.16, 1, 0.3, 1) ${delay}s`,
+              }
+        }
       >
         {children}
       </div>

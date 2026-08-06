@@ -1,4 +1,5 @@
 import { act, render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { setMediaQuery } from '../setup/match-media';
 import Reveal from '@/components/motion/Reveal';
@@ -284,6 +285,66 @@ describe('Reveal — live prefers-reduced-motion changes', () => {
     fireIntersection(true);
 
     expect(inner.style.transform).toBe('translateY(0)');
+  });
+});
+
+describe('Reveal — child identity across a live reduced-motion flip', () => {
+  /**
+   * Following the preference live means both branches can render during one
+   * page life. If they do not render the same tree shape, React unmounts the
+   * subtree and remounts it, taking uncontrolled DOM state with it — and the
+   * contact form is an uncontrolled <form> wrapped directly in a Reveal, so a
+   * visitor mid-message would lose what they had typed. Node identity is the
+   * assertion that catches this; value and focus are what it costs.
+   */
+
+  it('keeps the node, its typed value and focus when reduced motion turns on', async () => {
+    const user = userEvent.setup();
+    render(
+      <Reveal>
+        <input aria-label="message" />
+      </Reveal>
+    );
+
+    const before = screen.getByLabelText('message');
+    await user.type(before, 'half-written message');
+    expect(before).toHaveValue('half-written message');
+    expect(before).toHaveFocus();
+
+    act(() => {
+      setReducedMotion(true);
+    });
+
+    const after = screen.getByLabelText('message');
+    expect(after).toHaveValue('half-written message');
+    expect(after).toHaveFocus();
+    // The structural cause: a remount is what took the value and focus with it.
+    expect(after).toBe(before);
+  });
+
+  it('keeps the node, its typed value and focus when reduced motion turns off', async () => {
+    setReducedMotion(true);
+    const user = userEvent.setup();
+    render(
+      <Reveal>
+        <input aria-label="message" />
+      </Reveal>
+    );
+
+    const before = screen.getByLabelText('message');
+    await user.type(before, 'half-written message');
+    expect(before).toHaveValue('half-written message');
+    expect(before).toHaveFocus();
+
+    act(() => {
+      setReducedMotion(false);
+    });
+
+    const after = screen.getByLabelText('message');
+    expect(after).toHaveValue('half-written message');
+    expect(after).toHaveFocus();
+    // The structural cause: a remount is what took the value and focus with it.
+    expect(after).toBe(before);
   });
 });
 
