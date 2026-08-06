@@ -21,15 +21,23 @@ test.beforeEach(async ({ page }) => {
 });
 
 async function assertDarkOnLime(el: Locator, label: string) {
-  // Re-resolve via expect.poll: motion-wrapped elements (the nav CTA, the
-  // segmented pill) re-render while their layout animation settles, which can
-  // detach a held handle. evaluate() needs the node attached but not in view —
-  // computed color is viewport-independent, so we never scroll. The parsing
-  // itself runs in Node (not inside evaluate) so a degenerate computed color
-  // throws a clear error from `parseColorChannels`/`maxChannel` rather than
-  // silently feeding `Math.max(...[])` (`-Infinity`, always `< 80`) into the
-  // assertion. expect.poll retries on a thrown error the same way it retries
-  // a failed comparison, so a transiently-detached handle still gets re-read.
+  // Poll rather than read once: motion-wrapped elements (the nav CTA, the
+  // segmented pill) re-render while their layout animation settles, so the
+  // computed color can still be mid-transition on the first read. evaluate()
+  // needs the node attached but not in view — computed color is
+  // viewport-independent, so we never scroll. Detachment is the locator's
+  // problem, not the poll's: `el.evaluate()` re-resolves the selector and
+  // waits for the element on every call.
+  //
+  // The parsing runs in Node (not inside evaluate) so a degenerate computed
+  // color throws a clear error from `parseColorChannels`/`maxChannel` rather
+  // than silently feeding `Math.max(...[])` (`-Infinity`, always `< 80`) into
+  // the assertion. Note that expect.poll retries a failed *comparison* but not
+  // a *throw*: `invokePollMatcher` awaits the callback outside its try/catch,
+  // so an exception propagates immediately and fails the test. That is the
+  // behaviour we want here — an unparseable color is not a transient state
+  // that will settle, so failing at once with the raw string in the message
+  // beats polling it to a timeout.
   let fg: number[] = [255, 255, 255];
   await expect
     .poll(
