@@ -60,3 +60,4 @@ Raw ideas, no commitment. See `docs/ideas.md` for even rougher captures.
 | Projects section                          | 2025    |
 | Dark mode (system preference)             | 2025    |
 | `.claude/` project config + prettier hook | 2026-05 |
+| Post-upgrade debt cleanup                 | 2026-08 |

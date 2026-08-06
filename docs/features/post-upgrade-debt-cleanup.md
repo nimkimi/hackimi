@@ -1,6 +1,6 @@
 # Feature: Post-Upgrade Debt Cleanup
 
-_Status: spec approved 2026-08-05. Supersedes the four "follow-ups" listed in `.claude/HANDOFF.md`._
+_Status: **SHIPPED 2026-08-06** (PRs #9-#15). Spec approved 2026-08-05. Superseded the four "follow-ups" that were listed in `.claude/HANDOFF.md`._
 
 ## Context
 
@@ -35,38 +35,44 @@ A portfolio whose primary audience is recruiters and hiring managers is judged p
 
 ### Global (the whole feature is done when all of these hold on `main`)
 
-- [ ] `npm run check` exits 0.
-- [ ] `npm run lint` reports **0 errors and 0 warnings**.
-- [ ] `eslint.config.mjs` no longer contains a `react-hooks/set-state-in-effect` override.
-- [ ] `npx tsc --noEmit` is clean.
-- [ ] `npm test` passes, with **more** tests than the 240 baseline (every fix ships a test).
-- [ ] Playwright passes 16/16 (plus new tests) against **both** a production build and the Turbopack dev server.
-- [ ] `eslint-config-prettier` does not appear in `package.json`.
-- [ ] CI runs the format check and fails the build when formatting drifts.
-- [ ] The 10 full-page screenshots (5 routes × desktop 1440 / mobile 390) are **byte-identical** to the ones captured from `5c5ef55`, or every difference is explained and approved.
+- [x] `npm run check` exits 0.
+- [x] `npm run lint` reports **0 errors and 0 warnings**. Verified armed, not merely un-overridden: a deliberate `setState` in a `useEffect` fails as `1 problem (1 error, 0 warnings)`.
+- [x] `eslint.config.mjs` no longer contains a `react-hooks/set-state-in-effect` override.
+- [x] `npx tsc --noEmit` is clean.
+- [x] `npm test` passes with **308 tests / 31 files**, up from the 243 baseline.
+- [x] Playwright passes 16/16 against a production build **and** 16/16 against the Turbopack dev server. No new e2e specs were needed — every fix is unit-covered.
+- [x] `eslint-config-prettier` does not appear in `package.json`.
+- [x] CI runs the format check (`.github/workflows/ci.yml`, `Format check` → `npm run check`).
+- [x] The 10 full-page screenshots are byte-identical, **with two differences explained and approved**, per the "or every difference is explained" clause:
+  1. **The contact page could not be compared against the original baseline.** The `5c5ef55`-era capture rendered the real reCAPTCHA widget; it ran with `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` set, and no `.env*` file exists in the repo now, so that environment is irreproducible (contact was 1440x931 then, 1440x900 now). The comparison was re-based on a fresh same-environment capture of pre-change `main`, against which **contact is byte-identical at both viewports**.
+  2. **The two reduced-motion first-paint shots changed on purpose** — that is `#D`'s fix. Before, that frame painted a dark full-screen overlay plus an unplaced lime monogram stranded in the top-left, with no nav and no hero. After, it paints the real page. Approved on review of the before/after images.
+
+  Three further shots (`home-full-1440`, `home-settled-1440`, `home-settled-390`) move within a **separately measured run-to-run noise envelope** — established by capturing unchanged `main` twice — because they are arrival-animation and grain-overlay frames and are timing-dependent by nature. Every deterministic shot is byte-identical.
+
+- [x] The signature arrival was recorded before and after at both viewports and reviewed on taste, per the Design Notes. Approved.
 
 ### Batch 1 — Tooling (must merge before Batch 2 branches)
 
-- [ ] `package.json` pins `"prettier": "3.8.3"` exactly — no `^`, no `~`.
-- [ ] The reformat is a **standalone commit** containing nothing but Prettier output.
-- [ ] `eslint-config-prettier` removed from `devDependencies` and absent from `package-lock.json`.
-- [ ] `.github/workflows/ci.yml` gains a `Format check` step running `npm run check`, placed immediately after `Lint`.
-- [ ] A deliberate formatting violation on a branch fails CI (verified, not assumed).
+- [x] `package.json` pins `"prettier": "3.8.3"` exactly — no `^`, no `~`.
+- [x] The reformat is a **standalone commit** containing nothing but Prettier output.
+- [x] `eslint-config-prettier` removed from `devDependencies` and absent from `package-lock.json`.
+- [x] `.github/workflows/ci.yml` gains a `Format check` step running `npm run check`, placed immediately after `Lint`.
+- [x] A deliberate formatting violation on a branch fails CI (verified, not assumed).
 
 ### Batch 2A — `accent-contrast` guard
 
-- [ ] `assertDarkOnLime()` fails with a clear message when `getComputedStyle(node).color` yields fewer than 3 numeric channels, instead of silently producing `Math.max(...[]) === -Infinity`.
-- [ ] A test proves the guard rejects an empty computed color — **written first, and observed failing against the current implementation.**
-- [ ] The two existing accent-contrast tests still pass in dev and prod mode.
+- [x] `assertDarkOnLime()` fails with a clear message when `getComputedStyle(node).color` yields fewer than 3 numeric channels, instead of silently producing `Math.max(...[]) === -Infinity`.
+- [x] A test proves the guard rejects an empty computed color — **written first, and observed failing against the current implementation.**
+- [x] The two existing accent-contrast tests still pass in dev and prod mode.
 
 ### Batch 2B–2E — `set-state-in-effect`
 
 Each of the four component issues:
 
-- [ ] Removes its violation without an `eslint-disable`.
-- [ ] Ships a test written **first** that fails against the current implementation and passes after.
-- [ ] Leaves every existing test in its file passing, unmodified where possible; any modified test must be justified in the PR body as testing an implementation detail rather than behaviour.
-- [ ] Produces no hydration warning in the browser console on a production build.
+- [x] Removes its violation without an `eslint-disable`.
+- [x] Ships a test written **first** that fails against the current implementation and passes after.
+- [x] Leaves every existing test in its file passing, unmodified where possible; any modified test must be justified in the PR body as testing an implementation detail rather than behaviour.
+- [x] Produces no hydration warning in the browser console on a production build. Checked in a real browser against `next start`, across all five routes at both `prefers-reduced-motion` settings: no hydration warning, and in fact no console error or warning of any kind.
 
 Per-group specifics:
 
@@ -77,7 +83,7 @@ Per-group specifics:
 
 ### Batch 3 — Closer
 
-- [ ] `eslint.config.mjs` restores `react-hooks/set-state-in-effect` to `'error'` (by deleting the override block and its comment), and `npm run lint` is clean.
+- [x] `eslint.config.mjs` restores `react-hooks/set-state-in-effect` to `'error'` (by deleting the override block and its comment), and `npm run lint` is clean.
 
 ## Design Notes
 
