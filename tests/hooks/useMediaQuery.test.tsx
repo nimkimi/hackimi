@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { act, render, renderHook, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { mediaQuerySpies, setMediaQuery } from '../setup/match-media';
+import { installLegacyMatchMedia, mediaQuerySpies, setMediaQuery } from '../setup/match-media';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
 /**
@@ -229,6 +229,43 @@ describe('useMediaQuery — shared per-query subscription', () => {
     expect(coarse).toHaveTextContent('true');
     expect(mediaQuerySpies(QUERY).addEventListener).toHaveBeenCalledTimes(1);
     expect(mediaQuerySpies('(pointer: coarse)').addEventListener).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('useMediaQuery — legacy Safari MediaQueryList', () => {
+  // Safari < 14 shipped MediaQueryList without the EventTarget interface, so
+  // the hook falls back to addListener/removeListener. The fallback is not
+  // reachable through the default fake, whose lists carry both APIs.
+
+  it('subscribes and unsubscribes through addListener/removeListener', () => {
+    installLegacyMatchMedia();
+
+    const { unmount } = render(<Probe />);
+    const spies = mediaQuerySpies(QUERY);
+
+    expect(spies.addListener).toHaveBeenCalledTimes(1);
+    expect(spies.addEventListener).not.toHaveBeenCalled();
+
+    unmount();
+
+    expect(spies.removeListener).toHaveBeenCalledTimes(1);
+    expect(spies.removeEventListener).not.toHaveBeenCalled();
+    // The same handler goes in and comes back out, so nothing is stranded on
+    // the list — the leak a mismatched pair would cause is silent otherwise.
+    expect(spies.removeListener).toHaveBeenCalledWith(spies.addListener.mock.calls[0][0]);
+  });
+
+  it('reports live changes through the legacy listener', () => {
+    installLegacyMatchMedia();
+
+    render(<Probe />);
+    expect(screen.getByTestId('probe')).toHaveTextContent('false');
+
+    act(() => {
+      setMediaQuery(QUERY, true);
+    });
+
+    expect(screen.getByTestId('probe')).toHaveTextContent('true');
   });
 });
 

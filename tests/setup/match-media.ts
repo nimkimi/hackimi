@@ -59,7 +59,13 @@ function entryFor(query: string): QueryEntry {
   return entry;
 }
 
-function createMediaQueryList(query: string): MediaQueryList {
+/**
+ * `legacy` drops the EventTarget pair, the shape Safari < 14 shipped and the
+ * only way to reach the hook's addListener fallback.
+ */
+type ListShape = 'modern' | 'legacy';
+
+function createMediaQueryList(query: string, shape: ListShape): MediaQueryList {
   const entry = entryFor(query);
 
   const list = {
@@ -90,7 +96,25 @@ function createMediaQueryList(query: string): MediaQueryList {
     dispatchEvent: () => true,
   };
 
+  if (shape === 'legacy') {
+    // Deleted rather than never defined so both shapes share one definition and
+    // one set of spies: a legacy test can still assert the modern pair was not
+    // reached for.
+    delete (list as Partial<typeof list>).addEventListener;
+    delete (list as Partial<typeof list>).removeEventListener;
+  }
+
   return list as unknown as MediaQueryList;
+}
+
+function install(shape: ListShape): void {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    // The implementation is passed to `vi.fn()` rather than set afterwards so a
+    // test file's `vi.restoreAllMocks()` resets to this, not to a no-op.
+    value: vi.fn((query: string) => createMediaQueryList(query, shape)),
+  });
 }
 
 /**
@@ -114,13 +138,16 @@ export function mediaQuerySpies(query: string): MediaQuerySpies {
 
 /** Install the fake on `window`. Called by the global jsdom setup. */
 export function installMatchMedia(): void {
-  Object.defineProperty(window, 'matchMedia', {
-    writable: true,
-    configurable: true,
-    // The implementation is passed to `vi.fn()` rather than set afterwards so a
-    // test file's `vi.restoreAllMocks()` resets to this, not to a no-op.
-    value: vi.fn((query: string) => createMediaQueryList(query)),
-  });
+  install('modern');
+}
+
+/**
+ * Swap in lists that lack `addEventListener`/`removeEventListener`, as Safari
+ * < 14 did. Call it before rendering; `resetMediaQueries` puts the modern fake
+ * back after the test.
+ */
+export function installLegacyMatchMedia(): void {
+  install('legacy');
 }
 
 /**
