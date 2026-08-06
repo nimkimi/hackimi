@@ -86,6 +86,46 @@ const gsapApi = gsapDefault as unknown as {
 };
 const tl = gsapApi.__timeline;
 
+// ---- stylesheet containment helper ---------------------------------------
+// A rule that hides the overlay: the selector, then `display: none` inside its
+// OWN declaration block. `[^{}]` cannot cross a brace, so the match cannot
+// wander into a neighbouring rule.
+const HIDE_OVERLAY_RULE = /\[data-arrival-overlay\][^{}]*\{[^{}]*display:\s*none/;
+
+/**
+ * Split `css` into the body of the `@media (prefers-reduced-motion: reduce)`
+ * block and everything outside it, by counting braces.
+ *
+ * Containment is the whole point of this assertion and a regex cannot express
+ * it: a lazy `[^]*?` between the at-rule and the selector happily runs past the
+ * block's own closing brace, so it matches a rule that has been moved OUT of
+ * the media query — the one change that would delete the signature animation
+ * for every visitor. Brace-matching in code is what actually pins it.
+ *
+ * Returns empty strings for a missing block so the caller can assert on it.
+ */
+function splitOnReducedMotionBlock(css: string): { body: string; outside: string } {
+  const start = css.search(/@media\s*\(\s*prefers-reduced-motion:\s*reduce\s*\)\s*\{/);
+  if (start === -1) return { body: '', outside: css };
+
+  const open = css.indexOf('{', start);
+  let depth = 0;
+  for (let i = open; i < css.length; i++) {
+    if (css[i] === '{') depth++;
+    else if (css[i] === '}') {
+      depth--;
+      if (depth === 0) {
+        return {
+          body: css.slice(open + 1, i),
+          outside: css.slice(0, start) + css.slice(i + 1),
+        };
+      }
+    }
+  }
+  // Unbalanced braces — treat the block as absent rather than guessing.
+  return { body: '', outside: css };
+}
+
 // ---- matchMedia helper ---------------------------------------------------
 // The stub stores the `change` listeners registered against the reduced-motion
 // query so a test can flip the preference LIVE, the way the OS setting does
@@ -276,12 +316,22 @@ describe('Preloader — reduced-motion never paints (pre-hydration contract)', (
 
   it('hides [data-arrival-overlay] from the stylesheet under prefers-reduced-motion', () => {
     const css = readFileSync(join(__dirname, '..', '..', 'src/app/globals.css'), 'utf8');
+    const { body, outside } = splitOnReducedMotionBlock(css);
+
+    // The reduced-motion block must exist at all — otherwise `body` is empty
+    // and every containment assertion below would be vacuous.
+    expect(body).not.toBe('');
 
     // Whitespace-insensitive: only the rule's existence is the contract, not
-    // its formatting (Prettier owns that).
-    const rule =
-      /@media\s*\(prefers-reduced-motion:\s*reduce\)\s*\{[^]*?\[data-arrival-overlay\][^}]*\{[^}]*display:\s*none/;
-    expect(css).toMatch(rule);
+    // its formatting (Prettier owns that). `[^{}]` cannot leave the rule it
+    // starts in, so this pins `display: none` to the overlay's own declaration
+    // block rather than to some later rule in the same file.
+    expect(body).toMatch(HIDE_OVERLAY_RULE);
+
+    // ...and it must live ONLY there. The same rule outside the media block
+    // would hide the arrival for every visitor — i.e. silently delete the
+    // site's signature animation while this test still went green.
+    expect(outside).not.toMatch(HIDE_OVERLAY_RULE);
   });
 });
 
