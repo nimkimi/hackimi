@@ -23,7 +23,10 @@ import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vite
  *   and the whole build is wrapped in try/catch; on any error (or missing
  *   load-bearing nodes) it calls `finish()`, which `gsap.set(..., {clearProps})`
  *   the hero/nav/period and `setShow(false)` to tear the overlay down.
- * - Cleanup on unmount cancels the rAFs, removes the resize listener,
+ * - LIVE FLIP to reduced motion mid-intro: the play path listens on the same
+ *   media query and routes straight to `finish()`, because by then gsap's
+ *   inline `display` outranks the stylesheet rule and the hero is parked.
+ * - Cleanup on unmount cancels the rAFs, removes both listeners,
  *   `tl?.kill()`, and — if the timeline never completed — clears the inline
  *   transforms on hero/nav/period and hides the overlay.
  *
@@ -583,7 +586,10 @@ describe('Preloader — cleanup / fail-safe on unmount', () => {
     mountTargetDom();
     const { unmount } = render(<Preloader />);
 
-    // Skip path already set show=false and built no timeline.
+    // The overlay is still mounted at this point — the skip path's unmount is
+    // queued on a microtask that has deliberately not been flushed. What makes
+    // teardown a no-op is that no timeline was ever built, so there is nothing
+    // to kill and nothing to restore.
     expect(() => unmount()).not.toThrow();
     expect(tl.kill).not.toHaveBeenCalled();
   });
