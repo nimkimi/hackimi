@@ -85,4 +85,13 @@
     animation: none !important;
     transition: none !important;
   }
+
+  /* The signature arrival overlay is server-rendered, so the browser can paint
+     it (a full-screen dark cover plus the lime monogram) before React hydrates.
+     No JavaScript runs early enough to prevent that; a stylesheet does. This
+     rule — not the layout effect — is what actually honours the skip contract:
+     under reduced motion the overlay is never painted at all. */
+  [data-arrival-overlay] {
+    display: none;
+  }
 }

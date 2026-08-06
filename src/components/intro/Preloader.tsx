@@ -21,12 +21,19 @@ import { shouldPlayIntro } from '@/lib/intro';
  *      the nav logo settles in, and the parked spark flies into the name's period.
  *
  * Correctness contract (kept from v1):
- * - SSR-safe: the overlay is rendered on first paint, identical server/client.
+ * - SSR-safe: the overlay markup is identical server/client on first render.
  *   sessionStorage / matchMedia are read ONLY inside the layout effect.
  * - No CLS: the hero and nav already exist in final layout *under* the overlay.
  *   This component only animates their reveal; it never gates their existence.
- * - Skip path (reduced-motion): overlay removed before paint, hero/nav/period
- *   left in their default visible state. No GSAP, no flash.
+ * - Skip path (reduced-motion): the overlay is never painted, hero/nav/period
+ *   left in their default visible state. No GSAP, no flash. The no-paint half
+ *   of that promise is kept by CSS, not JS — `[data-arrival-overlay]` is
+ *   `display: none` under `prefers-reduced-motion: reduce` in globals.css,
+ *   because a stylesheet resolves before first paint and hydration does not.
+ *   The layout effect only unmounts the (already invisible) node afterwards.
+ * - Live flip: switching reduced motion ON mid-intro is the one case the
+ *   stylesheet cannot serve (gsap's inline display outranks it by then), so the
+ *   play path listens for it and settles the page at once via `finish()`.
  * - Fail-safe: every DOM lookup is guarded; the timeline build is wrapped in
  *   try/catch that restores the final visible state on any error. The page can
  *   never get stuck behind the overlay or with the hero hidden.
@@ -105,7 +112,9 @@ export default function Preloader() {
   useLayoutEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    // One-shot read: the skip/play decision is made here and never revisited.
+    const reduce = motionQuery.matches;
     // Plays on every full page load / refresh; skipped only under reduced motion.
     const play = shouldPlayIntro(reduce);
 
@@ -114,23 +123,62 @@ export default function Preloader() {
     // unmount mid-play).
     let completed = false;
 
+    // Clears every inline style the intro applies, leaving hero, nav logo and
+    // period in the visible state the markup already ships with. ONE definition
+    // shared by `finish()` and the unmount cleanup: the two used to be separate
+    // copies and drifted out of step with what the timeline actually primes.
+    //
+    // The nav logo is the inner <svg>, NOT the `#nav-logo-slot` <a> that the
+    // timeline's landing target names — the intro hides and reveals the child
+    // (`gsap.set(navLogo, { opacity: 0, scale: 0.7 })`), and `clearProps` on a
+    // parent does not reach it. Clearing only the slot left the header monogram
+    // at inline `opacity: 0` for the rest of the session on every path that
+    // restores before the 2.05s reveal. All lookups guarded.
+    const restoreRestingFrame = () => {
+      const heroLines = document.querySelectorAll<HTMLElement>('[data-hero-line]');
+      const navSlot = document.querySelector<HTMLElement>('#nav-logo-slot');
+      const navLogo = navSlot?.querySelector<SVGElement>('svg') ?? null;
+      const period = document.querySelector<HTMLElement>('#name-period');
+      if (heroLines.length) gsap.set(heroLines, { clearProps: 'transform' });
+      if (navSlot) gsap.set(navSlot, { clearProps: 'opacity,transform' });
+      if (navLogo) gsap.set(navLogo, { clearProps: 'opacity,transform' });
+      if (period) gsap.set(period, { clearProps: 'opacity,transform' });
+    };
+
     // Restores the final, visible resting frame and tears down the overlay.
     // Safe to call from the skip path, on completion, or from error handling.
     const finish = () => {
       completed = true;
-      const heroLines = document.querySelectorAll<HTMLElement>('[data-hero-line]');
-      const navSlot = document.querySelector<HTMLElement>('#nav-logo-slot');
-      const period = document.querySelector<HTMLElement>('#name-period');
-      if (heroLines.length) gsap.set(heroLines, { clearProps: 'transform' });
-      if (navSlot) gsap.set(navSlot, { clearProps: 'opacity,transform' });
-      if (period) gsap.set(period, { clearProps: 'opacity,transform' });
+      restoreRestingFrame();
       setShow(false);
     };
 
-    // SKIP PATH — hide instantly. Hero/nav/period defaults are already final.
+    // SKIP PATH — nothing to undo: the reduced-motion rule in globals.css has
+    // already kept the overlay off the screen (see the contract note above), and
+    // the hero/nav/period defaults are final. All that is left is to unmount the
+    // node so the DOM ends up where the play path ends up. That runs on a
+    // microtask rather than inline, so the layout effect never calls setState
+    // synchronously.
+    //
+    // The deferral is safe because the node is INVISIBLE while it waits — not
+    // because it is fast. A `setShow` from a microtask is not a discrete-event
+    // update, so React 19 schedules the re-render through the Scheduler (a
+    // MessageChannel macrotask); the unmount is NOT guaranteed to land before
+    // the next paint. What makes that harmless is that this branch is reachable
+    // ONLY when `reduce` is true — `shouldPlayIntro` is exactly `!reduce` (see
+    // src/lib/intro.ts) — and whenever `reduce` is true the stylesheet rule is
+    // active and the overlay is already `display: none`. If a once-per-session
+    // check were ever restored to `shouldPlayIntro`, the skip path would become
+    // reachable with motion allowed, and then this deferral WOULD paint a flash
+    // of the overlay. Re-check this comment if that function changes.
     if (!play) {
-      setShow(false);
-      return;
+      let cancelled = false;
+      queueMicrotask(() => {
+        if (!cancelled) setShow(false);
+      });
+      return () => {
+        cancelled = true;
+      };
     }
 
     // PLAY PATH --------------------------------------------------------------
@@ -142,10 +190,41 @@ export default function Preloader() {
     let resizeHandler: (() => void) | null = null;
     let resizeTimer: ReturnType<typeof setTimeout> | undefined;
 
+    // MID-INTRO FLIP TO REDUCED MOTION — the one case the stylesheet cannot
+    // serve. By now the timeline has parked the hero at `yPercent: 110` and
+    // gsap has written an inline `display: block` onto the overlay, which
+    // outranks the `[data-arrival-overlay]` rule; the user would get either a
+    // blank hero or a still-running animation for the rest of the ~2.1s. So we
+    // stop the motion and jump straight to the resting frame via the same
+    // `finish()` fail-safe the onComplete and error paths use. This subscribes
+    // only to that live edge case — the skip/play decision above stays a
+    // one-shot read.
+    const handleReduceFlip = (event: MediaQueryListEvent) => {
+      if (!event.matches || completed) return;
+      tl?.kill();
+      // `tl.kill()` cannot reach the 2.0s flourish: it fires `gsap.to(spark)`
+      // and, on that tween's completion, `gsap.fromTo(period)` as STANDALONE
+      // tweens rather than timeline children. The period one matters most — it
+      // animates `#name-period` in the hero, not in the overlay, so it would
+      // both keep moving after the user asked for no motion and re-apply an
+      // inline transform over the resting frame restored below.
+      const spark = sparkRef.current;
+      const period = document.querySelector<HTMLElement>('#name-period');
+      if (spark) gsap.killTweensOf(spark);
+      if (period) gsap.killTweensOf(period);
+      if (arrivalEl) gsap.set(arrivalEl, { display: 'none' });
+      finish();
+    };
+    motionQuery.addEventListener('change', handleReduceFlip);
+
     let raf1 = 0;
     let raf2 = 0;
     raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => {
+        // Reduced motion may have arrived between the effect running and this
+        // frame; `finish()` has already settled the page, so building the
+        // timeline now would only re-park the hero behind the user's back.
+        if (completed) return;
         try {
           const arrival = arrivalRef.current;
           const svg = svgRef.current;
@@ -501,6 +580,7 @@ export default function Preloader() {
     return () => {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
+      motionQuery.removeEventListener('change', handleReduceFlip);
       if (resizeHandler) window.removeEventListener('resize', resizeHandler);
       clearTimeout(resizeTimer);
       tl?.kill();
@@ -511,12 +591,7 @@ export default function Preloader() {
       // inline transforms so they're left VISIBLE and hide the overlay. We do
       // NOT call setShow here — the component is unmounting. All lookups guarded.
       if (!completed) {
-        const heroLines = document.querySelectorAll<HTMLElement>('[data-hero-line]');
-        const navSlot = document.querySelector<HTMLElement>('#nav-logo-slot');
-        const period = document.querySelector<HTMLElement>('#name-period');
-        if (heroLines.length) gsap.set(heroLines, { clearProps: 'transform' });
-        if (navSlot) gsap.set(navSlot, { clearProps: 'opacity,transform' });
-        if (period) gsap.set(period, { clearProps: 'opacity,transform' });
+        restoreRestingFrame();
         if (arrivalEl) gsap.set(arrivalEl, { display: 'none' });
       }
     };
@@ -526,7 +601,12 @@ export default function Preloader() {
   if (!show) return null;
 
   return (
-    <div ref={arrivalRef} aria-hidden className="pointer-events-none fixed inset-0 z-60 overflow-hidden">
+    <div
+      ref={arrivalRef}
+      data-arrival-overlay
+      aria-hidden
+      className="pointer-events-none fixed inset-0 z-60 overflow-hidden"
+    >
       {/* Full-screen masked overlay. viewBox is set to px in the effect so the
           mask geometry is in real screen pixels (accurate at any size). */}
       <svg

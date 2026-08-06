@@ -6,7 +6,9 @@ import { test, expect } from '@playwright/test';
  * DOM markers (see src/components/intro/Preloader.tsx, src/app/page.tsx,
  * src/components/motion/Reveal.tsx):
  *  - Preloader overlay: a fixed inset-0 `[aria-hidden]` div containing
- *    `#aperture-mask`. It unmounts entirely on completion / the skip path.
+ *    `#aperture-mask`. It unmounts entirely once the arrival completes; under
+ *    reduced motion the stylesheet hides it before first paint and the unmount
+ *    follows on a microtask.
  *  - Hero <h1> renders "Nima Hakimi" (the period rides on the same line).
  *  - "Selected Work" / "Playground" / "Contact" headings live further down,
  *    each gated by a masked scroll Reveal (inline transform: translateY(...)).
@@ -57,8 +59,12 @@ test.describe('reduced motion', () => {
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
 
-    // Under reduced motion the Preloader takes the skip path: it sets show=false
-    // before paint and renders null, so the overlay never blocks the page.
+    // Under reduced motion the overlay is never painted: the stylesheet rule
+    // `[data-arrival-overlay] { display: none }` resolves before the first
+    // paint, which is the only thing that can — the overlay is server-rendered,
+    // so the browser can paint it before React hydrates. The layout effect then
+    // unmounts the already-invisible node on a microtask. Nothing ever covers
+    // the page, so the hero is readable immediately.
     const heading = page.getByRole('heading', { name: 'Nima Hakimi' });
     await expect(heading).toBeVisible({ timeout: 1000 });
 
