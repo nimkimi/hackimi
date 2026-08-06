@@ -1,4 +1,5 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
+import { Profiler, type ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { ContactFormState } from '@/app/contact/state';
@@ -17,11 +18,26 @@ import { initialContactState } from '@/app/contact/state';
 const actionState: { current: ContactFormState } = { current: initialContactState };
 const formAction = vi.fn();
 
+/**
+ * React documents `useMemo` as a discardable performance hint: it may throw the
+ * cached value away and recompute (it already does on Suspense/Offscreen paths).
+ * Flipping this on makes every `useMemo` in the tree recompute on every render,
+ * which is the worst case React is allowed to hand a component. Nothing derived
+ * from a memo may change behaviour under it.
+ */
+const discardMemo = { current: false };
+
 vi.mock('react', async () => {
   const actual = await vi.importActual<typeof import('react')>('react');
   return {
     ...actual,
     useActionState: vi.fn(() => [actionState.current, formAction, false] as const),
+    // `actual.useMemo` is always called so hook order never shifts; only the
+    // returned value differs when the cache is treated as discarded.
+    useMemo: <T,>(factory: () => T, deps: unknown[]): T => {
+      const cached = actual.useMemo(factory, deps);
+      return discardMemo.current ? factory() : cached;
+    },
   };
 });
 
@@ -47,6 +63,7 @@ function setState(partial: Partial<ContactFormState>) {
 afterEach(() => {
   actionState.current = initialContactState;
   formAction.mockClear();
+  discardMemo.current = false;
 });
 
 describe('ContactClient — form fields', () => {
@@ -252,5 +269,232 @@ describe('ContactClient — reCAPTCHA widget', () => {
     expect(container.querySelector('.g-recaptcha')).toBeNull();
     expect(screen.queryByTestId('next-script')).not.toBeInTheDocument();
     expect(screen.getByText('reCAPTCHA is not configured.')).toBeInTheDocument();
+  });
+});
+
+/**
+ * Every test above mounts already in its target state, so none of them
+ * exercises the toast reacting to a CHANGED action result. These do: they
+ * re-render with a fresh `ContactFormState` (which is what `useActionState`
+ * hands back per submission) and assert the toast follows.
+ */
+describe('ContactClient — toast across successive submissions', () => {
+  it('replaces a success toast with an error toast on a second submission', () => {
+    setState({ status: 'success', message: 'Thanks! I’ll get back to you soon.' });
+    const { rerender } = render(<ContactClient siteKey="test-site-key" />);
+
+    expect(screen.getByText('Message sent')).toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite');
+
+    setState({ status: 'error', message: 'Could not send your message right now. Please try again.' });
+    rerender(<ContactClient siteKey="test-site-key" />);
+
+    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+    expect(screen.queryByText('Message sent')).not.toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveAttribute('aria-live', 'assertive');
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('shows the new message when a second submission succeeds again', () => {
+    setState({ status: 'success', message: 'First message delivered.' });
+    const { rerender } = render(<ContactClient siteKey="test-site-key" />);
+
+    // The message also appears in the inline banner, so assert on the toast
+    // itself — it is the only role="status" on the page.
+    expect(screen.getByRole('status')).toHaveTextContent('First message delivered.');
+
+    setState({ status: 'success', message: 'Second message delivered.' });
+    rerender(<ContactClient siteKey="test-site-key" />);
+
+    const statuses = screen.getAllByRole('status');
+    expect(statuses).toHaveLength(1);
+    // The toast desc echoes the action's message, so it must track the new one.
+    expect(statuses[0]).toHaveTextContent('Message sent');
+    expect(statuses[0]).toHaveTextContent('Second message delivered.');
+    expect(statuses[0]).not.toHaveTextContent('First message delivered.');
+  });
+
+  // Setting the toast from an effect defers it to a second commit, so the
+  // browser paints a frame with the result banner but no toast — the live
+  // region arrives a frame late for assistive tech and visibly pops in after
+  // the banner. Deriving it from `state` puts both in the same commit.
+  it('renders the toast in the same commit as the result banner', () => {
+    setState({});
+    const commits: string[] = [];
+    const probe = (): ReactNode => (
+      <Profiler id="contact" onRender={() => commits.push(document.body.textContent ?? '')}>
+        <ContactClient siteKey="test-site-key" />
+      </Profiler>
+    );
+
+    const { rerender } = render(probe());
+
+    setState({ status: 'success', message: 'Thanks! I’ll get back to you soon.' });
+    commits.length = 0;
+    rerender(probe());
+
+    expect(commits.length).toBeGreaterThan(0);
+    expect(commits[0]).toContain('Message sent');
+  });
+
+  it('auto-dismisses the toast 4s after a result, then unmounts it after the 200ms exit', () => {
+    vi.useFakeTimers();
+    try {
+      setState({ status: 'success', message: 'Thanks! I’ll get back to you soon.' });
+      render(<ContactClient siteKey="test-site-key" />);
+
+      expect(screen.getByRole('status')).toBeInTheDocument();
+
+      // Just before the auto-dismiss the toast is still up.
+      act(() => {
+        vi.advanceTimersByTime(3999);
+      });
+      expect(screen.getByRole('status')).toBeInTheDocument();
+
+      // At 4s it is dismissed, but stays mounted for its exit transition.
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+      expect(screen.getByRole('status')).toBeInTheDocument();
+
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  /**
+   * Deriving the toast from `state` made two transitions reachable that the
+   * old effect ignored, because the effect only ever acted on a result it
+   * recognised. Neither is reachable from today's server action — every error
+   * path in `submitContact` sets a message, and nothing returns to `idle` after
+   * a submission — but a toast is a lifecycle, so both are pinned here: this is
+   * the exact place a future server-action change would silently alter what the
+   * user sees. Clearing a stale toast is the intended behaviour of both.
+   */
+  it('shows no toast for an error result that carries no message', () => {
+    setState({ status: 'error' });
+    render(<ContactClient siteKey="test-site-key" />);
+
+    // Nothing to say, so nothing is announced — and the inline banner, which
+    // also needs a message, stays away too.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('dismisses a showing toast when the next result is an error with no message', () => {
+    vi.useFakeTimers();
+    try {
+      setState({ status: 'success', message: 'Thanks! I’ll get back to you soon.' });
+      const { rerender } = render(<ContactClient siteKey="test-site-key" />);
+      expect(screen.getByRole('status')).toBeInTheDocument();
+
+      setState({ status: 'error' });
+      rerender(<ContactClient siteKey="test-site-key" />);
+
+      // Dismissed, but held for the 200ms exit like every other dismissal.
+      expect(screen.getByRole('status')).toBeInTheDocument();
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('dismisses a showing toast when the result returns to idle', () => {
+    vi.useFakeTimers();
+    try {
+      setState({ status: 'success', message: 'Thanks! I’ll get back to you soon.' });
+      const { rerender } = render(<ContactClient siteKey="test-site-key" />);
+      expect(screen.getByRole('status')).toBeInTheDocument();
+
+      setState({});
+      rerender(<ContactClient siteKey="test-site-key" />);
+
+      expect(screen.getByRole('status')).toBeInTheDocument();
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  /**
+   * `Toast` detects a new toast by object identity, so the derived toast must
+   * keep the same identity for as long as the action result does — including
+   * across a render where React has thrown the memo cache away. A fresh object
+   * for an unchanged result reads as a brand-new toast: it re-runs the enter
+   * effect, which cancels the pending reveal frame and queues another one. One
+   * re-render only delays the reveal; a parent re-rendering every frame (scroll,
+   * a live region, a hovering sibling) would hold the toast invisible for good.
+   */
+  it('keeps the pending enter frame when an unchanged result is re-derived from a discarded memo', () => {
+    const frames: FrameRequestCallback[] = [];
+    const rafSpy = vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb: FrameRequestCallback) => {
+      frames.push(cb);
+      return frames.length;
+    });
+    const cafSpy = vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {});
+    discardMemo.current = true;
+
+    try {
+      setState({});
+      const { rerender } = render(<ContactClient siteKey="test-site-key" />);
+
+      // The result arrives: the toast commits hidden with one frame queued to
+      // reveal it.
+      setState({ status: 'success', message: 'Thanks! I’ll get back to you soon.' });
+      rerender(<ContactClient siteKey="test-site-key" />);
+      expect(screen.getByRole('status')).toHaveClass('opacity-0', 'translate-y-3');
+      expect(frames).toHaveLength(1);
+
+      // A re-render for an unrelated reason, with the memo cache discarded. The
+      // action result has not changed, so the queued reveal must survive it.
+      rerender(<ContactClient siteKey="test-site-key" />);
+      expect(cafSpy).not.toHaveBeenCalled();
+      expect(frames).toHaveLength(1);
+
+      act(() => {
+        frames.splice(0).forEach((cb) => cb(0));
+      });
+      expect(screen.getByRole('status')).toHaveClass('opacity-100', 'translate-y-0');
+    } finally {
+      rafSpy.mockRestore();
+      cafSpy.mockRestore();
+    }
+  });
+
+  it('dismisses the toast when the user clicks Dismiss, without re-showing it', () => {
+    vi.useFakeTimers();
+    try {
+      setState({ status: 'success', message: 'Thanks! I’ll get back to you soon.' });
+      const { rerender } = render(<ContactClient siteKey="test-site-key" />);
+
+      act(() => {
+        screen.getByRole('button', { name: 'Dismiss' }).click();
+      });
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+
+      // A re-render for an unrelated reason must not resurrect the toast — the
+      // dismissal is remembered against this action result, not this render.
+      rerender(<ContactClient siteKey="test-site-key" />);
+      act(() => {
+        vi.advanceTimersByTime(4000);
+      });
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

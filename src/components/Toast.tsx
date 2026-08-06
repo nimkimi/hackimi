@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IconAlertTriangleFilled, IconCircleCheckFilled } from '@tabler/icons-react';
 
 export type ToastState = {
@@ -8,42 +8,47 @@ export type ToastState = {
   desc: string;
 } | null;
 
+/**
+ * The toast outlives its `toast` prop: when the parent clears it, the content
+ * has to stay mounted for the 200ms exit transition. `renderedToast` is that
+ * lagging copy, and `visible` drives the enter/exit classes.
+ */
 export function Toast({ toast, onClose }: { toast: ToastState; onClose: () => void }) {
   const [renderedToast, setRenderedToast] = useState<ToastState>(toast);
   const [visible, setVisible] = useState(Boolean(toast));
-  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [prevToast, setPrevToast] = useState<ToastState>(toast);
 
-  useEffect(() => {
+  // Adjust state during render rather than from an effect. Passive effects run
+  // after paint, so setting `renderedToast` there costs a frame that still
+  // shows the previous toast's title, icon and role; a render-phase update is
+  // re-rendered before the browser paints at all.
+  if (toast !== prevToast) {
+    setPrevToast(toast);
     if (toast) {
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
-        hideTimeoutRef.current = null;
-      }
+      // Enter: commit the new content with `visible` untouched, so a toast
+      // arriving from nothing mounts hidden and the rAF below animates it in.
       setRenderedToast(toast);
-      const frame = requestAnimationFrame(() => setVisible(true));
-      return () => cancelAnimationFrame(frame);
-    }
-
-    if (renderedToast) {
+    } else if (renderedToast) {
+      // Exit: start fading now; the timeout below unmounts once it has played.
       setVisible(false);
-      const timeout = setTimeout(() => {
-        setRenderedToast(null);
-        hideTimeoutRef.current = null;
-      }, 200);
-      hideTimeoutRef.current = timeout;
-      return () => clearTimeout(timeout);
     }
-
-    return undefined;
-  }, [toast, renderedToast]);
+  }
 
   useEffect(() => {
-    return () => {
-      if (hideTimeoutRef.current) {
-        clearTimeout(hideTimeoutRef.current);
-      }
-    };
-  }, []);
+    if (!toast) return undefined;
+    // One frame after the hidden mount so the transition has two values to
+    // interpolate between — setting `visible` in the same commit skips it.
+    const frame = requestAnimationFrame(() => setVisible(true));
+    return () => cancelAnimationFrame(frame);
+  }, [toast]);
+
+  useEffect(() => {
+    if (toast || !renderedToast) return undefined;
+    // Matches the 200ms `duration-200` exit transition; cleanup covers both a
+    // toast arriving mid-exit and the component unmounting mid-exit.
+    const timeout = setTimeout(() => setRenderedToast(null), 200);
+    return () => clearTimeout(timeout);
+  }, [toast, renderedToast]);
 
   if (!renderedToast) {
     return null;
