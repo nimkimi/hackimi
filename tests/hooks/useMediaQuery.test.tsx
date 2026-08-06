@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { act, render, renderHook, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { mediaQuerySpies, setMediaQuery } from '../setup/match-media';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 
@@ -128,6 +128,107 @@ describe('useMediaQuery — teardown', () => {
     });
 
     expect(screen.queryByTestId('probe')).toBeNull();
+  });
+});
+
+describe('useMediaQuery — shared per-query subscription', () => {
+  /** Every `window.matchMedia(...)` argument the fake has been handed so far. */
+  function matchMediaCallsFor(query: string): unknown[][] {
+    const matchMedia = window.matchMedia as unknown as ReturnType<typeof vi.fn>;
+    return matchMedia.mock.calls.filter(([q]) => q === query);
+  }
+
+  it('allocates one MediaQueryList per query, not one per subscriber per render', () => {
+    render(
+      <>
+        <Probe />
+        <Probe />
+        <Probe />
+      </>
+    );
+
+    // Reveal is on the page many times over; a MediaQueryList per render is a
+    // per-render allocation on the site's hottest component.
+    expect(matchMediaCallsFor(QUERY)).toHaveLength(1);
+  });
+
+  it('registers a single native listener however many components subscribe', () => {
+    render(
+      <>
+        <Probe />
+        <Probe />
+        <Probe />
+      </>
+    );
+
+    expect(mediaQuerySpies(QUERY).addEventListener).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the native listener while any subscriber is left', () => {
+    const first = render(<Probe />);
+    render(<Probe />);
+
+    first.unmount();
+
+    expect(mediaQuerySpies(QUERY).removeEventListener).not.toHaveBeenCalled();
+  });
+
+  it('removes the native listener when the last subscriber unsubscribes', () => {
+    const first = render(<Probe />);
+    const second = render(<Probe />);
+
+    first.unmount();
+    second.unmount();
+
+    expect(mediaQuerySpies(QUERY).removeEventListener).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-attaches a listener when a query is subscribed again after going quiet', () => {
+    render(<Probe />).unmount();
+
+    const { getAllByTestId } = render(<Probe />);
+    act(() => {
+      setMediaQuery(QUERY, true);
+    });
+
+    expect(mediaQuerySpies(QUERY).addEventListener).toHaveBeenCalledTimes(2);
+    expect(getAllByTestId('probe')[0]).toHaveTextContent('true');
+  });
+
+  it('notifies every component sharing one query', () => {
+    render(
+      <>
+        <Probe />
+        <Probe />
+      </>
+    );
+    const probes = screen.getAllByTestId('probe');
+    expect(probes).toHaveLength(2);
+
+    act(() => {
+      setMediaQuery(QUERY, true);
+    });
+
+    for (const probe of probes) expect(probe).toHaveTextContent('true');
+  });
+
+  it('keeps two different queries independent when both are live', () => {
+    render(
+      <>
+        <Probe />
+        <Probe query="(pointer: coarse)" />
+      </>
+    );
+
+    act(() => {
+      setMediaQuery('(pointer: coarse)', true);
+    });
+
+    const [reduce, coarse] = screen.getAllByTestId('probe');
+    expect(reduce).toHaveTextContent('false');
+    expect(coarse).toHaveTextContent('true');
+    expect(mediaQuerySpies(QUERY).addEventListener).toHaveBeenCalledTimes(1);
+    expect(mediaQuerySpies('(pointer: coarse)').addEventListener).toHaveBeenCalledTimes(1);
   });
 });
 
