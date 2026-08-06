@@ -21,6 +21,8 @@ const OBSERVER_FALLBACK_MS = 2500;
  *    IntersectionObserver is unavailable, so content can never be stranded;
  *  - under `prefers-reduced-motion` it renders statically (no transform), and
  *    it follows that preference live, not only as it stood at mount;
+ *  - a live preference change never un-reveals: content already on screen stays
+ *    on screen when the query flips, in either direction;
  *  - SSR-safe: first render is identical server/client (starts hidden, animated
  *    branch), because `useMediaQuery`'s server snapshot is "not reduced".
  */
@@ -38,6 +40,25 @@ export default function Reveal({
   // Derived from the media query rather than copied into state by an effect, so
   // there is no cascading render on mount and the preference is followed live.
   const reduce = useMediaQuery('(prefers-reduced-motion: reduce)');
+
+  // Following the preference live means the static branch can hand back over to
+  // the animated one mid-session, and the animated branch starts hidden. The
+  // static branch has been painting this content all along, so without a latch
+  // turning Reduce Motion *off* would yank content out from under the user and
+  // replay the 0.8s slide on it.
+  //
+  // This is React's documented "adjust state when a value changes" pattern
+  // (react.dev/learn/you-might-not-need-an-effect): the set during render
+  // re-runs this component before anything commits, so the hidden state is
+  // discarded rather than painted. An effect would paint it first, and a ref
+  // cannot be written during render at all.
+  const [wasReduced, setWasReduced] = useState(reduce);
+  if (wasReduced !== reduce) {
+    setWasReduced(reduce);
+    // Only the reduce -> animated direction needs seeding; the other direction
+    // is leaving the animated branch, which has nothing to preserve.
+    if (wasReduced) setShown(true);
+  }
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

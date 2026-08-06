@@ -224,6 +224,67 @@ describe('Reveal — live prefers-reduced-motion changes', () => {
     // The observer is set up on the way back, so content is never stranded.
     expect(observeSpy).toHaveBeenCalled();
   });
+
+  it('keeps content the user is already looking at visible when reduced motion is turned off', () => {
+    setReducedMotion(true);
+
+    const { container } = render(
+      <Reveal>
+        <span>already painted</span>
+      </Reveal>
+    );
+
+    act(() => {
+      setReducedMotion(false);
+    });
+
+    // The animated branch takes over, but the content was on screen a moment
+    // ago: it must render revealed rather than snapping back under the mask and
+    // replaying the 0.8s slide.
+    const inner = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
+    expect(inner.style.transform).toBe('translateY(0)');
+  });
+
+  it('keeps content visible across a reduced-motion on/off round trip that never revealed', () => {
+    // Mounted animated and still below the fold, so the observer never fired and
+    // `shown` is false. Turning reduced motion on paints it anyway; turning it
+    // back off must not take it away again.
+    const { container } = render(
+      <Reveal>
+        <span>round trip</span>
+      </Reveal>
+    );
+    expect(((container.firstElementChild as HTMLElement).firstElementChild as HTMLElement).style.transform).toBe(
+      'translateY(110%)'
+    );
+
+    act(() => {
+      setReducedMotion(true);
+    });
+    act(() => {
+      setReducedMotion(false);
+    });
+
+    const inner = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
+    expect(inner.style.transform).toBe('translateY(0)');
+  });
+
+  it('still holds content under the mask on the ordinary path, with no flip involved', () => {
+    // Guards the fix from over-reaching: a component that has never seen
+    // reduced motion must still start hidden and wait for the observer.
+    const { container } = render(
+      <Reveal>
+        <span>ordinary</span>
+      </Reveal>
+    );
+
+    const inner = (container.firstElementChild as HTMLElement).firstElementChild as HTMLElement;
+    expect(inner.style.transform).toBe('translateY(110%)');
+
+    fireIntersection(true);
+
+    expect(inner.style.transform).toBe('translateY(0)');
+  });
 });
 
 describe('Reveal — IntersectionObserver unavailable', () => {
