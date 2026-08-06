@@ -367,6 +367,67 @@ describe('ContactClient — toast across successive submissions', () => {
   });
 
   /**
+   * Deriving the toast from `state` made two transitions reachable that the
+   * old effect ignored, because the effect only ever acted on a result it
+   * recognised. Neither is reachable from today's server action — every error
+   * path in `submitContact` sets a message, and nothing returns to `idle` after
+   * a submission — but a toast is a lifecycle, so both are pinned here: this is
+   * the exact place a future server-action change would silently alter what the
+   * user sees. Clearing a stale toast is the intended behaviour of both.
+   */
+  it('shows no toast for an error result that carries no message', () => {
+    setState({ status: 'error' });
+    render(<ContactClient siteKey="test-site-key" />);
+
+    // Nothing to say, so nothing is announced — and the inline banner, which
+    // also needs a message, stays away too.
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
+  it('dismisses a showing toast when the next result is an error with no message', () => {
+    vi.useFakeTimers();
+    try {
+      setState({ status: 'success', message: 'Thanks! I’ll get back to you soon.' });
+      const { rerender } = render(<ContactClient siteKey="test-site-key" />);
+      expect(screen.getByRole('status')).toBeInTheDocument();
+
+      setState({ status: 'error' });
+      rerender(<ContactClient siteKey="test-site-key" />);
+
+      // Dismissed, but held for the 200ms exit like every other dismissal.
+      expect(screen.getByRole('status')).toBeInTheDocument();
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('dismisses a showing toast when the result returns to idle', () => {
+    vi.useFakeTimers();
+    try {
+      setState({ status: 'success', message: 'Thanks! I’ll get back to you soon.' });
+      const { rerender } = render(<ContactClient siteKey="test-site-key" />);
+      expect(screen.getByRole('status')).toBeInTheDocument();
+
+      setState({});
+      rerender(<ContactClient siteKey="test-site-key" />);
+
+      expect(screen.getByRole('status')).toBeInTheDocument();
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      expect(screen.queryByRole('status')).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  /**
    * `Toast` detects a new toast by object identity, so the derived toast must
    * keep the same identity for as long as the action result does — including
    * across a render where React has thrown the memo cache away. A fresh object
