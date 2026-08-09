@@ -88,6 +88,7 @@ module.exports = nextConfig;
 - [ ] **Step 4: Run to verify it passes**
 
 Run: `npx playwright test e2e/seo.spec.ts` — Expected: PASS.
+If it fails unexpectedly after the config edit: Turbopack's persistent FS cache is known to go stale across `next.config.js` changes in this repo — `rm -rf .next`, restart the server, re-run BEFORE debugging the redirect rule itself.
 Also verify the host rule manually (dev server on :3000):
 `curl -s -o /dev/null -w '%{http_code} %{redirect_url}' -H 'Host: hackimi.vercel.app' http://localhost:3000/about`
 Expected: `308 https://hackimi.dev/about`. If the dev server doesn't honor the Host match, verify against `npm run build && npm run start` instead; if it only works in prod mode, note that in the task report — the rule itself is correct.
@@ -293,6 +294,8 @@ and change the import from `buildPageMetadata` to `buildHomeMetadata`. Touch not
 Run: `npm run test` then `npx playwright test e2e/seo.spec.ts` (unsandboxed, ulimit set).
 Expected: all PASS.
 
+Contingency: if the e2e title assertion fails with a DOUBLED suffix (`Nima Hakimi — Developer & AI Engineer | Nima Hakimi`), the root template did apply after all — switch `buildHomeMetadata`'s title to `title: { absolute: SITE_TITLE }` and update the two object-level title assertions to match. Live-production evidence says this won't happen; the e2e exists to catch exactly this case.
+
 - [ ] **Step 5: Commit**
 
 ```bash
@@ -313,6 +316,11 @@ git commit -m "feat: absolute name-led homepage title via buildHomeMetadata"
 **Interfaces:**
 - Consumes: `SITE_AUTHOR`, `SITE_ROLE`, `SITE_LOCATION` from `src/lib/site.ts`.
 - Produces: `SiteFooter` default-export server component, rendered on every page.
+
+- [ ] **Step 0: Pre-flight — check for existing `<footer>` elements**
+
+Run: `grep -rn '<footer' src/`
+Expected: zero hits (then `page.locator('footer')` below is unambiguous). If there ARE hits, give the new footer `data-site-footer` and use `page.locator('[data-site-footer]')` in the e2e instead — `footer`/`contentinfo` locators would throw strict-mode violations.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -762,9 +770,9 @@ export const SITE_PERSON_IMAGE = `${SITE_URL}/bigSmile.JPEG` as const;
 
 Run: `npm run test` and `npx playwright test e2e/seo.spec.ts` — Expected: PASS.
 
-- [ ] **Step 6: ⚠️ TASTE GATE — STOP and show Nima**
+- [ ] **Step 6: ⚠️ TASTE GATE — STOP and show Nima (ORCHESTRATOR-ONLY step)**
 
-Send Nima `public/og.png`, `src/app/apple-icon.png`, and a browser-tab-size rendering of `src/app/icon.svg` (screenshot a page in Chrome showing the actual favicon in the tab, or a 32px render). **Do not merge past this point without his explicit approval of both assets.** Iterate on his feedback (stroke weight, corner radius, monogram scale) by editing the SVG/script and re-running the generator.
+A subagent implementer CANNOT perform this step — it must return after Step 5 WITHOUT committing, reporting the generated asset paths. The orchestrator then sends Nima `public/og.png`, `src/app/apple-icon.png`, and a browser-tab-size rendering of `src/app/icon.svg` (screenshot of the actual favicon in a tab, or a 32px render), plays the approval sound, and waits. **Nothing merges past this point without his explicit approval of both assets.** Iterate on his feedback (stroke weight, corner radius, monogram scale) by editing the SVG/script and re-running the generator.
 
 - [ ] **Step 7: Commit (after approval)**
 
@@ -990,7 +998,7 @@ Expected: zero hits. (Visible-copy hits in `page.tsx`/`about`/`ContactClient`/`s
 
 Push (its own command, per git-push-guard): `git push -u origin seo/name-query`
 
-PR against `main`, title "SEO: win the name query". Body: summary of the seven workstreams, the taste-gate approvals (link the OG/favicon approval), and the post-merge checklist for Nima (Vercel apex flip → manual deploy → GSC property + token → sitemap submit → recrawl requests → LinkedIn/GitHub profile updates). No AI attribution anywhere.
+PR against `main`, title "SEO: win the name query". Body: summary of the seven workstreams, a plain statement that the OG card and favicon were taste-approved (no links of any kind to sessions/conversations), and the post-merge checklist for Nima (Vercel apex flip → manual deploy → GSC property + token → sitemap submit → recrawl requests → LinkedIn/GitHub profile updates). No AI attribution anywhere. Note: `gh` requires unsandboxed Bash on this machine (sandboxed TLS to api.github.com fails).
 
 - [ ] **Step 4: Post-deploy verification (after Nima merges + deploys)**
 
