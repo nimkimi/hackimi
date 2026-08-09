@@ -21,6 +21,7 @@ import {
   SITE_OG_IMAGE,
   SITE_PERSON_IMAGE,
   SITE_SOCIAL_LINKS,
+  SITE_GOOGLE_SITE_VERIFICATION,
 } from '@/lib/site';
 
 describe('resolveUrl', () => {
@@ -158,10 +159,13 @@ describe('buildRootMetadata', () => {
     expect(meta.twitter).toBeDefined();
   });
 
-  it('emits no verification block while the GSC token is empty', () => {
+  it('emits the verification block only when the GSC token is set', () => {
     // SITE_GOOGLE_SITE_VERIFICATION is '' until Nima creates the property;
-    // an empty <meta name="google-site-verification"> must never ship.
-    expect(buildRootMetadata().verification).toBeUndefined();
+    // an empty <meta name="google-site-verification"> must never ship. The
+    // assertion is conditional so the future token commit stays green too.
+    expect(buildRootMetadata().verification).toEqual(
+      SITE_GOOGLE_SITE_VERIFICATION ? { google: SITE_GOOGLE_SITE_VERIFICATION } : undefined
+    );
   });
 });
 

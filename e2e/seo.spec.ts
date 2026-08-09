@@ -25,6 +25,11 @@ test.describe('rendered metadata', () => {
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://hackimi.dev');
   });
 
+  test('child-page canonical points at its own apex URL', async ({ page }) => {
+    await page.goto('/about');
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://hackimi.dev/about');
+  });
+
   test('footer carries the visible name line on every page', async ({ page }) => {
     for (const path of ['/', '/about', '/work']) {
       await page.goto(path);
