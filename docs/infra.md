@@ -9,7 +9,8 @@
 
 ## Deployments
 
-- `vercel.json` sets `git.deploymentEnabled.main: false` — merging to `main` does NOT auto-deploy. Production deploys are triggered manually (dashboard or `vercel --prod`).
+- Production deploys are automatic but CI-gated (commit `1c92564`, 2026-06-02): GitHub Actions runs lint/types/Vitest/Playwright on every push, and a deploy job (`vercel build` + `vercel deploy --prebuilt --prod`) runs only on `main` after the tests pass.
+- `vercel.json` sets `git.deploymentEnabled.main: false` to disable Vercel's OWN git auto-deploy for `main` only — so production flows exclusively through the tested CI gate while PR/branch previews keep deploying via Vercel as normal. Merging to `main` therefore DOES deploy, via CI.
 
 ## Search Console
 
