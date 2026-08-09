@@ -157,6 +157,12 @@ describe('buildRootMetadata', () => {
     expect(meta.openGraph).toBeDefined();
     expect(meta.twitter).toBeDefined();
   });
+
+  it('emits no verification block while the GSC token is empty', () => {
+    // SITE_GOOGLE_SITE_VERIFICATION is '' until Nima creates the property;
+    // an empty <meta name="google-site-verification"> must never ship.
+    expect(buildRootMetadata().verification).toBeUndefined();
+  });
 });
 
 describe('buildPersonJsonLd', () => {

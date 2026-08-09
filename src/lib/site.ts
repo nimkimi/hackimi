@@ -20,3 +20,5 @@ export const SITE_SOCIAL_LINKS = {
 };
 export const SITE_OG_IMAGE = `${SITE_URL}/og.png` as const;
 export const SITE_PERSON_IMAGE = `${SITE_URL}/bigSmile.JPEG` as const;
+/** Google Search Console meta-tag token. Empty until the property is created. */
+export const SITE_GOOGLE_SITE_VERIFICATION = '';

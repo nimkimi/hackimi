@@ -4,6 +4,7 @@ import {
   SITE_DESCRIPTION,
   SITE_EMAIL,
   SITE_EMPLOYER,
+  SITE_GOOGLE_SITE_VERIFICATION,
   SITE_KEYWORDS,
   SITE_LOCATION,
   SITE_OG_IMAGE,
@@ -105,6 +106,7 @@ export function buildRootMetadata(): Metadata {
     alternates: {
       canonical: SITE_URL,
     },
+    ...(SITE_GOOGLE_SITE_VERIFICATION ? { verification: { google: SITE_GOOGLE_SITE_VERIFICATION } } : {}),
   };
 }
 
