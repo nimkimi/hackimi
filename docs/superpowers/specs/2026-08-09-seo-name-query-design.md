@@ -1,8 +1,6 @@
 # SEO: win the name query — design spec
 
-**Date:** 2026-08-09
-**Goal:** hackimi.dev is what people find when they search for Nima Hakimi.
-**Branch:** `seo/name-query`
+**Date:** 2026-08-09 **Goal:** hackimi.dev is what people find when they search for Nima Hakimi. **Branch:** `seo/name-query`
 
 ## Acceptance criteria
 
@@ -52,7 +50,7 @@
 Files: `src/lib/site.ts`, `src/lib/metadata.ts`, `src/app/page.tsx`, `src/app/about/page.tsx`, `src/app/contact/page.tsx`, root `layout.tsx` (footer).
 
 - `SITE_ROLE` = `'Developer & AI Engineer'`; `SITE_TITLE` = `` `${SITE_AUTHOR} — ${SITE_ROLE}` `` (em-dash form; reads better in tabs/SERPs than the pipe).
-- **Homepage title becomes the explicit full string "Nima Hakimi — Developer & AI Engineer".** Root cause being fixed: Next's `title.template` applies only to child segments, so the root `page.tsx`'s `title: 'Portfolio'` rendered as literally `<title>Portfolio</title>` — no name on the site's most important page. The fix must be asserted at the rendered layer (see Testing) because the metadata *object* was always "correct" while the resolved output was wrong.
+- **Homepage title becomes the explicit full string "Nima Hakimi — Developer & AI Engineer".** Root cause being fixed: Next's `title.template` applies only to child segments, so the root `page.tsx`'s `title: 'Portfolio'` rendered as literally `<title>Portfolio</title>` — no name on the site's most important page. The fix must be asserted at the rendered layer (see Testing) because the metadata _object_ was always "correct" while the resolved output was wrong.
 - `SITE_DESCRIPTION` and the home/about meta descriptions drop "frontend developer" for "developer and AI engineer" phrasing. `SITE_KEYWORDS` → `['Nima Hakimi', 'Developer', 'AI Engineer', 'Next.js', 'React', 'Oslo']` (Google ignores the tag; kept harmless and consistent).
 - **Footer (new, site-wide):** visible name line — `© <year> Nima Hakimi — Developer & AI Engineer, Oslo`. Today the name exists as visible text only in the hero h1; this adds one crawlable, every-page occurrence. Small server component, near-black/muted styling consistent with the design system, no navigation duties.
 - **Contact page** reroutes through `buildPageMetadata()` — fixes the shipping bug where its unspecified `openGraph` falls through to the root layout's homepage OG object.

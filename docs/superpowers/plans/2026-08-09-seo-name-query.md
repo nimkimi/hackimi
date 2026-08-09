@@ -25,10 +25,12 @@
 ### Task 1: Permanent redirects — recover the dead /projects URL
 
 **Files:**
+
 - Modify: `next.config.js` (currently an empty `nextConfig = {}`)
 - Create: `e2e/seo.spec.ts`
 
 **Interfaces:**
+
 - Produces: `e2e/seo.spec.ts` — later tasks append describe-blocks to this file.
 
 - [ ] **Step 1: Write the failing e2e test**
@@ -55,8 +57,7 @@ test.describe('redirects', () => {
 
 - [ ] **Step 2: Run to verify it fails**
 
-Run (unsandboxed, `ulimit -n 10240` first): `npx playwright test e2e/seo.spec.ts`
-Expected: FAIL — `/projects` returns 404, not 308.
+Run (unsandboxed, `ulimit -n 10240` first): `npx playwright test e2e/seo.spec.ts` Expected: FAIL — `/projects` returns 404, not 308.
 
 - [ ] **Step 3: Implement redirects**
 
@@ -87,11 +88,7 @@ module.exports = nextConfig;
 
 - [ ] **Step 4: Run to verify it passes**
 
-Run: `npx playwright test e2e/seo.spec.ts` — Expected: PASS.
-If it fails unexpectedly after the config edit: Turbopack's persistent FS cache is known to go stale across `next.config.js` changes in this repo — `rm -rf .next`, restart the server, re-run BEFORE debugging the redirect rule itself.
-Also verify the host rule manually (dev server on :3000):
-`curl -s -o /dev/null -w '%{http_code} %{redirect_url}' -H 'Host: hackimi.vercel.app' http://localhost:3000/about`
-Expected: `308 https://hackimi.dev/about`. If the dev server doesn't honor the Host match, verify against `npm run build && npm run start` instead; if it only works in prod mode, note that in the task report — the rule itself is correct.
+Run: `npx playwright test e2e/seo.spec.ts` — Expected: PASS. If it fails unexpectedly after the config edit: Turbopack's persistent FS cache is known to go stale across `next.config.js` changes in this repo — `rm -rf .next`, restart the server, re-run BEFORE debugging the redirect rule itself. Also verify the host rule manually (dev server on :3000): `curl -s -o /dev/null -w '%{http_code} %{redirect_url}' -H 'Host: hackimi.vercel.app' http://localhost:3000/about` Expected: `308 https://hackimi.dev/about`. If the dev server doesn't honor the Host match, verify against `npm run build && npm run start` instead; if it only works in prod mode, note that in the task report — the rule itself is correct.
 
 - [ ] **Step 5: Commit**
 
@@ -105,10 +102,12 @@ git commit -m "feat: permanent redirects for legacy /projects and vercel.app hos
 ### Task 2: Positioning constants — Developer & AI Engineer
 
 **Files:**
+
 - Modify: `src/lib/site.ts`
 - Modify: `tests/unit/site.test.ts`
 
 **Interfaces:**
+
 - Produces: `SITE_ROLE = 'Developer & AI Engineer'`, `SITE_TITLE = 'Nima Hakimi — Developer & AI Engineer'` (em-dash), updated `SITE_DESCRIPTION`/`SITE_KEYWORDS`, and `SITE_SOCIAL_LINKS.orcid`. Tasks 3–7 consume these.
 
 - [ ] **Step 1: Update the pinned test to the new contract**
@@ -137,8 +136,7 @@ it('keywords carry the new positioning, not "Frontend"', () => {
 
 - [ ] **Step 2: Run to verify failure**
 
-Run: `npx vitest run tests/unit/site.test.ts`
-Expected: FAIL (pipe title, no orcid key, 'Frontend Developer' keyword).
+Run: `npx vitest run tests/unit/site.test.ts` Expected: FAIL (pipe title, no orcid key, 'Frontend Developer' keyword).
 
 - [ ] **Step 3: Implement in `src/lib/site.ts`**
 
@@ -164,8 +162,7 @@ Leave `SITE_OG_IMAGE` untouched in this task (Task 7 changes it).
 
 - [ ] **Step 4: Run the full unit/server suite**
 
-Run: `npm run test`
-Expected: PASS — `tests/unit/metadata.test.ts` compares against the imported constants, so it rides through. If `buildPersonJsonLd`'s sameAs test fails (it pins `[github, linkedin]`), do NOT fix it here — that contract changes in Task 6; temporarily it still passes because the builder maps the two keys explicitly.
+Run: `npm run test` Expected: PASS — `tests/unit/metadata.test.ts` compares against the imported constants, so it rides through. If `buildPersonJsonLd`'s sameAs test fails (it pins `[github, linkedin]`), do NOT fix it here — that contract changes in Task 6; temporarily it still passes because the builder maps the two keys explicitly.
 
 - [ ] **Step 5: Commit**
 
@@ -179,12 +176,14 @@ git commit -m "feat: reposition site constants to Developer & AI Engineer"
 ### Task 3: Name-led homepage title
 
 **Files:**
+
 - Modify: `src/lib/metadata.ts` (add `buildHomeMetadata`)
 - Modify: `src/app/page.tsx:10-14` (metadata export only — no JSX changes)
 - Modify: `tests/unit/metadata.test.ts`, `tests/integration/pages.test.tsx:58-62`
 - Modify: `e2e/seo.spec.ts` (append)
 
 **Interfaces:**
+
 - Consumes: `SITE_TITLE`, `SITE_DESCRIPTION` from Task 2.
 - Produces: `buildHomeMetadata(): Metadata` in `src/lib/metadata.ts`.
 
@@ -242,8 +241,7 @@ test.describe('rendered metadata', () => {
 
 - [ ] **Step 2: Run to verify failures**
 
-Run: `npx vitest run tests/unit/metadata.test.ts tests/integration/pages.test.tsx`
-Expected: FAIL — `buildHomeMetadata` doesn't exist; home title is 'Portfolio'.
+Run: `npx vitest run tests/unit/metadata.test.ts tests/integration/pages.test.tsx` Expected: FAIL — `buildHomeMetadata` doesn't exist; home title is 'Portfolio'.
 
 - [ ] **Step 3: Implement**
 
@@ -291,8 +289,7 @@ and change the import from `buildPageMetadata` to `buildHomeMetadata`. Touch not
 
 - [ ] **Step 4: Run to verify passes**
 
-Run: `npm run test` then `npx playwright test e2e/seo.spec.ts` (unsandboxed, ulimit set).
-Expected: all PASS.
+Run: `npm run test` then `npx playwright test e2e/seo.spec.ts` (unsandboxed, ulimit set). Expected: all PASS.
 
 Contingency: if the e2e title assertion fails with a DOUBLED suffix (`Nima Hakimi — Developer & AI Engineer | Nima Hakimi`), the root template did apply after all — switch `buildHomeMetadata`'s title to `title: { absolute: SITE_TITLE }` and update the two object-level title assertions to match. Live-production evidence says this won't happen; the e2e exists to catch exactly this case.
 
@@ -308,19 +305,20 @@ git commit -m "feat: absolute name-led homepage title via buildHomeMetadata"
 ### Task 4: Site footer with visible name line
 
 **Files:**
+
 - Create: `src/components/layout/SiteFooter.tsx`
 - Modify: `src/app/layout.tsx:30-33` (add footer inside `SmoothScroll`, after `main`)
 - Create: `tests/components/site-footer.test.tsx`
 - Modify: `e2e/seo.spec.ts` (append)
 
 **Interfaces:**
+
 - Consumes: `SITE_AUTHOR`, `SITE_ROLE`, `SITE_LOCATION` from `src/lib/site.ts`.
 - Produces: `SiteFooter` default-export server component, rendered on every page.
 
 - [ ] **Step 0: Pre-flight — check for existing `<footer>` elements**
 
-Run: `grep -rn '<footer' src/`
-Expected: zero hits (then `page.locator('footer')` below is unambiguous). If there ARE hits, give the new footer `data-site-footer` and use `page.locator('[data-site-footer]')` in the e2e instead — `footer`/`contentinfo` locators would throw strict-mode violations.
+Run: `grep -rn '<footer' src/` Expected: zero hits (then `page.locator('footer')` below is unambiguous). If there ARE hits, give the new footer `data-site-footer` and use `page.locator('[data-site-footer]')` in the e2e instead — `footer`/`contentinfo` locators would throw strict-mode violations.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -356,8 +354,7 @@ test('footer carries the visible name line on every page', async ({ page }) => {
 
 - [ ] **Step 2: Run to verify failure**
 
-Run: `npx vitest run tests/components/site-footer.test.tsx`
-Expected: FAIL — module not found.
+Run: `npx vitest run tests/components/site-footer.test.tsx` Expected: FAIL — module not found.
 
 - [ ] **Step 3: Implement**
 
@@ -396,8 +393,7 @@ In `src/app/layout.tsx`, import it (`import SiteFooter from '@/components/layout
 
 - [ ] **Step 4: Run to verify passes**
 
-Run: `npm run test`, then `npx playwright test e2e/seo.spec.ts e2e/accessibility.spec.ts` (the axe smoke must stay green with the new landmark).
-Expected: PASS.
+Run: `npm run test`, then `npx playwright test e2e/seo.spec.ts e2e/accessibility.spec.ts` (the axe smoke must stay green with the new landmark). Expected: PASS.
 
 - [ ] **Step 5: Commit**
 
@@ -411,12 +407,14 @@ git commit -m "feat: site footer with visible name line"
 ### Task 5: Per-page metadata hygiene (contact OG bug, about description, slug not-found)
 
 **Files:**
+
 - Modify: `src/app/contact/page.tsx:6-12`
 - Modify: `src/app/about/page.tsx:8-13` (description string only)
 - Modify: `src/app/work/[slug]/page.tsx:17`
 - Modify: `tests/integration/contact-page.test.tsx:82-86`
 
 **Interfaces:**
+
 - Consumes: `buildPageMetadata` (existing).
 
 - [ ] **Step 1: Write the failing tests**
@@ -437,8 +435,7 @@ it('exports contact metadata with its own OpenGraph object', async () => {
 
 - [ ] **Step 2: Run to verify failure**
 
-Run: `npx vitest run tests/integration/contact-page.test.tsx`
-Expected: FAIL — `metadata.openGraph` is undefined.
+Run: `npx vitest run tests/integration/contact-page.test.tsx` Expected: FAIL — `metadata.openGraph` is undefined.
 
 - [ ] **Step 3: Implement**
 
@@ -484,6 +481,7 @@ git commit -m "fix: contact OG fallthrough, about description wording, slug not-
 ### Task 6: Entity graph — @id, ORCID, WebSite, ProfilePage, BreadcrumbList
 
 **Files:**
+
 - Modify: `src/lib/metadata.ts` (Person builder + three new builders)
 - Create: `src/components/seo/JsonLd.tsx`
 - Modify: `src/app/layout.tsx` (Person + WebSite via JsonLd), `src/app/about/page.tsx` (ProfilePage), `src/app/work/[slug]/page.tsx` (BreadcrumbList)
@@ -491,6 +489,7 @@ git commit -m "fix: contact OG fallthrough, about description wording, slug not-
 - Modify: `e2e/seo.spec.ts` (append)
 
 **Interfaces:**
+
 - Consumes: `SITE_SOCIAL_LINKS.orcid` (Task 2).
 - Produces: `PERSON_ID` const (`https://hackimi.dev/#person`); `buildWebSiteJsonLd()`, `buildProfilePageJsonLd()`, `buildBreadcrumbJsonLd(caseTitle: string, slug: string)`; `JsonLd({ data }: { data: object })` component.
 
@@ -527,9 +526,9 @@ describe('entity graph builders', () => {
     const ld = buildBreadcrumbJsonLd('Be My Guide', 'be-my-guide');
     expect(ld['@type']).toBe('BreadcrumbList');
     expect(ld.itemListElement).toEqual([
-      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: 'Work', item: `${SITE_URL}/work` },
-      { '@type': 'ListItem', position: 3, name: 'Be My Guide', item: `${SITE_URL}/work/be-my-guide` },
+      { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': SITE_URL },
+      { '@type': 'ListItem', 'position': 2, 'name': 'Work', 'item': `${SITE_URL}/work` },
+      { '@type': 'ListItem', 'position': 3, 'name': 'Be My Guide', 'item': `${SITE_URL}/work/be-my-guide` },
     ]);
   });
 });
@@ -570,9 +569,9 @@ export function buildBreadcrumbJsonLd(caseTitle: string, slug: string) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     'itemListElement': [
-      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: 'Work', item: `${SITE_URL}/work` },
-      { '@type': 'ListItem', position: 3, name: caseTitle, item: `${SITE_URL}/work/${slug}` },
+      { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': SITE_URL },
+      { '@type': 'ListItem', 'position': 2, 'name': 'Work', 'item': `${SITE_URL}/work` },
+      { '@type': 'ListItem', 'position': 3, 'name': caseTitle, 'item': `${SITE_URL}/work/${slug}` },
     ],
   } as const;
 }
@@ -645,11 +644,13 @@ git commit -m "feat: entity graph JSON-LD (person @id, WebSite, ProfilePage, bre
 ### Task 7: Brand assets — favicon set and OG card ⚠️ TASTE GATE
 
 **Files:**
+
 - Create: `scripts/generate-brand-assets.mjs`, `src/app/icon.svg`, `src/app/apple-icon.png`, `public/og.png`
 - Modify: `src/lib/site.ts` (`SITE_OG_IMAGE` → og.png; new `SITE_PERSON_IMAGE`), `src/lib/metadata.ts` (Person image), `tests/unit/site.test.ts`, `tests/unit/metadata.test.ts`
 - Modify: `e2e/seo.spec.ts` (append)
 
 **Interfaces:**
+
 - Consumes: Monogram geometry from `src/components/brand/Monogram.tsx` (120×120 viewBox; N: `M20 100 L20 20 L54 100 L54 20`; H: `M66 20 L66 100 M66 60 L100 60 M100 20 L100 100`; strokeWidth 8, round caps/joins).
 - Produces: `SITE_PERSON_IMAGE` (the face photo, kept for Person JSON-LD), `SITE_OG_IMAGE` now `${SITE_URL}/og.png`.
 
@@ -752,8 +753,7 @@ await browser.close();
 console.log('wrote public/og.png and src/app/apple-icon.png');
 ```
 
-Run it (unsandboxed Bash, `ulimit -n 10240` first): `node scripts/generate-brand-assets.mjs`
-Verify dims: `sips -g pixelWidth -g pixelHeight public/og.png src/app/apple-icon.png` → 1200×630 and 180×180.
+Run it (unsandboxed Bash, `ulimit -n 10240` first): `node scripts/generate-brand-assets.mjs` Verify dims: `sips -g pixelWidth -g pixelHeight public/og.png src/app/apple-icon.png` → 1200×630 and 180×180.
 
 - [ ] **Step 4: Switch the constants**
 
@@ -786,6 +786,7 @@ git commit -m "feat: NH monogram favicon set and branded OG card"
 ### Task 8: Honest sitemap + idiomatic robots.ts
 
 **Files:**
+
 - Modify: `src/app/sitemap.ts`, `tests/server/sitemap.test.ts`
 - Create: `src/app/robots.ts`
 - Delete: `src/app/robots.txt/` (whole folder)
@@ -866,9 +867,7 @@ Delete the folder `src/app/robots.txt/` (`git rm -r src/app/robots.txt`).
 
 - [ ] **Step 4: Run to verify passes**
 
-Run: `npm run test`, then boot the dev server and check both endpoints render:
-`curl -s http://localhost:3000/robots.txt` → `User-Agent: *`, `Allow: /`, `Sitemap: https://hackimi.dev/sitemap.xml`
-`curl -s http://localhost:3000/sitemap.xml` → 7 `<loc>` entries, no `<lastmod>`.
+Run: `npm run test`, then boot the dev server and check both endpoints render: `curl -s http://localhost:3000/robots.txt` → `User-Agent: *`, `Allow: /`, `Sitemap: https://hackimi.dev/sitemap.xml` `curl -s http://localhost:3000/sitemap.xml` → 7 `<loc>` entries, no `<lastmod>`.
 
 - [ ] **Step 5: Commit**
 
@@ -882,6 +881,7 @@ git commit -m "refactor: url-only sitemap, robots.ts file convention, SITE_URL s
 ### Task 9: Search Console verification slot + infra docs
 
 **Files:**
+
 - Modify: `src/lib/site.ts`, `src/lib/metadata.ts` (`buildRootMetadata`), `tests/unit/metadata.test.ts`
 - Create: `docs/infra.md`
 
@@ -928,26 +928,19 @@ Create `docs/infra.md`:
 ## Domains (Vercel dashboard → Settings → Domains)
 
 - Production domains: `hackimi.dev` (apex) and `www.hackimi.dev`.
-- **Canonical host: apex `https://hackimi.dev`** — every canonical tag, sitemap URL,
-  robots Sitemap line, and JSON-LD url in this repo uses apex.
-- Redirect direction: `www` → 308 → apex. (Flipped 2026-08-__ by Nima; before that
-  the dashboard had apex → www, contradicting the code's canonicals.)
-- `hackimi.vercel.app` additionally 308s to apex via `next.config.js` (exact-host
-  rule — preview URLs on *.vercel.app are deliberately not matched).
+- **Canonical host: apex `https://hackimi.dev`** — every canonical tag, sitemap URL, robots Sitemap line, and JSON-LD url in this repo uses apex.
+- Redirect direction: `www` → 308 → apex. (Flipped 2026-08-\_\_ by Nima; before that the dashboard had apex → www, contradicting the code's canonicals.)
+- `hackimi.vercel.app` additionally 308s to apex via `next.config.js` (exact-host rule — preview URLs on \*.vercel.app are deliberately not matched).
 
 ## Deployments
 
-- `vercel.json` sets `git.deploymentEnabled.main: false` — merging to `main` does
-  NOT auto-deploy. Production deploys are triggered manually (dashboard or
-  `vercel --prod`).
+- `vercel.json` sets `git.deploymentEnabled.main: false` — merging to `main` does NOT auto-deploy. Production deploys are triggered manually (dashboard or `vercel --prod`).
 
 ## Search Console
 
 - Property: `https://hackimi.dev` (URL-prefix), meta-tag verification.
-- Token lives in `SITE_GOOGLE_SITE_VERIFICATION` (`src/lib/site.ts`); empty string
-  disables the tag entirely.
-- After each SEO-relevant deploy: submit `sitemap.xml`, request indexing of
-  changed URLs.
+- Token lives in `SITE_GOOGLE_SITE_VERIFICATION` (`src/lib/site.ts`); empty string disables the tag entirely.
+- After each SEO-relevant deploy: submit `sitemap.xml`, request indexing of changed URLs.
 ```
 
 (The redirect-direction line contains a deliberate `2026-08-__` blank — Nima fills the date when he flips it; leave as-is.)
