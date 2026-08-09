@@ -1,4 +1,5 @@
 import Preloader from '@/components/intro/Preloader';
+import SiteFooter from '@/components/layout/SiteFooter';
 import SiteNav from '@/components/layout/SiteNav';
 import SmoothScroll from '@/components/motion/SmoothScroll';
 import './globals.css';
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SmoothScroll>
           <SiteNav />
           <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">{children}</main>
+          <SiteFooter />
         </SmoothScroll>
       </body>
     </html>

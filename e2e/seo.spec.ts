@@ -24,4 +24,11 @@ test.describe('rendered metadata', () => {
     await page.goto('/');
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://hackimi.dev');
   });
+
+  test('footer carries the visible name line on every page', async ({ page }) => {
+    for (const path of ['/', '/about', '/work']) {
+      await page.goto(path);
+      await expect(page.locator('footer')).toContainText('Nima Hakimi — Developer & AI Engineer');
+    }
+  });
 });
