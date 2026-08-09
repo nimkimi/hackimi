@@ -4,9 +4,11 @@ import {
   SITE_DESCRIPTION,
   SITE_EMAIL,
   SITE_EMPLOYER,
+  SITE_GOOGLE_SITE_VERIFICATION,
   SITE_KEYWORDS,
   SITE_LOCATION,
   SITE_OG_IMAGE,
+  SITE_PERSON_IMAGE,
   SITE_ROLE,
   SITE_SOCIAL_LINKS,
   SITE_TITLE,
@@ -104,6 +106,7 @@ export function buildRootMetadata(): Metadata {
     alternates: {
       canonical: SITE_URL,
     },
+    ...(SITE_GOOGLE_SITE_VERIFICATION ? { verification: { google: SITE_GOOGLE_SITE_VERIFICATION } } : {}),
   };
 }
 
@@ -136,10 +139,41 @@ export function buildPageMetadata({ title, description, path, keywords, ogImage 
   };
 }
 
+/**
+ * Home is the ONE page whose title must be absolute: Next's title.template
+ * only applies to child segments, so the root page.tsx never receives the
+ * "%s | Nima Hakimi" suffix — it must carry the full name-led string itself.
+ */
+export function buildHomeMetadata(): Metadata {
+  return {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    keywords: defaultKeywords,
+    alternates: { canonical: SITE_URL },
+    openGraph: {
+      title: SITE_TITLE,
+      description: SITE_DESCRIPTION,
+      url: SITE_URL,
+      siteName: SITE_AUTHOR,
+      type: 'website',
+      images: [defaultImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: SITE_TITLE,
+      description: SITE_DESCRIPTION,
+      images: [defaultTwitterImage],
+    },
+  };
+}
+
+export const PERSON_ID = `${SITE_URL}/#person` as const;
+
 export function buildPersonJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Person',
+    '@id': PERSON_ID,
     'name': SITE_AUTHOR,
     'url': SITE_URL,
     'jobTitle': SITE_ROLE,
@@ -153,8 +187,39 @@ export function buildPersonJsonLd() {
       'addressCountry': SITE_LOCATION.country,
     },
     'email': `mailto:${SITE_EMAIL}`,
-    'image': SITE_OG_IMAGE,
-    'sameAs': [SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin],
+    'image': SITE_PERSON_IMAGE,
+    'sameAs': [SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin, SITE_SOCIAL_LINKS.orcid],
+  } as const;
+}
+
+export function buildWebSiteJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    'name': SITE_AUTHOR,
+    'url': SITE_URL,
+    'publisher': { '@id': PERSON_ID },
+  } as const;
+}
+
+export function buildProfilePageJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    'url': `${SITE_URL}/about`,
+    'mainEntity': { '@id': PERSON_ID },
+  } as const;
+}
+
+export function buildBreadcrumbJsonLd(caseTitle: string, slug: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': SITE_URL },
+      { '@type': 'ListItem', 'position': 2, 'name': 'Work', 'item': `${SITE_URL}/work` },
+      { '@type': 'ListItem', 'position': 3, 'name': caseTitle, 'item': `${SITE_URL}/work/${slug}` },
+    ],
   } as const;
 }
 

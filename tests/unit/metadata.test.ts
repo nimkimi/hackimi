@@ -1,5 +1,15 @@
 import { describe, it, expect } from 'vitest';
-import { buildRootMetadata, buildPageMetadata, buildPersonJsonLd, resolveUrl, METADATA_BASE } from '@/lib/metadata';
+import {
+  buildRootMetadata,
+  buildPageMetadata,
+  buildHomeMetadata,
+  buildPersonJsonLd,
+  buildWebSiteJsonLd,
+  buildProfilePageJsonLd,
+  buildBreadcrumbJsonLd,
+  resolveUrl,
+  METADATA_BASE,
+} from '@/lib/metadata';
 import {
   SITE_URL,
   SITE_AUTHOR,
@@ -9,7 +19,9 @@ import {
   SITE_EMAIL,
   SITE_EMPLOYER,
   SITE_OG_IMAGE,
+  SITE_PERSON_IMAGE,
   SITE_SOCIAL_LINKS,
+  SITE_GOOGLE_SITE_VERIFICATION,
 } from '@/lib/site';
 
 describe('resolveUrl', () => {
@@ -111,6 +123,21 @@ describe('buildPageMetadata', () => {
   });
 });
 
+describe('buildHomeMetadata', () => {
+  it('title is the absolute SITE_TITLE (root segment gets no template)', () => {
+    const meta = buildHomeMetadata();
+    expect(meta.title).toBe(SITE_TITLE);
+    expect(meta.openGraph?.title).toBe(SITE_TITLE);
+    expect(meta.twitter?.title).toBe(SITE_TITLE);
+  });
+
+  it('canonical and og.url are the bare SITE_URL', () => {
+    const meta = buildHomeMetadata();
+    expect(meta.alternates?.canonical).toBe(SITE_URL);
+    expect(meta.openGraph?.url).toBe(SITE_URL);
+  });
+});
+
 describe('buildRootMetadata', () => {
   it('metadataBase is a URL of SITE_URL', () => {
     const meta = buildRootMetadata();
@@ -131,6 +158,15 @@ describe('buildRootMetadata', () => {
     expect(meta.openGraph).toBeDefined();
     expect(meta.twitter).toBeDefined();
   });
+
+  it('emits the verification block only when the GSC token is set', () => {
+    // SITE_GOOGLE_SITE_VERIFICATION is '' until Nima creates the property;
+    // an empty <meta name="google-site-verification"> must never ship. The
+    // assertion is conditional so the future token commit stays green too.
+    expect(buildRootMetadata().verification).toEqual(
+      SITE_GOOGLE_SITE_VERIFICATION ? { google: SITE_GOOGLE_SITE_VERIFICATION } : undefined
+    );
+  });
 });
 
 describe('buildPersonJsonLd', () => {
@@ -143,6 +179,43 @@ describe('buildPersonJsonLd', () => {
     expect(ld.jobTitle).toBe(SITE_ROLE);
     expect(ld.worksFor.name).toBe(SITE_EMPLOYER.name);
     expect(ld.email).toBe(`mailto:${SITE_EMAIL}`);
-    expect(ld.sameAs).toEqual([SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin]);
+    expect(ld.sameAs).toEqual([SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin, SITE_SOCIAL_LINKS.orcid]);
+  });
+
+  it('carries a stable @id and all three sameAs anchors', () => {
+    const ld = buildPersonJsonLd();
+    expect(ld['@id']).toBe(`${SITE_URL}/#person`);
+    expect(ld.sameAs).toEqual([SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin, SITE_SOCIAL_LINKS.orcid]);
+  });
+
+  it('uses the person photo, not the OG card, as the Person image', () => {
+    expect(buildPersonJsonLd().image).toBe(SITE_PERSON_IMAGE);
+  });
+});
+
+describe('entity graph builders', () => {
+  it('WebSite names the site after the author and references the person', () => {
+    const ld = buildWebSiteJsonLd();
+    expect(ld['@type']).toBe('WebSite');
+    expect(ld.name).toBe(SITE_AUTHOR);
+    expect(ld.url).toBe(SITE_URL);
+    expect(ld.publisher).toEqual({ '@id': `${SITE_URL}/#person` });
+  });
+
+  it('ProfilePage points its mainEntity at the person @id', () => {
+    const ld = buildProfilePageJsonLd();
+    expect(ld['@type']).toBe('ProfilePage');
+    expect(ld.url).toBe(`${SITE_URL}/about`);
+    expect(ld.mainEntity).toEqual({ '@id': `${SITE_URL}/#person` });
+  });
+
+  it('BreadcrumbList walks Home → Work → case', () => {
+    const ld = buildBreadcrumbJsonLd('Be My Guide', 'be-my-guide');
+    expect(ld['@type']).toBe('BreadcrumbList');
+    expect(ld.itemListElement).toEqual([
+      { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': SITE_URL },
+      { '@type': 'ListItem', 'position': 2, 'name': 'Work', 'item': `${SITE_URL}/work` },
+      { '@type': 'ListItem', 'position': 3, 'name': 'Be My Guide', 'item': `${SITE_URL}/work/be-my-guide` },
+    ]);
   });
 });

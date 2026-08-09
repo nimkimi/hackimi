@@ -12,18 +12,16 @@ describe('sitemap', () => {
     expect(entries).toHaveLength(STATIC_ROUTES.length + work.length);
   });
 
-  it("uses the bare base URL (no trailing slash) and priority 1 for '/'", () => {
+  it("uses the bare base URL (no trailing slash) for '/'", () => {
     const root = sitemap().find((e) => e.url === BASE_URL);
     expect(root).toBeDefined();
     expect(root?.url).toBe('https://hackimi.dev');
-    expect(root?.priority).toBe(1);
   });
 
-  it('uses the full path and priority 0.6 for a non-root route', () => {
+  it('uses the full path for a non-root route', () => {
     const about = sitemap().find((e) => e.url === `${BASE_URL}/about`);
     expect(about).toBeDefined();
     expect(about?.url).toBe('https://hackimi.dev/about');
-    expect(about?.priority).toBe(0.6);
   });
 
   it('includes every work slug as /work/<slug>', () => {
@@ -33,10 +31,9 @@ describe('sitemap', () => {
     }
   });
 
-  it("gives every entry changeFrequency 'monthly' and a lastModified Date", () => {
+  it('entries are url-only — no fabricated lastModified/changeFrequency/priority', () => {
     for (const entry of sitemap()) {
-      expect(entry.changeFrequency).toBe('monthly');
-      expect(entry.lastModified).toBeInstanceOf(Date);
+      expect(Object.keys(entry)).toEqual(['url']);
     }
   });
 });

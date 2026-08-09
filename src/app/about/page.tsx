@@ -1,14 +1,15 @@
 import about from '@/data/about';
-import { buildPageMetadata } from '@/lib/metadata';
+import { buildPageMetadata, buildProfilePageJsonLd } from '@/lib/metadata';
 import { SITE_EMAIL } from '@/lib/site';
 import Reveal from '@/components/motion/Reveal';
 import UnderlineLink from '@/components/motion/UnderlineLink';
 import MagneticButton from '@/components/motion/MagneticButton';
+import JsonLd from '@/components/seo/JsonLd';
 
 export const metadata = buildPageMetadata({
   title: 'About',
   description:
-    'Nima Hakimi — frontend developer with a designer’s eye, building accessible, expressive web interfaces. Experience, education, and skills.',
+    'Nima Hakimi — developer and AI engineer with a designer’s eye, building accessible, expressive web interfaces. Experience, education, and skills.',
   path: '/about',
 });
 
@@ -24,6 +25,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export default function AboutPage() {
   return (
     <article className="py-12 sm:py-16">
+      <JsonLd data={buildProfilePageJsonLd()} />
       {/* Intro — developer-first identity, design taste as the edge */}
       <header className="max-w-5xl">
         <Reveal>
