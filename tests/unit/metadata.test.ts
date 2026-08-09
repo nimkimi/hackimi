@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { buildRootMetadata, buildPageMetadata, buildPersonJsonLd, resolveUrl, METADATA_BASE } from '@/lib/metadata';
+import {
+  buildRootMetadata,
+  buildPageMetadata,
+  buildHomeMetadata,
+  buildPersonJsonLd,
+  resolveUrl,
+  METADATA_BASE,
+} from '@/lib/metadata';
 import {
   SITE_URL,
   SITE_AUTHOR,
@@ -108,6 +115,21 @@ describe('buildPageMetadata', () => {
       expect(result).toEqual([...SITE_KEYWORDS, 'TypeScript']);
       expect(new Set(result).size).toBe(result.length); // no duplicates
     });
+  });
+});
+
+describe('buildHomeMetadata', () => {
+  it('title is the absolute SITE_TITLE (root segment gets no template)', () => {
+    const meta = buildHomeMetadata();
+    expect(meta.title).toBe(SITE_TITLE);
+    expect(meta.openGraph?.title).toBe(SITE_TITLE);
+    expect(meta.twitter?.title).toBe(SITE_TITLE);
+  });
+
+  it('canonical and og.url are the bare SITE_URL', () => {
+    const meta = buildHomeMetadata();
+    expect(meta.alternates?.canonical).toBe(SITE_URL);
+    expect(meta.openGraph?.url).toBe(SITE_URL);
   });
 });
 

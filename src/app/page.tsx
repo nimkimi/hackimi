@@ -1,4 +1,4 @@
-import { buildPageMetadata } from '@/lib/metadata';
+import { buildHomeMetadata } from '@/lib/metadata';
 import Reveal from '@/components/motion/Reveal';
 import MagneticButton from '@/components/motion/MagneticButton';
 import UnderlineLink from '@/components/motion/UnderlineLink';
@@ -7,11 +7,7 @@ import PlaygroundSection from '@/components/playground/PlaygroundSection';
 import work from '@/data/work';
 import { SITE_EMAIL, SITE_SOCIAL_LINKS } from '@/lib/site';
 
-export const metadata = buildPageMetadata({
-  title: 'Portfolio',
-  description: 'Discover the work, skills, and contact information of frontend developer Nima Hakimi.',
-  path: '/',
-});
+export const metadata = buildHomeMetadata();
 
 export default function Home() {
   return (

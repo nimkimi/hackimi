@@ -13,3 +13,15 @@ test.describe('redirects', () => {
     expect(res.headers()['location']).toBe('/work');
   });
 });
+
+test.describe('rendered metadata', () => {
+  test('homepage title is the full name-led title', async ({ page }) => {
+    await page.goto('/');
+    await expect(page).toHaveTitle('Nima Hakimi — Developer & AI Engineer');
+  });
+
+  test('homepage canonical points at apex', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', 'https://hackimi.dev');
+  });
+});

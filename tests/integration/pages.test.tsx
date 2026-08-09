@@ -55,9 +55,10 @@ describe('Home page (/)', () => {
     }
   });
 
-  it('exports page metadata derived from buildPageMetadata', async () => {
+  it('exports absolute name-led home metadata', async () => {
     const { metadata } = await import('@/app/page');
-    expect(metadata.title).toBe('Portfolio');
+    const { SITE_TITLE } = await import('@/lib/site');
+    expect(metadata.title).toBe(SITE_TITLE);
     expect(metadata.description).toContain('Nima Hakimi');
   });
 });

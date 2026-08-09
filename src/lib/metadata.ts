@@ -136,6 +136,34 @@ export function buildPageMetadata({ title, description, path, keywords, ogImage 
   };
 }
 
+/**
+ * Home is the ONE page whose title must be absolute: Next's title.template
+ * only applies to child segments, so the root page.tsx never receives the
+ * "%s | Nima Hakimi" suffix — it must carry the full name-led string itself.
+ */
+export function buildHomeMetadata(): Metadata {
+  return {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    keywords: defaultKeywords,
+    alternates: { canonical: SITE_URL },
+    openGraph: {
+      title: SITE_TITLE,
+      description: SITE_DESCRIPTION,
+      url: SITE_URL,
+      siteName: SITE_AUTHOR,
+      type: 'website',
+      images: [defaultImage],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: SITE_TITLE,
+      description: SITE_DESCRIPTION,
+      images: [defaultTwitterImage],
+    },
+  };
+}
+
 export function buildPersonJsonLd() {
   return {
     '@context': 'https://schema.org',
