@@ -189,12 +189,12 @@ describe('Work case page (/work/[slug])', () => {
     expect(meta.alternates?.canonical).toContain(`/work/${c.slug}`);
   });
 
-  it('generateMetadata returns an empty object for an unknown slug', async () => {
+  it('generateMetadata returns a not-found title for an unknown slug', async () => {
     const { generateMetadata } = await import('@/app/work/[slug]/page');
 
     const meta = await generateMetadata({
       params: Promise.resolve({ slug: 'does-not-exist' }),
     });
-    expect(meta).toEqual({});
+    expect(meta).toEqual({ title: 'Not found' });
   });
 });

@@ -79,9 +79,13 @@ describe('Contact page (/contact)', () => {
     expect(contactClientSpy).toHaveBeenCalledWith(expect.objectContaining({ siteKey: 'public-key' }));
   });
 
-  it('exports static contact metadata', async () => {
+  it('exports contact metadata with its own OpenGraph object', async () => {
     const { metadata } = await import('@/app/contact/page');
+    const { SITE_AUTHOR } = await import('@/lib/site');
     expect(metadata.title).toBe('Contact');
     expect(metadata.alternates?.canonical).toBe('https://hackimi.dev/contact');
+    // Regression: an absent openGraph made /contact inherit the homepage OG.
+    expect(metadata.openGraph?.title).toBe(`Contact | ${SITE_AUTHOR}`);
+    expect(metadata.openGraph?.url).toBe('https://hackimi.dev/contact');
   });
 });

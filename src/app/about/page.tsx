@@ -8,7 +8,7 @@ import MagneticButton from '@/components/motion/MagneticButton';
 export const metadata = buildPageMetadata({
   title: 'About',
   description:
-    'Nima Hakimi — frontend developer with a designer’s eye, building accessible, expressive web interfaces. Experience, education, and skills.',
+    'Nima Hakimi — developer and AI engineer with a designer’s eye, building accessible, expressive web interfaces. Experience, education, and skills.',
   path: '/about',
 });
 

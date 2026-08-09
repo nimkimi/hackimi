@@ -14,7 +14,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const c = work.find((w) => w.slug === slug);
-  if (!c) return {};
+  if (!c) return { title: 'Not found' };
   return buildPageMetadata({
     title: c.title,
     description: c.summary,
