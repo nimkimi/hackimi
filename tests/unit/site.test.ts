@@ -15,8 +15,9 @@ describe('site constants', () => {
     expect(url.protocol).toBe('https:');
   });
 
-  it('SITE_TITLE is `${SITE_AUTHOR} | ${SITE_ROLE}`', () => {
-    expect(SITE_TITLE).toBe(`${SITE_AUTHOR} | ${SITE_ROLE}`);
+  it('SITE_TITLE is `${SITE_AUTHOR} — ${SITE_ROLE}` (em-dash form)', () => {
+    expect(SITE_TITLE).toBe(`${SITE_AUTHOR} — ${SITE_ROLE}`);
+    expect(SITE_ROLE).toBe('Developer & AI Engineer');
   });
 
   it('SITE_OG_IMAGE starts with SITE_URL', () => {
@@ -30,7 +31,16 @@ describe('site constants', () => {
     });
   });
 
+  it('social links include GitHub, LinkedIn and ORCID', () => {
+    expect(Object.keys(SITE_SOCIAL_LINKS).sort()).toEqual(['github', 'linkedin', 'orcid']);
+  });
+
   it('SITE_KEYWORDS is non-empty', () => {
     expect(SITE_KEYWORDS.length).toBeGreaterThan(0);
+  });
+
+  it('keywords carry the new positioning, not "Frontend"', () => {
+    expect(SITE_KEYWORDS).toContain('AI Engineer');
+    expect(SITE_KEYWORDS.join(' ')).not.toMatch(/frontend/i);
   });
 });
