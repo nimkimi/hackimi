@@ -31,6 +31,19 @@ test.describe('rendered metadata', () => {
       await expect(page.locator('footer')).toContainText('Nima Hakimi — Developer & AI Engineer');
     }
   });
+
+  test('favicon links are emitted', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('link[rel="icon"]').first()).toHaveAttribute('href', /icon/);
+  });
+
+  test('og image resolves to a real asset', async ({ page, request }) => {
+    await page.goto('/');
+    const og = await page.locator('meta[property="og:image"]').getAttribute('content');
+    expect(og).toContain('/og.png');
+    const res = await request.get('/og.png');
+    expect(res.status()).toBe(200);
+  });
 });
 
 test.describe('structured data', () => {

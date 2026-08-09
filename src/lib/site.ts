@@ -18,4 +18,5 @@ export const SITE_SOCIAL_LINKS = {
   linkedin: 'https://linkedin.com/in/nima-hakimi-387716175',
   orcid: 'https://orcid.org/0009-0002-6656-2498',
 };
-export const SITE_OG_IMAGE = `${SITE_URL}/bigSmile.JPEG` as const;
+export const SITE_OG_IMAGE = `${SITE_URL}/og.png` as const;
+export const SITE_PERSON_IMAGE = `${SITE_URL}/bigSmile.JPEG` as const;

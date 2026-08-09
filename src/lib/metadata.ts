@@ -7,6 +7,7 @@ import {
   SITE_KEYWORDS,
   SITE_LOCATION,
   SITE_OG_IMAGE,
+  SITE_PERSON_IMAGE,
   SITE_ROLE,
   SITE_SOCIAL_LINKS,
   SITE_TITLE,
@@ -184,7 +185,7 @@ export function buildPersonJsonLd() {
       'addressCountry': SITE_LOCATION.country,
     },
     'email': `mailto:${SITE_EMAIL}`,
-    'image': SITE_OG_IMAGE,
+    'image': SITE_PERSON_IMAGE,
     'sameAs': [SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin, SITE_SOCIAL_LINKS.orcid],
   } as const;
 }

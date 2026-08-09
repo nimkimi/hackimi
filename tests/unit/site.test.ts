@@ -24,6 +24,12 @@ describe('site constants', () => {
     expect(SITE_OG_IMAGE.startsWith(SITE_URL)).toBe(true);
   });
 
+  it('OG image is the branded card; person image is the photo', async () => {
+    const { SITE_OG_IMAGE, SITE_PERSON_IMAGE, SITE_URL } = await import('@/lib/site');
+    expect(SITE_OG_IMAGE).toBe(`${SITE_URL}/og.png`);
+    expect(SITE_PERSON_IMAGE).toBe(`${SITE_URL}/bigSmile.JPEG`);
+  });
+
   it('social links are valid URLs', () => {
     Object.values(SITE_SOCIAL_LINKS).forEach((link) => {
       expect(() => new URL(link)).not.toThrow();

@@ -19,6 +19,7 @@ import {
   SITE_EMAIL,
   SITE_EMPLOYER,
   SITE_OG_IMAGE,
+  SITE_PERSON_IMAGE,
   SITE_SOCIAL_LINKS,
 } from '@/lib/site';
 
@@ -175,6 +176,10 @@ describe('buildPersonJsonLd', () => {
     const ld = buildPersonJsonLd();
     expect(ld['@id']).toBe(`${SITE_URL}/#person`);
     expect(ld.sameAs).toEqual([SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin, SITE_SOCIAL_LINKS.orcid]);
+  });
+
+  it('uses the person photo, not the OG card, as the Person image', () => {
+    expect(buildPersonJsonLd().image).toBe(SITE_PERSON_IMAGE);
   });
 });
 
