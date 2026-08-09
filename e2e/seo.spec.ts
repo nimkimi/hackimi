@@ -32,3 +32,21 @@ test.describe('rendered metadata', () => {
     }
   });
 });
+
+test.describe('structured data', () => {
+  async function ldTypes(page: import('@playwright/test').Page) {
+    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    return blocks.map((b) => JSON.parse(b)['@type']);
+  }
+
+  test('every page carries Person + WebSite; about and case pages add their own', async ({ page }) => {
+    await page.goto('/');
+    expect((await ldTypes(page)).sort()).toEqual(['Person', 'WebSite']);
+
+    await page.goto('/about');
+    expect((await ldTypes(page)).sort()).toEqual(['Person', 'ProfilePage', 'WebSite']);
+
+    await page.goto('/work/be-my-guide');
+    expect((await ldTypes(page)).sort()).toEqual(['BreadcrumbList', 'Person', 'WebSite']);
+  });
+});

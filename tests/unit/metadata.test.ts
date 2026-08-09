@@ -4,6 +4,9 @@ import {
   buildPageMetadata,
   buildHomeMetadata,
   buildPersonJsonLd,
+  buildWebSiteJsonLd,
+  buildProfilePageJsonLd,
+  buildBreadcrumbJsonLd,
   resolveUrl,
   METADATA_BASE,
 } from '@/lib/metadata';
@@ -165,6 +168,39 @@ describe('buildPersonJsonLd', () => {
     expect(ld.jobTitle).toBe(SITE_ROLE);
     expect(ld.worksFor.name).toBe(SITE_EMPLOYER.name);
     expect(ld.email).toBe(`mailto:${SITE_EMAIL}`);
-    expect(ld.sameAs).toEqual([SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin]);
+    expect(ld.sameAs).toEqual([SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin, SITE_SOCIAL_LINKS.orcid]);
+  });
+
+  it('carries a stable @id and all three sameAs anchors', () => {
+    const ld = buildPersonJsonLd();
+    expect(ld['@id']).toBe(`${SITE_URL}/#person`);
+    expect(ld.sameAs).toEqual([SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin, SITE_SOCIAL_LINKS.orcid]);
+  });
+});
+
+describe('entity graph builders', () => {
+  it('WebSite names the site after the author and references the person', () => {
+    const ld = buildWebSiteJsonLd();
+    expect(ld['@type']).toBe('WebSite');
+    expect(ld.name).toBe(SITE_AUTHOR);
+    expect(ld.url).toBe(SITE_URL);
+    expect(ld.publisher).toEqual({ '@id': `${SITE_URL}/#person` });
+  });
+
+  it('ProfilePage points its mainEntity at the person @id', () => {
+    const ld = buildProfilePageJsonLd();
+    expect(ld['@type']).toBe('ProfilePage');
+    expect(ld.url).toBe(`${SITE_URL}/about`);
+    expect(ld.mainEntity).toEqual({ '@id': `${SITE_URL}/#person` });
+  });
+
+  it('BreadcrumbList walks Home → Work → case', () => {
+    const ld = buildBreadcrumbJsonLd('Be My Guide', 'be-my-guide');
+    expect(ld['@type']).toBe('BreadcrumbList');
+    expect(ld.itemListElement).toEqual([
+      { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': SITE_URL },
+      { '@type': 'ListItem', 'position': 2, 'name': 'Work', 'item': `${SITE_URL}/work` },
+      { '@type': 'ListItem', 'position': 3, 'name': 'Be My Guide', 'item': `${SITE_URL}/work/be-my-guide` },
+    ]);
   });
 });

@@ -164,10 +164,13 @@ export function buildHomeMetadata(): Metadata {
   };
 }
 
+export const PERSON_ID = `${SITE_URL}/#person` as const;
+
 export function buildPersonJsonLd() {
   return {
     '@context': 'https://schema.org',
     '@type': 'Person',
+    '@id': PERSON_ID,
     'name': SITE_AUTHOR,
     'url': SITE_URL,
     'jobTitle': SITE_ROLE,
@@ -182,7 +185,38 @@ export function buildPersonJsonLd() {
     },
     'email': `mailto:${SITE_EMAIL}`,
     'image': SITE_OG_IMAGE,
-    'sameAs': [SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin],
+    'sameAs': [SITE_SOCIAL_LINKS.github, SITE_SOCIAL_LINKS.linkedin, SITE_SOCIAL_LINKS.orcid],
+  } as const;
+}
+
+export function buildWebSiteJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    'name': SITE_AUTHOR,
+    'url': SITE_URL,
+    'publisher': { '@id': PERSON_ID },
+  } as const;
+}
+
+export function buildProfilePageJsonLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    'url': `${SITE_URL}/about`,
+    'mainEntity': { '@id': PERSON_ID },
+  } as const;
+}
+
+export function buildBreadcrumbJsonLd(caseTitle: string, slug: string) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    'itemListElement': [
+      { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': SITE_URL },
+      { '@type': 'ListItem', 'position': 2, 'name': 'Work', 'item': `${SITE_URL}/work` },
+      { '@type': 'ListItem', 'position': 3, 'name': caseTitle, 'item': `${SITE_URL}/work/${slug}` },
+    ],
   } as const;
 }
 

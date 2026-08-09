@@ -1,10 +1,11 @@
 import { notFound } from 'next/navigation';
-import { buildPageMetadata } from '@/lib/metadata';
+import { buildBreadcrumbJsonLd, buildPageMetadata } from '@/lib/metadata';
 import Reveal from '@/components/motion/Reveal';
 import UnderlineLink from '@/components/motion/UnderlineLink';
 import CaseHero from '@/components/work/CaseHero';
 import CaseSection from '@/components/work/CaseSection';
 import { CaseCover, CaseGallery } from '@/components/work/CaseGallery';
+import JsonLd from '@/components/seo/JsonLd';
 import work from '@/data/work';
 
 export function generateStaticParams() {
@@ -33,6 +34,7 @@ export default async function CasePage({ params }: { params: Promise<{ slug: str
 
   return (
     <article className="pb-[clamp(3rem,10vh,7rem)]">
+      <JsonLd data={buildBreadcrumbJsonLd(c.title, c.slug)} />
       <div className="pt-[clamp(1.5rem,5vh,3rem)]">
         <UnderlineLink href="/work" className="font-mono text-xs uppercase tracking-[0.12em] text-muted">
           ← All work
