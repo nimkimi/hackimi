@@ -26,9 +26,15 @@ describe('unlisted talk deck', () => {
   });
 
   it('is reachable at /harness via a rewrite to the static file', async () => {
-    const rewrites = await nextConfig.rewrites();
+    // `rewrites` is optional on NextConfig, so losing the whole hook is a way
+    // this could break that a lookup in its result would not catch.
+    const { rewrites } = nextConfig;
+    if (!rewrites) throw new Error('next.config.js no longer defines rewrites()');
 
-    expect(rewrites).toContainEqual({ source: '/harness', destination: '/harness.html' });
+    expect(await rewrites()).toContainEqual({
+      source: '/harness',
+      destination: '/harness.html',
+    });
   });
 });
 
