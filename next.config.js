@@ -15,6 +15,13 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    return [
+      // Unlisted talk deck (aug 2026): served from public/harness.html.
+      // Intentionally not linked from any nav.
+      { source: '/harness', destination: '/harness.html' },
+    ];
+  },
 };
 
 module.exports = nextConfig;
