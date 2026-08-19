@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent = modell + harness</title>
+<style>
+  :root {
+    --bg: #101114;
+    --panel: #17181d;
+    --term: #0b0c0f;
+    --border: #2a2c34;
+    --border-soft: #1f2127;
+    --text: #ecede8;
+    --text-2: #a6abb4;
+    --muted: #6d7380;
+    --amber: #f2a64a;
+    --amber-dim: #a9762f;
+    --red: #e5655c;
+    --green: #5cb270;
+    --sans: "Lato", "Avenir Next", -apple-system, "Segoe UI", system-ui, sans-serif;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    overflow: hidden;
+  }
+  #viewport {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  #stage {
+    width: 1280px; height: 720px;
+    position: relative;
+    flex: none;
+  }
+  section.slide {
+    position: absolute; inset: 0;
+    padding: 64px 84px 56px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity .22s ease, transform .22s ease;
+    pointer-events: none;
+    display: flex; flex-direction: column;
+  }
+  section.slide.active { opacity: 1; transform: none; pointer-events: auto; }
+  @media (prefers-reduced-motion: reduce) {
+    section.slide { transition: none; }
+  }
+
+  /* ---------- shared pieces ---------- */
+  .kicker {
+    font-family: var(--mono);
+    font-size: 14px; letter-spacing: .18em; text-transform: uppercase;
+    color: var(--amber-dim);
+    margin-bottom: 14px;
+  }
+  h1 {
+    font-size: 44px; font-weight: 700; line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin-bottom: 34px;
+  }
+  h1 .thin { color: var(--text-2); font-weight: 400; }
+  .body { font-size: 25px; line-height: 1.5; color: var(--text); }
+  .grey { color: var(--text-2); }
+  .dim  { color: var(--muted); }
+  .amber { color: var(--amber); }
+  .mono { font-family: var(--mono); }
+  code.inline {
+    font-family: var(--mono); font-size: .86em;
+    background: var(--panel); border: 1px solid var(--border-soft);
+    border-radius: 5px; padding: 2px 8px;
+    color: var(--text);
+  }
+
+  ul.points { list-style: none; }
+  ul.points li {
+    font-size: 25px; line-height: 1.45;
+    padding-left: 26px; position: relative;
+    margin-bottom: 18px; color: var(--text);
+  }
+  ul.points li::before {
+    content: ""; position: absolute; left: 2px; top: .62em;
+    width: 9px; height: 2px; background: var(--amber);
+  }
+  ul.points li .sub { font-size: 20px; color: var(--text-2); }
+
+  /* terminal / file cards */
+  .card {
+    background: var(--term);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .card .bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--border-soft);
+    font-family: var(--mono); font-size: 14px; color: var(--muted);
+  }
+  .card .bar .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); }
+  .card .bar .name { color: var(--text-2); }
+  .card pre {
+    font-family: var(--mono);
+    padding: 16px 20px;
+    line-height: 1.55;
+    white-space: pre;
+    overflow: hidden;
+  }
+  .tk  { color: var(--amber); }          /* keys / section heads */
+  .ts  { color: var(--green); }          /* strings */
+  .tc  { color: var(--muted); }          /* comments / punctuation */
+  .tr  { color: var(--red); }
+
+  /* footer chrome */
+  .slidefoot {
+    position: absolute; left: 84px; right: 84px; bottom: 26px;
+    display: flex; justify-content: space-between; align-items: flex-end;
+    font-family: var(--mono); font-size: 13px; color: var(--muted);
+    pointer-events: none;
+  }
+  #pagenum {
+    position: absolute; right: 28px; bottom: 22px;
+    font-family: var(--mono); font-size: 13px; color: var(--muted);
+    z-index: 40;
+  }
+  #pagenum.speaking::before { content: "\25CF  "; color: var(--amber); }
+  #progress {
+    position: absolute; left: 0; bottom: 0; height: 2px;
+    background: var(--amber); width: 0;
+    transition: width .25s ease; z-index: 50;
+  }
+
+  /* mini staircase (nav aid, slides 5-10) */
+  .ministairs {
+    position: absolute; top: 40px; right: 84px;
+    display: flex; align-items: flex-end; gap: 3px;
+    opacity: .85;
+  }
+  .ministairs .st {
+    width: 26px; background: var(--border-soft);
+    border-radius: 2px 2px 0 0;
+  }
+  .ministairs .st:nth-child(1) { height: 8px; }
+  .ministairs .st:nth-child(2) { height: 16px; }
+  .ministairs .st:nth-child(3) { height: 24px; }
+  .ministairs .st.on { background: var(--amber); }
+
+  /* ---------- slide 1 ---------- */
+  #s1 { align-items: center; justify-content: center; text-align: center; }
+  #s1 .equation {
+    font-family: var(--mono); font-size: 64px; font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  #s1 .equation .op { color: var(--muted); padding: 0 .35em; }
+  #s1 .equation .h { color: var(--amber); }
+  #s1 .credit {
+    position: absolute; right: 84px; bottom: 60px;
+    font-size: 14px; color: var(--muted); font-family: var(--mono);
+  }
+
+  /* ---------- slide 2 ---------- */
+  .twocol { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; flex: 1; align-content: center; }
+  .obs {
+    background: var(--term);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--border);
+    border-radius: 8px;
+    padding: 26px 28px;
+    font-family: var(--mono); font-size: 20px; line-height: 1.65;
+    color: var(--text-2);
+  }
+  .obs.bad  { border-left-color: var(--red); }
+  .obs.good { border-left-color: var(--green); }
+  .obs .lbl { font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 14px; }
+  #s2 .landing {
+    margin-top: 34px; text-align: center;
+    font-family: var(--mono); font-size: 26px; color: var(--text);
+  }
+
+  /* ---------- slide 3 ---------- */
+  #s3 .cols { display: grid; grid-template-columns: 1.15fr .85fr; gap: 48px; flex: 1; align-items: center; }
+  #s3 .def {
+    font-family: var(--mono); font-size: 21px; line-height: 1.7; color: var(--text-2);
+    border-left: 3px solid var(--amber); padding-left: 20px; margin-bottom: 34px;
+  }
+  #s3 .def b { color: var(--text); font-weight: 500; }
+  .harnessbox {
+    border: 1.5px dashed var(--amber-dim); border-radius: 12px;
+    padding: 44px 36px; position: relative;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .harnessbox .tag {
+    position: absolute; top: -11px; left: 22px;
+    background: var(--bg); padding: 0 10px;
+    font-family: var(--mono); font-size: 14px; color: var(--amber);
+    letter-spacing: .1em;
+  }
+  .harnessbox .model {
+    border: 1px solid var(--border); background: var(--panel);
+    border-radius: 8px; padding: 22px 40px;
+    font-family: var(--mono); font-size: 20px; color: var(--text);
+  }
+  .harnessbox .lab {
+    position: absolute; font-family: var(--mono); font-size: 14px; color: var(--muted);
+  }
+  .harnessbox .l1 { top: 16px; right: 24px; }
+  .harnessbox .l2 { bottom: 14px; left: 24px; }
+  .harnessbox .l3 { bottom: 14px; right: 24px; }
+  .harnessbox .l4 { top: 16px; left: 50%; transform: translateX(-50%); }
+
+  /* ---------- slide 4 ---------- */
+  #s4 .stairs { display: flex; align-items: flex-end; gap: 4px; flex: 1; padding: 10px 0 26px; }
+  #s4 .step {
+    flex: 1; border: 1px solid var(--border);
+    border-bottom: none;
+    background: linear-gradient(180deg, var(--panel), rgba(23,24,29,0));
+    border-radius: 10px 10px 0 0;
+    padding: 24px 26px 0;
+  }
+  #s4 .step .n { font-family: var(--mono); font-size: 15px; color: var(--amber); margin-bottom: 8px; }
+  #s4 .step h3 { font-size: 26px; font-weight: 700; margin-bottom: 8px; }
+  #s4 .step p { font-size: 19px; color: var(--text-2); line-height: 1.45; }
+  #s4 .step.h0 { height: 46%; }
+  #s4 .step.h1 { height: 68%; }
+  #s4 .step.h2 { height: 90%; }
+  #s4 .maxim {
+    text-align: center; font-size: 25px; color: var(--text);
+    border-top: 1px solid var(--border-soft); padding-top: 22px;
+  }
+  #s4 .maxim b { color: var(--amber); font-weight: 700; }
+
+  /* ---------- slide 5 ---------- */
+  #s5 .filegrid { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+  #s5 pre { font-size: 15px; }
+  #s5 .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 36px; }
+  #s5 .foot {
+    margin-top: 18px; font-size: 16.5px; color: var(--muted); line-height: 1.5;
+  }
+
+  /* ---------- slide 6 ---------- */
+  #s6 .cols { display: grid; grid-template-columns: .95fr 1.05fr; gap: 46px; flex: 1; align-items: start; }
+  #s6 pre { font-size: 17px; }
+  #s6 ul.points li { font-size: 23px; }
+
+  /* ---------- slide 7 ---------- */
+  #s7 { padding-right: 64px; }
+  #s7 .wrap { display: grid; grid-template-columns: 1fr 236px; gap: 40px; flex: 1; }
+  #s7 .lede { font-size: 24px; color: var(--text-2); margin-bottom: 24px; }
+  #s7 .lede b { color: var(--text); font-weight: 700; }
+  .reason { display: flex; gap: 18px; margin-bottom: 18px; align-items: baseline; }
+  .reason .no { font-family: var(--mono); font-size: 22px; color: var(--amber); flex: none; width: 26px; }
+  .reason p { font-size: 23px; line-height: 1.42; }
+  .reason p .sub { color: var(--text-2); }
+  #s7 .caveat { font-size: 17px; color: var(--muted); margin: 6px 0 0 44px; line-height: 1.5; }
+  #s7 .maximline {
+    margin: 20px 0 0 44px; font-size: 18px; color: var(--amber-dim); font-style: italic;
+  }
+  .events {
+    border-left: 1px solid var(--border-soft);
+    padding-left: 22px;
+    font-family: var(--mono); font-size: 13.5px; line-height: 2.05;
+    color: var(--muted);
+  }
+  .events .cap { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 10px; color: var(--muted); }
+  .events .ev.hot { color: var(--amber); }
+  #s7 .loop {
+    margin-top: 18px;
+    display: flex; align-items: center; gap: 0;
+    font-family: var(--mono); font-size: 15px; color: var(--text-2);
+  }
+  #s7 .loop .node {
+    border: 1px solid var(--border); border-radius: 7px;
+    padding: 8px 16px; background: var(--panel); flex: none;
+  }
+  #s7 .loop .arrow { color: var(--muted); padding: 0 10px; flex: none; }
+  #s7 .loop .gate { color: var(--amber); font-size: 13px; padding: 0 6px; flex: none; text-align: center; line-height: 1.3; }
+
+  /* ---------- slide 8 ---------- */
+  #s8 h1 { margin-bottom: 22px; }
+  #s8 .griddy { display: grid; grid-template-columns: 1.04fr .96fr; gap: 20px; }
+  #s8 pre { font-size: 14.5px; line-height: 1.5; padding: 12px 16px; }
+  #s8 .out {
+    margin-top: 18px;
+    border: 1px solid var(--amber-dim);
+    background: #16120a;
+    border-radius: 9px;
+    padding: 16px 22px;
+    font-family: var(--mono); font-size: 20px; color: var(--amber);
+  }
+  #s8 .out .pfx { color: var(--red); }
+  #s8 .mini { margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }
+  #s8 .mini h4 { font-size: 14px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); margin-bottom: 7px; font-family: var(--mono); font-weight: 400; }
+  #s8 .mini p { font-size: 16.5px; color: var(--text-2); line-height: 1.45; }
+  #s8 .debugfoot {
+    margin-top: 14px; font-family: var(--mono); font-size: 12.5px; color: var(--muted);
+  }
+
+  /* ---------- slide 9 ---------- */
+  #s9 .cols { display: grid; grid-template-columns: .92fr 1.08fr; gap: 44px; flex: 1; align-items: start; }
+  #s9 .hook { margin-bottom: 24px; }
+  #s9 .hook .hn { font-family: var(--mono); font-size: 19px; color: var(--text); margin-bottom: 6px; }
+  #s9 .hook p { font-size: 19px; color: var(--text-2); line-height: 1.5; }
+  #s9 .badge {
+    display: inline-block; font-family: var(--mono); font-size: 12.5px;
+    color: var(--amber); border: 1px solid var(--amber-dim);
+    border-radius: 999px; padding: 3px 12px; letter-spacing: .08em;
+  }
+  #s9 pre { font-size: 15px; }
+  #s9 .reuse { margin-top: 18px; font-size: 18px; color: var(--text-2); line-height: 1.55; }
+  #s9 .cmdline {
+    margin: 10px 0 8px;
+    font-family: var(--mono); font-size: 14px;
+    background: var(--panel); border: 1px solid var(--border-soft);
+    border-radius: 7px; padding: 10px 14px; color: var(--text);
+    white-space: nowrap;
+  }
+
+  /* ---------- slide 10 ---------- */
+  #s10 .mid { margin: auto 0; }
+  #s10 .diagram {
+    display: flex; align-items: center; justify-content: center; gap: 26px;
+    margin: 0 0 38px;
+    font-family: var(--mono); font-size: 18px;
+  }
+  #s10 .diagram .side { color: var(--amber); }
+  #s10 .diagram .agent {
+    border: 1px solid var(--border); background: var(--panel);
+    border-radius: 9px; padding: 14px 30px; color: var(--text); font-size: 19px;
+  }
+  #s10 .diagram .arr { color: var(--muted); font-size: 24px; }
+  #s10 .gs { display: grid; grid-template-columns: 1fr 1fr; gap: 34px; }
+  #s10 .gcard { border: 1px solid var(--border-soft); border-radius: 10px; padding: 22px 26px; background: var(--panel); }
+  #s10 .gcard h3 { font-size: 22px; margin-bottom: 8px; }
+  #s10 .gcard h3 .lv { font-family: var(--mono); font-size: 14px; color: var(--amber-dim); font-weight: 400; margin-left: 8px; }
+  #s10 .gcard p { font-size: 19px; color: var(--text-2); line-height: 1.5; }
+  #s10 .landing { margin-top: 30px; text-align: center; font-size: 24px; color: var(--text); }
+
+  /* ---------- slide 11 ---------- */
+  #s11 { justify-content: center; }
+  #s11 .paths { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 30px; }
+  #s11 .paths code {
+    font-family: var(--mono); font-size: 19px;
+    background: var(--panel); border: 1px solid var(--border-soft);
+    padding: 8px 16px; border-radius: 7px; color: var(--text);
+  }
+  #s11 .line { font-size: 24px; color: var(--text); margin-bottom: 16px; }
+  #s11 .std { font-size: 17px; color: var(--muted); margin-bottom: 44px; font-family: var(--mono); }
+  #s11 .eq { font-family: var(--mono); font-size: 34px; color: var(--amber); margin-bottom: 44px; }
+  #s11 .q { font-size: 44px; font-weight: 700; }
+
+  /* ---------- notes panel ---------- */
+  #notes {
+    position: fixed; left: 0; right: 0; bottom: 0;
+    background: rgba(11,12,15,.94);
+    border-top: 1px solid var(--border);
+    padding: 18px 32px 22px;
+    font-family: var(--mono); font-size: 15px; line-height: 1.6;
+    color: var(--text-2);
+    max-height: 40vh; overflow-y: auto;
+    display: none; z-index: 100;
+  }
+  #notes.open { display: block; }
+  #notes .nhead { color: var(--amber); margin-bottom: 8px; font-size: 13px; letter-spacing: .1em; }
+  aside.notes { display: none; }
+
+  @media print {
+    body { overflow: visible; }
+    #viewport { position: static; display: block; }
+    #stage { width: auto; height: auto; transform: none !important; }
+    section.slide { position: relative; opacity: 1; transform: none; page-break-after: always; height: 720px; width: 1280px; }
+    #notes, #pagenum, #progress { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<div id="viewport">
+  <div id="stage">
+
+    <!-- 1 ------------------------------------------------------------ -->
+    <section class="slide" id="s1">
+      <div class="equation">agent <span class="op">=</span> modell <span class="op">+</span> <span class="h">harness</span></div>
+      <div class="credit">&#171;Agent = Model + Harness&#187; &#8212; LangChain</div>
+      <aside class="notes" data-time="~20 sek" data-cue="Hei. Ti minutter. Den mest undervurderte delen: harness. Hele presentasjonen er denne ene linja.">Hei. Jeg skal bruke ti minutter på den mest undervurderte delen av å utvikle med AI: harnessen. Hele presentasjonen er egentlig denne ene linja i praksis.</aside>
+    </section>
+
+    <!-- 2 ------------------------------------------------------------ -->
+    <section class="slide" id="s2">
+      <h1>Samme modell. <span class="thin">Helt forskjellig resultat.</span></h1>
+      <div class="twocol">
+        <div class="obs bad">
+          <span class="lbl">mandag</span>
+          Kjørte testene med feil kommando, la koden i feil mappe, fant opp et mønster vi sluttet med i fjor
+        </div>
+        <div class="obs good">
+          <span class="lbl">tirsdag</span>
+          Kjørte riktig testkommando, la filen i riktig mappe, stoppet før force push
+        </div>
+      </div>
+      <div class="landing">Samme modell.</div>
+      <aside class="notes" data-time="~35 sek" data-cue="Mandag: feil kommando, feil mappe, gammelt mønster. Tirsdag: alt riktig, stoppet force push. Ikke modellen. Alt rundt den.">Typisk situasjon: du ber agenten fikse noe, og den kjører testene med feil kommando, legger filer i feil mappe, og finner opp et mønster dere gikk bort fra i fjor. Andre dager gjør samme modell alt riktig, og stopper til og med seg selv før en force push. Forskjellen ligger ikke i modellen. Den ligger i alt rundt den.</aside>
+    </section>
+
+    <!-- 3 ------------------------------------------------------------ -->
+    <section class="slide" id="s3">
+      <h1>Harness: <span class="thin">alt som ikke er modellen</span></h1>
+      <div class="cols">
+        <div>
+          <div class="def">harness <b>=</b> system prompt <b>+</b> tools <b>+</b> context <b>+</b> regler <b>+</b> feedback loops</div>
+          <ul class="points">
+            <li>Copilot CLI <b>er</b> en harness: agent loop, tools, filsystem</li>
+            <li>Men: den er generisk. <span class="grey">Den kjenner ikke repoet deres.</span></li>
+          </ul>
+        </div>
+        <div class="harnessbox">
+          <span class="tag">harness</span>
+          <span class="lab l4">tools</span>
+          <span class="lab l1">context</span>
+          <span class="lab l2">regler</span>
+          <span class="lab l3">feedback</span>
+          <div class="model">modell</div>
+        </div>
+      </div>
+      <aside class="notes" data-time="~45 sek" data-cue="Harness: alt som ikke er modellen. Copilot CLI er en harness, men generisk. Motoren leier vi. Resten av bilen er vår.">Det rundt har et navn: harness. Alt som ikke er modellen. System-prompten, tools, tilgang til filsystem og terminal, context management, regler, feedback loops. Copilot CLI er i seg selv en harness: den tar en rå modell og gir den en agent loop, tools og et sted å jobbe. Men den er generisk. Den vet ingenting om akkurat vårt repo, våre konvensjoner, vår deploy. Modellen er motoren, harnessen er resten av bilen. Motoren får vi ikke gjort noe med, den leier vi. Resten av bilen er vår.</aside>
+    </section>
+
+    <!-- 4 ------------------------------------------------------------ -->
+    <section class="slide" id="s4">
+      <h1>Tre nivåer</h1>
+      <div class="stairs">
+        <div class="step h0">
+          <div class="n">NIVÅ 0</div>
+          <h3>Out of the box</h3>
+          <p>Der vi står allerede</p>
+        </div>
+        <div class="step h1">
+          <div class="n">NIVÅ 1</div>
+          <h3>Prose</h3>
+          <p>Du <em>forteller</em> agenten ting: instructions, skills</p>
+        </div>
+        <div class="step h2">
+          <div class="n">NIVÅ 2</div>
+          <h3>Programmatisk</h3>
+          <p>Du <em>garanterer</em> ting: hooks</p>
+        </div>
+      </div>
+      <div class="maxim">Prose er <b>forslag</b>. Kode er <b>garantier</b>.</div>
+      <aside class="notes" data-time="~35 sek" data-cue="Tre nivåer. Null: out of the box. Én: prose, fortelle. To: kode, garantere. Prose er forslag, kode er garantier.">Harnessen kan vi bygge på, og jeg tenker på det som tre nivåer. Nivå null står vi allerede på: CLI-en rett ut av boksen, den forrige sliden. Nivå én er prose: du skriver tekst som styrer agenten, altså instructions og skills. Nivå to er programmatisk: du skriver kode som håndhever ting, hooks. Forskjellen mellom dem er den som betyr noe: prose er forslag, kode er garantier.</aside>
+    </section>
+
+    <!-- 5 ------------------------------------------------------------ -->
+    <section class="slide" id="s5">
+      <div class="ministairs"><div class="st"></div><div class="st on"></div><div class="st"></div></div>
+      <div class="kicker">Nivå 1 · Prose</div>
+      <h1>AGENTS.md: <span class="thin">alltid i kontekst</span></h1>
+      <div class="filegrid">
+        <div class="card">
+          <div class="bar"><span class="dot"></span><span class="name">AGENTS.md</span></div>
+          <pre class="cols2"><div><span class="tk">## Kommandoer</span>
+- Test:      pnpm test        <span class="tc">(én fil: pnpm test -- path)</span>
+- Lint:      pnpm lint --fix
+- Typecheck: pnpm typecheck  <span class="tc"># før du sier deg ferdig</span>
+
+<span class="tk">## Struktur</span>
+- apps/web    Next.js-frontend
+- packages/ui Delte komponenter, aldri uten review
+- infra/      Terraform. Ikke rør uoppfordret.</div><div><span class="tk">## Konvensjoner</span>
+- Ingen default-eksporter
+- Feil: Result-typen i core/result.ts, ikke throw
+- Nye endepunkter trenger test i samme PR
+
+<span class="tk">## Ikke gjør</span>
+- Ikke commit til main
+- Ikke oppgrader avhengigheter som sidefeature</div></pre>
+        </div>
+        <p class="foot">Leses automatisk hver session, fra git root og cwd &#183; path-spesifikke regler: <span class="mono">.github/instructions/*.instructions.md</span> med <span class="mono">applyTo</span>-glob &#183; leser også <span class="mono">CLAUDE.md</span></p>
+      </div>
+      <aside class="notes" data-time="~55 sek" data-cue="AGENTS.md i rota, leses hver session. Alt du sier til nye utviklere. Path-spesifikke regler finnes. Leser også CLAUDE.md. Ti minutters jobb, best ROI.">Nivå én, laveste terskel: en markdown-fil i roten av repoet. AGENTS.md. Copilot CLI leser den automatisk i hver session. Der skriver dere det dere ellers må si til hver nye utvikler: hvordan kjøre testene, hvor ting ligger, hvilke mønstre dere bruker, hva man ikke skal røre. Omtrent som denne. Trenger dere mer presisjon finnes path-spesifikke instructions, egne regler som bare gjelder for eksempel frontend-koden. Og en fin detalj: Copilot leser også CLAUDE.md, så har dere en fra før, gjelder den allerede. Dette er ti minutters jobb, og sannsynligvis den beste ROI-en i hele denne presentasjonen.</aside>
+    </section>
+
+    <!-- 6 ------------------------------------------------------------ -->
+    <section class="slide" id="s6">
+      <div class="ministairs"><div class="st"></div><div class="st on"></div><div class="st"></div></div>
+      <div class="kicker">Nivå 1 · Prose</div>
+      <h1>Skills: <span class="thin">kunnskap on demand</span></h1>
+      <div class="cols">
+        <div class="card">
+          <div class="bar"><span class="dot"></span><span class="name">.github/skills/deploy/SKILL.md</span></div>
+          <pre><span class="tc">---</span>
+<span class="tk">name:</span> deploy
+<span class="tk">description:</span> <span class="ts">Slik deployer vi. Bruk ved
+  release, rollback eller feilsøk av pipeline.</span>
+<span class="tc">---</span></pre>
+        </div>
+        <ul class="points">
+          <li>Instructions er alltid med &#8594; tar plass i context. <b>Skills lastes når de er relevante.</b></li>
+          <li>Agenten ser bare navn + description, henter resten ved behov</li>
+          <li>Interop: leser også <code class="inline">.claude/skills/</code></li>
+          <li class="grey">Samme gate: custom agents (<span class="mono">.agent.md</span>, subagent med eget context window og begrensede tools)</li>
+        </ul>
+      </div>
+      <aside class="notes" data-time="~60 sek" data-cue="Instructions er alltid med, koster context. Skills lastes on demand: bare navn og beskrivelse. Eksempler: deploy, internrammeverk, migrasjon. Pluss custom agents: security-reviewer.">Men instructions har en kostnad: de er alltid med, i hver eneste prompt. Context window er begrenset, og alt dere dytter inn der konkurrerer om modellens oppmerksomhet. Ting den ikke trenger akkurat nå er støy. Skills løser det. En skill er en mappe med en SKILL.md, pluss eventuelt scripts og ressurser. Agenten ser bare navnet og beskrivelsen, og laster resten først når det er relevant for oppgaven. Kunnskap on demand. Typiske skills: deploy-rutinen deres, konvensjoner for internrammeverket, hvordan skrive en migrasjon. I samme gate finner dere custom agents: spesialiserte agenter med et avgrenset oppdrag og egne rettigheter, som en security-reviewer dere kaller på ved behov.</aside>
+    </section>
+
+    <!-- 7 ------------------------------------------------------------ -->
+    <section class="slide" id="s7">
+      <div class="ministairs" style="right:64px"><div class="st"></div><div class="st"></div><div class="st on"></div></div>
+      <div class="kicker">Nivå 2 · Programmatisk</div>
+      <h1>Hvorfor hooks, <span class="thin">og ikke bare prose?</span></h1>
+      <div class="wrap">
+        <div>
+          <p class="lede">&#171;Ikke push til main&#187; i markdown er et <b>ønske</b>, ikke en regel.</p>
+          <div class="reason"><span class="no">1</span><p>Prose drukner: <span class="sub">jo lengre session, jo dårligere etterlevelse</span></p></div>
+          <div class="reason"><span class="no">2</span><p>Prose koster context. Hooks koster null: <span class="sub">de kjører utenfor modellen, hver gang</span></p></div>
+          <div class="reason"><span class="no">3</span><p>Guardrails må være garantier</p></div>
+          <p class="caveat">Forbehold: krasjer hooken &#8594; kallet blokkeres (fail-closed). Timer den ut &#8594; slipper gjennom. Sett timeout, hold den rask.</p>
+          <p class="maximline">Prose er kultur, hooks er lovverk.</p>
+          <div class="loop">
+            <span class="node">prompt</span><span class="arrow">&#8594;</span>
+            <span class="gate">preToolUse<br>allow/deny/ask</span><span class="arrow">&#8594;</span>
+            <span class="node">tool call</span><span class="arrow">&#8594;</span>
+            <span class="gate">postToolUse</span><span class="arrow">&#8594;</span>
+            <span class="node">resultat</span><span class="arrow">&#8594;</span>
+            <span class="node">svar</span>
+          </div>
+        </div>
+        <div class="events">
+          <div class="cap">events · v1.0.80</div>
+          <div class="ev">sessionStart</div>
+          <div class="ev">sessionEnd</div>
+          <div class="ev">userPromptSubmitted</div>
+          <div class="ev">userPromptTransformed</div>
+          <div class="ev">postResult</div>
+          <div class="ev hot">preToolUse</div>
+          <div class="ev">postToolUse</div>
+          <div class="ev">postToolUseFailure</div>
+          <div class="ev">preMcpToolCall</div>
+          <div class="ev">errorOccurred</div>
+          <div class="ev">agentStop</div>
+          <div class="ev">subagentStop</div>
+          <div class="ev">subagentStart</div>
+          <div class="ev">preCompact</div>
+          <div class="ev">permissionRequest</div>
+        </div>
+      </div>
+      <aside class="notes" data-time="~1 min 15 sek" data-cue="Tre grunner. Én: prose drukner i lange sessions. To: prose koster context, hooks koster null. 35 millisekunder. Tre: garantier, ikke 99 prosent. Krasj blokkerer, timeout slipper gjennom. Pre tool use: allow, deny, ask. Prose for skjønn, kode for aldri.">Alt til nå har vært prose, og prose har tre begrensninger. Én: modellen er probabilistisk, og i lange sessions begynner den å glemme regler. Jo mer context, jo lettere drukner de. To: prose koster context, det var derfor skills lastes on demand. En hook koster null context: den kjører utenfor modellen og fyrer hver gang, uansett hvor lang sessionen er blitt. Og den er billig, målt til rundt 35 millisekunder for en enkel hook. Tre: noen ting skal ikke være sannsynlige. For farlige kommandoer holder det ikke med 99 prosent etterlevelse. Siden dette er kode, hører feilmodusen med: krasjer hooken, blokkeres kallet. Timer den ut, slipper det gjennom. Så sett en timeout, og hold den rask. Mekanikken er enkel: en hook kjører på events i agent-loopen, og den viktigste er preToolUse. Den ser hvert tool call før det kjører, og svarer allow, deny eller ask. Tommelfingerregelen min: prose for det som krever skjønn, kode for det som aldri skal skje.</aside>
+    </section>
+
+    <!-- 8 ------------------------------------------------------------ -->
+    <section class="slide" id="s8">
+      <div class="ministairs"><div class="st"></div><div class="st"></div><div class="st on"></div></div>
+      <div class="kicker">Nivå 2 · Programmatisk</div>
+      <h1>Hooks i praksis <span class="thin" style="font-size:26px">(testet på versjonen vi kjører)</span></h1>
+      <div class="griddy">
+        <div class="card">
+          <div class="bar"><span class="dot"></span><span class="name">~/.copilot/hooks/guard.json</span></div>
+          <pre>{
+  <span class="tk">"version"</span>: 1,
+  <span class="tk">"hooks"</span>: {
+    <span class="tk">"preToolUse"</span>: [
+      { <span class="tk">"hooks"</span>: [ {
+        <span class="tk">"type"</span>: <span class="ts">"command"</span>,
+        <span class="tk">"command"</span>: <span class="ts">"bash ~/.copilot/hooks/guard.sh"</span>,
+        <span class="tk">"timeoutSec"</span>: 5
+      } ] }
+    ]
+  }
+}</pre>
+        </div>
+        <div class="card">
+          <div class="bar"><span class="dot"></span><span class="name">guard.sh</span></div>
+          <pre><span class="tc">#!/bin/bash</span>
+IN=$(cat)
+<span class="tk">if</span> echo "$IN" | grep -q <span class="ts">'rm -rf'</span>; <span class="tk">then</span>
+  echo <span class="ts">'{"permissionDecision":"deny",
+    "permissionDecisionReason":
+      "rm -rf er ikke lov her."}'</span>
+<span class="tk">fi</span>
+<span class="tk">exit</span> 0</pre>
+        </div>
+      </div>
+      <div class="out"><span class="pfx">Denied by preToolUse hook:</span> rm -rf er ikke lov her.</div>
+      <div class="mini">
+        <div>
+          <h4>Typisk bruk</h4>
+          <p>Guardrails med deny (<span class="mono">rm -rf</span>, <span class="mono">git push --force</span>, prod-credentials) &#183; formatter/tester etter edit &#183; context inn ved sessionStart</p>
+        </div>
+        <div>
+          <h4>Sikkerhet</h4>
+          <p>Repo-hooks kjører først når mappa er <b>trusted</b> &#183; enterprise-policyer i <span class="mono">policy.d</span> kan ikke skrus av &#183; <span class="mono">disableAllHooks</span> finnes</p>
+        </div>
+      </div>
+      <p class="debugfoot">debug: /env viser lastede hooks &#183; stdout &#8594; ~/.copilot/logs/ &#183; lastes ved session-start &#183; Windows: egne bash- og powershell-nøkler</p>
+      <aside class="notes" data-time="~1 min 10 sek" data-cue="Testet på vår versjon. JSON peker på seks linjer bash. Pek på outputen: denied. Mer enn guardrails: formatter, tester, session start. Trusted repo. Policy sentralt på enterprise.">Sånn ser det ut i praksis, og dette er testet på versjonen vi faktisk kjører. Én JSON-fil som sier: før hvert tool call, kjør dette scriptet, fem sekunders timeout. Og scriptet er seks linjer bash: les input, sjekk etter rm minus rf, svar deny med en begrunnelse. Det er alt. Nederst ser dere hva som skjer når agenten prøver seg: den får beskjed, med begrunnelsen vår. Samme mekanikk brukes til mer enn guardrails: kjør formatter og tester etter hver edit, eller injecter git status ved session start så agenten starter orientert. Og to ting til de sikkerhetsbevisste: repo-hooks kjører først når mappa er trusted, så et fremmed repo dere kloner får ikke kjøre shell hos dere automatisk. Og på enterprise kan policyer legges sentralt, de kan ikke skrus av av brukeren.</aside>
+    </section>
+
+    <!-- 9 ------------------------------------------------------------ -->
+    <section class="slide" id="s9">
+      <div class="ministairs"><div class="st"></div><div class="st"></div><div class="st on"></div></div>
+      <div class="kicker">Nivå 2 · Programmatisk</div>
+      <h1>Fra min egen verktøykasse</h1>
+      <div class="cols">
+        <div>
+          <div class="hook">
+            <div class="hn">tiering-guard.sh</div>
+            <p>Denier subagent-kall uten eksplisitt modellvalg. Deny-meldingen inneholder regelen &#8594; agenten leser den, retter seg og prøver igjen.</p>
+          </div>
+          <div class="hook">
+            <div class="hn">context-budget-advisor.sh</div>
+            <p>Leser context-forbruket ved hver stopp, ber agenten runde av eller ta handoff ved 50&nbsp;% og 75&nbsp;% av vinduet.</p>
+          </div>
+          <p class="reuse">Gjenbruk i Copilot:</p>
+          <div class="cmdline">"command": "bash ~/.claude/hooks/tiering-guard.sh"</div>
+          <p class="reuse" style="margin-top:0"><span class="dim">Scriptet er det samme; feltnavnene inn/ut må matche verktøyet.</span></p>
+        </div>
+        <div>
+          <div class="card">
+            <div class="bar"><span class="dot"></span><span class="name">tiering-guard.sh &#183; utdrag</span><span style="margin-left:auto"><span class="badge">Claude Code-format</span></span></div>
+            <pre>deny() {
+  jq -n --arg r <span class="ts">"$1"</span> <span class="ts">'{hookSpecificOutput:
+    {hookEventName:"PreToolUse",
+     permissionDecision:"deny",
+     permissionDecisionReason:$r}}'</span>
+  <span class="tk">exit</span> 0
+}
+model=$(printf <span class="ts">'%s'</span> "$input" | jq -r <span class="ts">'.tool_input.model // empty'</span>)
+[ -n "$model" ] &amp;&amp; <span class="tk">exit</span> 0
+deny <span class="ts">"no explicit model on this dispatch -- tier it and re-issue"</span></pre>
+          </div>
+        </div>
+      </div>
+      <aside class="notes" data-time="~45 sek · KUTTBAR: går tiden, dropp hele sliden (slide 10 refererer den ikke)" data-cue="Mine to. Tiering-guard: deny med regelen i meldinga, agenten retter seg selv. Budget-advisor: varsler på 50 og 75 prosent. Vanlige shell-scripts. Bare feltnavnene må matche.">To fra mitt eget oppsett, i Claude Code, samme konsept. Den første denier alle subagent-kall som ikke har valgt modell eksplisitt. Det fine er at deny-meldingen inneholder selve regelen. Agenten leser den, retter seg og prøver igjen. Ingen spør meg om noe, den oppdrar seg selv. Den andre leser context-forbruket ved hver stopp, og ber agenten runde av eller ta handoff når vi passerer 50 og 75 prosent av vinduet. Begge er vanlige shell-scripts som JSON-en peker på. Skulle jeg flytte dem til Copilot, gjenbruker jeg scriptene som de er. Det som må matche er feltnavnene inn og ut, ikke koden.</aside>
+    </section>
+
+    <!-- 10 ----------------------------------------------------------- -->
+    <section class="slide" id="s10">
+      <div class="ministairs"><div class="st on"></div><div class="st on"></div><div class="st on"></div></div>
+      <h1>Gi agenten sensorer</h1>
+      <div class="mid">
+      <div class="diagram">
+        <span class="side">guides</span><span class="arr">&#8594;</span>
+        <span class="agent">agent loop</span>
+        <span class="arr">&#8592;</span><span class="side">sensors</span>
+      </div>
+      <div class="gs">
+        <div class="gcard">
+          <h3>Guides <span class="grey" style="font-weight:400">styrer før</span><span class="lv">nivå 1</span></h3>
+          <p>Instructions, skills: øker kvaliteten på første forsøk</p>
+        </div>
+        <div class="gcard">
+          <h3>Sensors <span class="grey" style="font-weight:400">fanger opp etter</span><span class="lv">nivå 2</span></h3>
+          <p>Tester, lint, typecheck via hooks: agenten retter seg selv</p>
+        </div>
+      </div>
+      <div class="landing">Dårlig output er ofte en manglende sensor.</div>
+      </div>
+      <aside class="notes" data-time="~50 sek" data-cue="Feedback loops, fra definisjonen i starten. Tester, lint, typecheck er øynene. Guides før: prose. Sensors etter: hooks. Dårlig output er ofte en manglende sensor.">Helt i starten definerte vi harness med feedback loops på lista. Det er den siste brikken. En agent er bare så god som feedbacken den får: tester, linter, typecheck, build-output er øynene dens. Uten dem gjetter den, med dem retter den seg selv. Birgitta Böckeler hos Thoughtworks kaller det guides og sensors, og det mapper rett på trappa vår. Guides styrer agenten før den handler: instructions og skills, prose-nivået. Sensors fanger opp feil etterpå: for eksempel hooks som kjører testene og dytter resultatet tilbake. Neste gang agenten leverer noe dårlig, sjekk om den hadde mulighet til å oppdage feilen selv. Som regel hadde den ikke det. Da er det ikke modellen det står på, det er en sensor som mangler.</aside>
+    </section>
+
+    <!-- 11 ----------------------------------------------------------- -->
+    <section class="slide" id="s11">
+      <h1>Oppsummert</h1>
+      <div class="paths">
+        <code>AGENTS.md</code>
+        <code>.github/skills/</code>
+        <code>.github/agents/</code>
+        <code>.github/hooks/</code>
+      </div>
+      <p class="line">Versjonert, PR-bart, delt: én person bygger, alle får nytte.</p>
+      <p class="std">Åpen standard, aug 2026: Agent Plugins 1.0 &#183; AWS &#183; Anysphere &#183; Microsoft &#183; OpenAI &#183; Vercel</p>
+      <div class="eq">agent = modell + <span style="color:var(--amber)">harness</span></div>
+      <div class="q">Spørsmål?</div>
+      <aside class="notes" data-time="~35 sek + Q&amp;A" data-cue="Alt er filer i repoet. Én bygger, alle får nytte. Åpen standard i august. Modellene blir bedre av seg selv, harnessen bare hvis noen bygger den. Spørsmål.">For å samle det: alt dere har sett er filer i repoet. En markdown-fil, en mappe med skills, en JSON med hooks. De versjoneres og deles som all annen kode, så én person bygger og alle får nytte. Og formatet ble i august en åpen standard, så det dere lager flytter med dere på tvers av verktøy. Modellene blir bedre av seg selv, det ordner andre. Harnessen blir bare bedre hvis noen bygger den. Det var det jeg hadde. Spørsmål?</aside>
+    </section>
+
+  </div>
+</div>
+
+<div id="pagenum"></div>
+<div id="progress"></div>
+<div id="notes"><div class="nhead"></div><div class="nbody"></div></div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('section.slide'));
+  var stage = document.getElementById('stage');
+  var pagenum = document.getElementById('pagenum');
+  var progress = document.getElementById('progress');
+  var notes = document.getElementById('notes');
+  var nhead = notes.querySelector('.nhead');
+  var nbody = notes.querySelector('.nbody');
+  var idx = 0;
+
+  function clamp(n) { return Math.max(0, Math.min(slides.length - 1, n)); }
+
+  function render() {
+    slides.forEach(function (s, i) { s.classList.toggle('active', i === idx); });
+    pagenum.textContent = (idx + 1) + ' / ' + slides.length;
+    progress.style.width = ((idx) / (slides.length - 1) * 100) + '%';
+    if (location.hash !== '#' + (idx + 1)) {
+      history.replaceState(null, '', '#' + (idx + 1));
+    }
+    var aside = slides[idx].querySelector('aside.notes');
+    if (aside) {
+      nhead.textContent = 'SLIDE ' + (idx + 1) + ' · ' + (aside.getAttribute('data-time') || '');
+      nbody.textContent = aside.textContent;
+    } else {
+      nhead.textContent = 'SLIDE ' + (idx + 1);
+      nbody.textContent = '';
+    }
+  }
+
+  function go(n) {
+    var next = clamp(n);
+    if (next !== idx) speakStop();
+    idx = next; render();
+  }
+
+  /* ---- tale (T): les notatene for gjeldende slide høyt ---- */
+  var speaking = false;
+  var voiceNb = null;
+  function pickVoice() {
+    try {
+      var vs = speechSynthesis.getVoices();
+      voiceNb = null;
+      for (var i = 0; i < vs.length; i++) {
+        if (/^(nb|nn|no)([-_]|$)/i.test(vs[i].lang)) { voiceNb = vs[i]; break; }
+      }
+    } catch (e) {}
+  }
+  if ('speechSynthesis' in window) {
+    pickVoice();
+    speechSynthesis.onvoiceschanged = pickVoice;
+  }
+  function speakStop() {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();
+    speaking = false;
+    pagenum.classList.remove('speaking');
+  }
+  function speakNotes() {
+    if (!('speechSynthesis' in window)) return;
+    if (speaking) { speakStop(); return; }
+    var aside = slides[idx].querySelector('aside.notes');
+    if (!aside) return;
+    var text = (aside.getAttribute('data-cue') || aside.textContent).replace(/\s+/g, ' ').trim();
+    if (!text) return;
+    speechSynthesis.cancel();
+    // setningsvis kø: gjør stopp responsiv og unngår Chrome-kutt på lange utterances
+    var parts = text.match(/[^.!?]+[.!?]+\s*/g) || [text];
+    speaking = true;
+    pagenum.classList.add('speaking');
+    parts.forEach(function (p, i) {
+      var u = new SpeechSynthesisUtterance(p.trim());
+      u.lang = 'nb-NO';
+      if (voiceNb) u.voice = voiceNb;
+      u.rate = 1.25;
+      if (i === parts.length - 1) {
+        u.onend = function () { speaking = false; pagenum.classList.remove('speaking'); };
+      }
+      speechSynthesis.speak(u);
+    });
+  }
+
+  function fit() {
+    var scale = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    stage.style.transform = 'scale(' + scale + ')';
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    switch (e.key) {
+      case 'ArrowRight': case 'ArrowDown': case ' ': case 'PageDown':
+        e.preventDefault(); go(idx + 1); break;
+      case 'ArrowLeft': case 'ArrowUp': case 'PageUp':
+        e.preventDefault(); go(idx - 1); break;
+      case 'Home': e.preventDefault(); go(0); break;
+      case 'End': e.preventDefault(); go(slides.length - 1); break;
+      case 'f': case 'F':
+        if (document.fullscreenElement) { document.exitFullscreen(); }
+        else { document.documentElement.requestFullscreen(); }
+        break;
+      case 'n': case 'N':
+        notes.classList.toggle('open'); break;
+      case 't': case 'T':
+        speakNotes(); break;
+      case 'Escape':
+        speakStop(); break;
+    }
+  });
+
+  // click zones: outer 12% edges = prev/next
+  document.addEventListener('click', function (e) {
+    if (notes.contains(e.target)) return;
+    var x = e.clientX / window.innerWidth;
+    if (x > 0.88) go(idx + 1);
+    else if (x < 0.12) go(idx - 1);
+  });
+
+  window.addEventListener('hashchange', function () {
+    var n = parseInt(location.hash.slice(1), 10);
+    if (!isNaN(n)) go(n - 1);
+  });
+  window.addEventListener('resize', fit);
+
+  var start = parseInt((location.hash || '').slice(1), 10);
+  if (!isNaN(start)) idx = clamp(start - 1);
+  fit();
+  render();
+})();
+</script>
+</body>
+</html>
