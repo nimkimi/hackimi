@@ -93,7 +93,7 @@ describe('About page (/about)', () => {
     const About = (await import('@/app/about/page')).default;
     render(<About />);
 
-    // Some skills (e.g. "Astro.js", "Kotlin") also appear as experience tech
+    // Some skills (e.g. "Astro", "Kotlin") also appear as experience tech
     // tags elsewhere on the page, so the same label can occur more than once.
     for (const skill of about.skills.technical) {
       expect(screen.getAllByText(skill).length).toBeGreaterThan(0);

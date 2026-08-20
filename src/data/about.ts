@@ -54,7 +54,7 @@ const about: AboutData = {
       details: [
         'I work in Team Min side, a cross-functional platform team behind the microfrontends and notifications on nav.no.',
         'I maintain and develop the shared products Utbetalinger (Payments) and Dokumenter (Documents) for logged-in users.',
-        'Technologies: Astro.js, TypeScript, Kotlin, Kafka',
+        'Technologies: Astro, TypeScript, Kotlin, Kafka',
       ],
     },
     {
