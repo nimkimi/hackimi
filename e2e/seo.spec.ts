@@ -68,6 +68,12 @@ test.describe('structured data', () => {
     expect((await ldTypes(page)).sort()).toEqual(['BreadcrumbList', 'Person', 'WebSite']);
   });
 
+  test('an unknown route serves the on-brand 404 with a real 404 status', async ({ page }) => {
+    const response = await page.goto('/work/does-not-exist');
+    expect(response?.status()).toBe(404);
+    await expect(page.getByRole('heading', { name: 'This page doesn’t exist.' })).toBeVisible();
+  });
+
   test('the removed be-my-guide case 308s to /work instead of 404ing', async ({ page }) => {
     const resp = await page.request.get('/work/be-my-guide', { maxRedirects: 0 });
     expect(resp.status()).toBe(308);

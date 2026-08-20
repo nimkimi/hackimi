@@ -3,7 +3,7 @@ export const SITE_AUTHOR = 'Nima Hakimi';
 export const SITE_ROLE = 'Developer & AI Engineer';
 export const SITE_TITLE = `${SITE_AUTHOR} — ${SITE_ROLE}`;
 export const SITE_DESCRIPTION =
-  'Portfolio of Nima Hakimi, a developer and AI engineer building accessible, high-performance web applications.';
+  'Portfolio of Nima Hakimi, a developer and AI engineer building accessible, expressive interfaces for the web.';
 export const SITE_KEYWORDS = ['Nima Hakimi', 'Developer', 'AI Engineer', 'Next.js', 'React', 'Oslo'];
 export const SITE_EMAIL = 'nima@hackimi.dev';
 export const SITE_LOCATION = {

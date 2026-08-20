@@ -28,7 +28,6 @@ type AboutData = {
   education: Education[];
   skills: {
     technical: string[];
-    personal: string[];
   };
   interests: string[];
   languages: {
@@ -134,13 +133,6 @@ const about: AboutData = {
       'Java',
       'Agile teamwork',
       'WCAG',
-    ],
-    personal: [
-      'Analytical and structured',
-      'Eager and willing to learn',
-      'Programming and problem-solving',
-      'Perseverance',
-      'Humble and approachable',
     ],
   },
 

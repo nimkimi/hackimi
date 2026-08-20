@@ -15,7 +15,7 @@ export default function Home() {
         {/* Eyebrow */}
         <div className="mb-[clamp(1.25rem,4vh,2.5rem)] flex items-center gap-3">
           <span aria-hidden className="h-px w-7 bg-accent" />
-          <span className="mono-label text-accent">Frontend Developer</span>
+          <span className="mono-label text-accent">Developer &amp; AI Engineer</span>
         </div>
 
         {/* Name headline — masked reveal target lives in `data-hero-line` */}
@@ -36,10 +36,10 @@ export default function Home() {
         {/* Positioning line */}
         <Reveal delay={0.1} className="mt-[clamp(1.5rem,5vh,3rem)]">
           <p className="measure text-[clamp(1rem,2.1vw,1.3125rem)] font-medium leading-relaxed text-muted">
-            <span className="text-ink">Frontend developer</span> with a{' '}
-            <span className="text-ink">designer&rsquo;s eye</span> — I build{' '}
-            <span className="text-ink">accessible</span>, <span className="text-ink">expressive</span> interfaces for
-            the web. Currently at <span className="text-accent">NAV</span>.
+            <span className="text-ink">Developer and AI engineer</span> with a{' '}
+            <span className="text-ink">designer&rsquo;s eye</span>. I build <span className="text-ink">accessible</span>
+            , <span className="text-ink">expressive</span> interfaces for the web. Currently at{' '}
+            <span className="text-accent">NAV</span>.
           </p>
         </Reveal>
 
@@ -66,7 +66,7 @@ export default function Home() {
       {/* Selected Work */}
       <section id="work" className="scroll-mt-24 py-24">
         <Reveal>
-          <h2 className="mono-label">Selected Work</h2>
+          <h2 className="mono-label">Selected work</h2>
         </Reveal>
 
         <div className="work-list mt-2 border-t border-white/10">
@@ -87,7 +87,7 @@ export default function Home() {
       {/* Contact — big-type closing moment */}
       <section id="contact" className="scroll-mt-24 border-t border-white/10 py-24">
         <Reveal>
-          <h2 className="mono-label text-accent">Open to frontend roles</h2>
+          <h2 className="mono-label text-accent">Open to new roles</h2>
         </Reveal>
 
         <h3
@@ -101,14 +101,14 @@ export default function Home() {
 
         <Reveal delay={0.1} className="mt-[clamp(1.5rem,5vh,2.5rem)]">
           <p className="measure text-[clamp(1rem,2.1vw,1.3125rem)] leading-relaxed text-muted">
-            Looking for a frontend developer who sweats the details? I’m{' '}
-            <span className="text-ink">open to new opportunities</span> — let’s get into it.
+            I’m <span className="text-ink">open to new opportunities</span>. If what you’re building needs{' '}
+            <span className="text-ink">engineering with design taste</span>, get in touch.
           </p>
         </Reveal>
 
         <Reveal delay={0.2} className="mt-[clamp(2rem,7vh,3.5rem)]">
           <div className="flex flex-wrap items-center gap-x-8 gap-y-4">
-            <MagneticButton href="/contact">Start a conversation</MagneticButton>
+            <MagneticButton href="/contact">Get in touch</MagneticButton>
             <UnderlineLink href={`mailto:${SITE_EMAIL}`} className="text-muted">
               {SITE_EMAIL}
             </UnderlineLink>

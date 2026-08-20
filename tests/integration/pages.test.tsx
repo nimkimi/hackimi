@@ -44,11 +44,11 @@ describe('Home page (/)', () => {
     expect(heading).toHaveTextContent('Nima Hakimi');
   });
 
-  it('renders the "Selected Work" section and the first project title', async () => {
+  it('renders the "Selected work" section and the first project title', async () => {
     const Home = (await import('@/app/page')).default;
     render(<Home />);
 
-    expect(screen.getByText('Selected Work')).toBeInTheDocument();
+    expect(screen.getByText('Selected work')).toBeInTheDocument();
     // Every case from the data layer gets a WorkRow link on the home page.
     for (const c of work) {
       expect(screen.getByRole('link', { name: `View case study: ${c.title}` })).toBeInTheDocument();
@@ -69,7 +69,7 @@ describe('About page (/about)', () => {
     render(<About />);
 
     const heading = screen.getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('I’m a frontend developer');
+    expect(heading).toHaveTextContent('I’m a developer and AI engineer');
     expect(heading).toHaveTextContent('designer’s');
 
     // The intro paragraph interpolates the location from the data layer.
@@ -113,7 +113,16 @@ describe('Work list page (/work)', () => {
     render(<Work />);
 
     const heading = screen.getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('Selected Work');
+    expect(heading).toHaveTextContent('Selected work');
+  });
+
+  it('renders an on-brand 404 page with routes back in', async () => {
+    const NotFound = (await import('@/app/not-found')).default;
+    render(<NotFound />);
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('This page doesn’t exist.');
+    expect(screen.getByRole('link', { name: 'Back home' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: /all work/i })).toHaveAttribute('href', '/work');
   });
 
   it('renders one case-study link per entry in data/work', async () => {

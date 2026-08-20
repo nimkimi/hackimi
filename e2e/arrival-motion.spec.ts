@@ -88,7 +88,7 @@ test.describe('scroll reveal', () => {
 
     // Contact closing moment, well below the fold behind a Reveal.
     const contact = page.getByRole('heading', {
-      name: /open to frontend roles/i,
+      name: /open to new roles/i,
     });
     await contact.scrollIntoViewIfNeeded();
     await expect(contact).toBeVisible({ timeout: 3000 });
