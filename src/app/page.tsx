@@ -70,7 +70,8 @@ export default function Home() {
         </Reveal>
 
         <div className="work-list mt-2 border-t border-white/10">
-          {work.map((c, index) => (
+          {/* Curated cut: top three only — the full list lives on /work. */}
+          {work.slice(0, 3).map((c, index) => (
             <Reveal key={c.slug} delay={index * 0.05}>
               <WorkRow c={c} index={index} />
             </Reveal>

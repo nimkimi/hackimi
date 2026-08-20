@@ -49,10 +49,15 @@ describe('Home page (/)', () => {
     render(<Home />);
 
     expect(screen.getByText('Selected work')).toBeInTheDocument();
-    // Every case from the data layer gets a WorkRow link on the home page.
-    for (const c of work) {
+    // Home is a curated cut: the top three cases get rows, the rest live only
+    // on /work behind the "All work" link.
+    for (const c of work.slice(0, 3)) {
       expect(screen.getByRole('link', { name: `View case study: ${c.title}` })).toBeInTheDocument();
     }
+    for (const c of work.slice(3)) {
+      expect(screen.queryByRole('link', { name: `View case study: ${c.title}` })).toBeNull();
+    }
+    expect(screen.getByRole('link', { name: /all work/i })).toHaveAttribute('href', '/work');
   });
 
   it('exports absolute name-led home metadata', async () => {
