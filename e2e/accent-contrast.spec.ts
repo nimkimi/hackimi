@@ -2,7 +2,7 @@ import { test, expect, type Locator } from '@playwright/test';
 import { contrast, maxChannel, parseColorChannels } from './support/color';
 
 // Regression guard for issue #3. The dark-on-lime sites (accent buttons, the
-// nav CTA, the selected segmented-control label) used to get their dark text
+// nav CTA, the work-row "In progress" tag) used to get their dark text
 // color from `text-base` — the same utility that caused the invisible-heading
 // footgun. The fix renames the color token to `dark`, so these now use
 // `text-dark`. If a future edit drops `text-dark`, the text would fall back to
@@ -11,9 +11,8 @@ import { contrast, maxChannel, parseColorChannels } from './support/color';
 // against the lime accent it sits on.
 
 // The accent these elements sit on (`accent` in tailwind.config.ts, #C6FF3D).
-// Both targets are placed on it by design — the nav CTA via `bg-accent`, the
-// segmented label via an absolute sibling pill — so we check contrast against
-// this constant rather than walking the DOM for a background.
+// Both targets are placed on it by design via `bg-accent` — so we check
+// contrast against this constant rather than walking the DOM for a background.
 const ACCENT = [198, 255, 61];
 
 test.beforeEach(async ({ page }) => {
@@ -62,14 +61,15 @@ async function assertDarkOnLime(el: Locator, label: string) {
 // the accent-button case for that component.
 test('nav "Let\'s talk" CTA renders dark text on lime', async ({ page }) => {
   await page.goto('/');
-  await assertDarkOnLime(page.getByRole('link', { name: "Let's talk" }).first(), "nav Let's talk CTA");
+  await assertDarkOnLime(page.getByRole('link', { name: 'Let’s talk' }).first(), "nav Let's talk CTA");
 });
 
-test('selected segmented-control label renders dark text on lime', async ({ page }) => {
+// The playground's segmented control (this spec's original second target) was
+// removed 2026-08; the work list's "In progress" tag is the remaining
+// dark-on-lime pill.
+test('work-row "In progress" tag renders dark text on lime', async ({ page }) => {
   await page.goto('/');
-  // The dark color lives on the inner text span; the sibling motion span is the
-  // (aria-hidden) lime pill background.
-  const selectedLabel = page.locator('[role="radio"][aria-checked="true"] span:not([aria-hidden])');
-  await expect(selectedLabel).toHaveCount(1);
-  await assertDarkOnLime(selectedLabel, 'segmented selected label');
+  const tag = page.getByText('In progress').first();
+  await expect(tag).toBeVisible();
+  await assertDarkOnLime(tag, 'work-row In progress tag');
 });

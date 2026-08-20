@@ -16,8 +16,8 @@ import { SITE_AUTHOR } from '@/lib/site';
  *   const ui = await CasePage({ params: Promise.resolve({ slug }) });
  *   render(ui);
  *
- * The pages pull in client islands (Reveal, MagneticButton, the Playground
- * demos, WorkRow). These use `motion/react` + IntersectionObserver/matchMedia,
+ * The pages pull in client islands (Reveal, MagneticButton, WorkRow). These
+ * use `motion/react` + IntersectionObserver/matchMedia,
  * all of which the jsdom setup (tests/setup/jsdom-setup.ts) already stubs, so
  * the trees render in full under jsdom without extra mocking. The only mock
  * required is `next/navigation`'s `notFound`, which we make a throwing spy so
@@ -44,15 +44,20 @@ describe('Home page (/)', () => {
     expect(heading).toHaveTextContent('Nima Hakimi');
   });
 
-  it('renders the "Selected Work" section and the first project title', async () => {
+  it('renders the "Selected work" section and the first project title', async () => {
     const Home = (await import('@/app/page')).default;
     render(<Home />);
 
-    expect(screen.getByText('Selected Work')).toBeInTheDocument();
-    // Every case from the data layer gets a WorkRow link on the home page.
-    for (const c of work) {
+    expect(screen.getByText('Selected work')).toBeInTheDocument();
+    // Home is a curated cut: the top three cases get rows, the rest live only
+    // on /work behind the "All work" link.
+    for (const c of work.slice(0, 3)) {
       expect(screen.getByRole('link', { name: `View case study: ${c.title}` })).toBeInTheDocument();
     }
+    for (const c of work.slice(3)) {
+      expect(screen.queryByRole('link', { name: `View case study: ${c.title}` })).toBeNull();
+    }
+    expect(screen.getByRole('link', { name: /all work/i })).toHaveAttribute('href', '/work');
   });
 
   it('exports absolute name-led home metadata', async () => {
@@ -69,7 +74,7 @@ describe('About page (/about)', () => {
     render(<About />);
 
     const heading = screen.getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('I’m a frontend developer');
+    expect(heading).toHaveTextContent('I’m a developer and AI engineer');
     expect(heading).toHaveTextContent('designer’s');
 
     // The intro paragraph interpolates the location from the data layer.
@@ -93,7 +98,7 @@ describe('About page (/about)', () => {
     const About = (await import('@/app/about/page')).default;
     render(<About />);
 
-    // Some skills (e.g. "Astro.js", "Kotlin") also appear as experience tech
+    // Some skills (e.g. "Astro", "Kotlin") also appear as experience tech
     // tags elsewhere on the page, so the same label can occur more than once.
     for (const skill of about.skills.technical) {
       expect(screen.getAllByText(skill).length).toBeGreaterThan(0);
@@ -113,7 +118,16 @@ describe('Work list page (/work)', () => {
     render(<Work />);
 
     const heading = screen.getByRole('heading', { level: 1 });
-    expect(heading).toHaveTextContent('Selected Work');
+    expect(heading).toHaveTextContent('Selected work');
+  });
+
+  it('renders an on-brand 404 page with routes back in', async () => {
+    const NotFound = (await import('@/app/not-found')).default;
+    render(<NotFound />);
+
+    expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('This page doesn’t exist.');
+    expect(screen.getByRole('link', { name: 'Back home' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: /all work/i })).toHaveAttribute('href', '/work');
   });
 
   it('renders one case-study link per entry in data/work', async () => {

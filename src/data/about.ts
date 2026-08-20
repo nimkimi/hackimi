@@ -28,7 +28,6 @@ type AboutData = {
   education: Education[];
   skills: {
     technical: string[];
-    personal: string[];
   };
   interests: string[];
   languages: {
@@ -43,7 +42,7 @@ const about: AboutData = {
   location: 'Oslo, Norway',
   photo: '/bigSmile.JPEG',
   summary:
-    'I am a developer with experience from NAV IT and TV 2 Skole, with a focus on accessibility and user experience. I work with modern technologies such as React, TypeScript and Kotlin to develop responsive and user-friendly applications. My background in software development and design provides a solid foundation for delivering holistic solutions with the user in focus.',
+    'I am a developer with experience from NAV IT and TV 2 Skole, focused on accessibility and user experience. I work mostly in TypeScript and React, with Kotlin and Python where a project calls for them, and I design what I build as well as engineering it.',
 
   experience: [
     {
@@ -52,9 +51,9 @@ const about: AboutData = {
       location: 'Oslo',
       period: 'Jul 2024 — Present',
       details: [
-        'Frontend developer in Team Min side – a cross-functional platform team delivering platform services for microfrontends and notifications on nav.no.',
-        'Contribute to the maintenance and further development of the shared products Utbetalinger (Payments) and Dokumenter (Documents) for logged-in users.',
-        'Technologies: Astro.js, TypeScript, Kotlin, Kafka',
+        'I work in Team Min side, a cross-functional platform team behind the microfrontends and notifications on nav.no.',
+        'I maintain and develop the shared products Utbetalinger (Payments) and Dokumenter (Documents) for logged-in users.',
+        'Technologies: Astro, TypeScript, Kotlin, Kafka',
       ],
     },
     {
@@ -63,8 +62,8 @@ const about: AboutData = {
       location: 'Oslo',
       period: 'Jun 2023 — Aug 2023',
       details: [
-        'Led planning, design, and development of an internal registration app that replaced manual processes.',
-        'The solution is now NAV’s primary platform for event registration and management of internal events.',
+        'I led the planning, design, and development of an internal registration app that replaced manual processes.',
+        'It is now NAV’s primary platform for internal events.',
         'Technologies: Next.js, Kotlin/Ktor, PostgreSQL',
       ],
     },
@@ -74,19 +73,19 @@ const about: AboutData = {
       location: 'Hybrid',
       period: 'Mar 2023 — Jun 2024 (part-time)',
       details: [
-        'Advisor for Elevkanalen, identified and implemented measures in line with WCAG/EN301549.',
-        'Participated in planning and carried out user and accessibility testing for external clients, including DNB and Designit.',
-        'This experience strengthened my competence in test design, analysis, and concrete recommendations.',
+        'I advised Elevkanalen on accessibility, finding problems and fixing them to WCAG and EN 301 549.',
+        'I took part in planning and ran user and accessibility testing for external clients, including DNB and Designit.',
+        'I designed accessibility tests, ran them with users, and turned the findings into concrete recommendations.',
       ],
     },
     {
       title: 'Leader, Musikkom',
-      company: 'NTNU – EMIL student association',
+      company: 'NTNU — EMIL student association',
       location: 'Trondheim',
       period: 'Jan 2018 — Aug 2021',
       details: [
-        'Musikkom is a committee in the EMIL student association for Energy and Environment. Its purpose is to provide students interested in music with opportunities to further develop their interest alongside their studies.',
-        'As leader, I learned the importance of collaboration and communication, and what it means to take responsibility.',
+        'Musikkom is the music committee in EMIL, NTNU’s student association for Energy and Environment, for students who want to keep playing alongside their studies.',
+        'Leading it taught me collaboration and communication, and what it means to take responsibility for a group.',
       ],
     },
   ],
@@ -103,7 +102,7 @@ const about: AboutData = {
       institution: 'NTNU',
       location: 'Trondheim, Norway',
       period: 'Aug 2019 — Jun 2024',
-      details: ['Specialization: Software Systems'],
+      details: ['Specialisation: Software Systems'],
     },
     {
       degree: 'Energy and Environment, 5-year Master’s Programme',
@@ -121,26 +120,19 @@ const about: AboutData = {
 
   skills: {
     technical: [
-      'Astro.js',
-      'React.js',
+      'Astro',
+      'React',
       'Next.js',
       'TypeScript',
-      'JavaScript (ES5/ES6)',
+      'JavaScript',
       'CSS/SCSS',
       'Tailwind CSS',
       'DevOps',
-      'Starlight (Documentation framework)',
+      'Starlight',
       'Kotlin',
       'Java',
-      'Agile development in cross-functional teams',
-      'Web Content Accessibility Guidelines (WCAG)',
-    ],
-    personal: [
-      'Analytical and structured',
-      'Eager and willing to learn',
-      'Programming and problem-solving',
-      'Perseverance',
-      'Humble and approachable',
+      'Agile teamwork',
+      'WCAG',
     ],
   },
 

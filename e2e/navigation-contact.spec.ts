@@ -30,7 +30,7 @@ test.describe('Primary navigation (desktop)', () => {
 
     await page.getByRole('link', { name: 'Work', exact: true }).click();
     await expect(page).toHaveURL(/\/work$/);
-    await expect(page.getByRole('heading', { name: 'Selected Work' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Selected work' })).toBeVisible();
 
     await page.getByRole('link', { name: 'About', exact: true }).click();
     await expect(page).toHaveURL(/\/about$/);
@@ -63,7 +63,7 @@ test.describe('Mobile menu', () => {
 
     await workLink.click();
     await expect(page).toHaveURL(/\/work$/);
-    await expect(page.getByRole('heading', { name: 'Selected Work' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Selected work' })).toBeVisible();
 
     // Route change closes the menu.
     await expect(panel).toBeHidden();
@@ -73,7 +73,7 @@ test.describe('Mobile menu', () => {
 test.describe('Work browse', () => {
   test('first case study link opens its detail page', async ({ page }) => {
     await page.goto('/work');
-    await expect(page.getByRole('heading', { name: 'Selected Work' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Selected work' })).toBeVisible();
 
     const firstCase = page.locator('.work-list a.work-row').first();
     const title = (await firstCase.locator('.work-row__name').first().innerText()).trim();

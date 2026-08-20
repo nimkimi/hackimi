@@ -55,4 +55,20 @@ describe('talk deck is self-contained', () => {
   it('references no remote origin', () => {
     expect(deck).not.toMatch(/https?:\/\//i);
   });
+
+  // 2026-08: the presenter-notes panel (n) and the speech feature (t) were
+  // removed; the deck is navigation-only with a key hint on the first slide.
+  it('carries no notes panel, speaker notes, or speech feature', () => {
+    expect(deck).not.toMatch(/aside class="notes"|id="notes"|speechSynthesis/);
+    expect(deck).not.toMatch(/case 'n'|case 't'/);
+  });
+
+  it('shows a lowkey hotkey hint on the first slide only', () => {
+    expect(deck.match(/class="keys"/g)).toHaveLength(1);
+    // The hint lives inside slide 1's section, before slide 2 begins.
+    const s1 = deck.slice(deck.indexOf('id="s1"'), deck.indexOf('id="s2"'));
+    expect(s1).toContain('class="keys"');
+    expect(s1).toMatch(/fullskjerm/i);
+    expect(s1).toMatch(/Esc/);
+  });
 });

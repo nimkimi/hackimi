@@ -130,7 +130,6 @@
     font-family: var(--mono); font-size: 13px; color: var(--muted);
     z-index: 40;
   }
-  #pagenum.speaking::before { content: "\25CF  "; color: var(--amber); }
   #progress {
     position: absolute; left: 0; bottom: 0; height: 2px;
     background: var(--amber); width: 0;
@@ -163,6 +162,11 @@
   #s1 .credit {
     position: absolute; right: 84px; bottom: 60px;
     font-size: 14px; color: var(--muted); font-family: var(--mono);
+  }
+  #s1 .keys {
+    position: absolute; left: 84px; bottom: 60px;
+    font-size: 13px; color: var(--muted); font-family: var(--mono);
+    letter-spacing: .04em;
   }
 
   /* ---------- slide 2 ---------- */
@@ -355,27 +359,12 @@
   #s11 .eq { font-family: var(--mono); font-size: 34px; color: var(--amber); margin-bottom: 44px; }
   #s11 .q { font-size: 44px; font-weight: 700; }
 
-  /* ---------- notes panel ---------- */
-  #notes {
-    position: fixed; left: 0; right: 0; bottom: 0;
-    background: rgba(11,12,15,.94);
-    border-top: 1px solid var(--border);
-    padding: 18px 32px 22px;
-    font-family: var(--mono); font-size: 15px; line-height: 1.6;
-    color: var(--text-2);
-    max-height: 40vh; overflow-y: auto;
-    display: none; z-index: 100;
-  }
-  #notes.open { display: block; }
-  #notes .nhead { color: var(--amber); margin-bottom: 8px; font-size: 13px; letter-spacing: .1em; }
-  aside.notes { display: none; }
-
   @media print {
     body { overflow: visible; }
     #viewport { position: static; display: block; }
     #stage { width: auto; height: auto; transform: none !important; }
     section.slide { position: relative; opacity: 1; transform: none; page-break-after: always; height: 720px; width: 1280px; }
-    #notes, #pagenum, #progress { display: none !important; }
+    #pagenum, #progress, #s1 .keys { display: none !important; }
   }
 </style>
 </head>
@@ -387,7 +376,7 @@
     <section class="slide" id="s1">
       <div class="equation">agent <span class="op">=</span> modell <span class="op">+</span> <span class="h">harness</span></div>
       <div class="credit">&#171;Agent = Model + Harness&#187; &#8212; LangChain</div>
-      <aside class="notes" data-time="~20 sek" data-cue="Hei. Ti minutter. Den mest undervurderte delen: harness. Hele presentasjonen er denne ene linja.">Hei. Jeg skal bruke ti minutter på den mest undervurderte delen av å utvikle med AI: harnessen. Hele presentasjonen er egentlig denne ene linja i praksis.</aside>
+      <div class="keys">&#8592; &#8594; naviger &#183; Home/End f&#248;rste/siste &#183; F fullskjerm &#183; Esc avslutt</div>
     </section>
 
     <!-- 2 ------------------------------------------------------------ -->
@@ -404,7 +393,6 @@
         </div>
       </div>
       <div class="landing">Samme modell.</div>
-      <aside class="notes" data-time="~35 sek" data-cue="Mandag: feil kommando, feil mappe, gammelt mønster. Tirsdag: alt riktig, stoppet force push. Ikke modellen. Alt rundt den.">Typisk situasjon: du ber agenten fikse noe, og den kjører testene med feil kommando, legger filer i feil mappe, og finner opp et mønster dere gikk bort fra i fjor. Andre dager gjør samme modell alt riktig, og stopper til og med seg selv før en force push. Forskjellen ligger ikke i modellen. Den ligger i alt rundt den.</aside>
     </section>
 
     <!-- 3 ------------------------------------------------------------ -->
@@ -427,7 +415,6 @@
           <div class="model">modell</div>
         </div>
       </div>
-      <aside class="notes" data-time="~45 sek" data-cue="Harness: alt som ikke er modellen. Copilot CLI er en harness, men generisk. Motoren leier vi. Resten av bilen er vår.">Det rundt har et navn: harness. Alt som ikke er modellen. System-prompten, tools, tilgang til filsystem og terminal, context management, regler, feedback loops. Copilot CLI er i seg selv en harness: den tar en rå modell og gir den en agent loop, tools og et sted å jobbe. Men den er generisk. Den vet ingenting om akkurat vårt repo, våre konvensjoner, vår deploy. Modellen er motoren, harnessen er resten av bilen. Motoren får vi ikke gjort noe med, den leier vi. Resten av bilen er vår.</aside>
     </section>
 
     <!-- 4 ------------------------------------------------------------ -->
@@ -451,7 +438,6 @@
         </div>
       </div>
       <div class="maxim">Prose er <b>forslag</b>. Kode er <b>garantier</b>.</div>
-      <aside class="notes" data-time="~35 sek" data-cue="Tre nivåer. Null: out of the box. Én: prose, fortelle. To: kode, garantere. Prose er forslag, kode er garantier.">Harnessen kan vi bygge på, og jeg tenker på det som tre nivåer. Nivå null står vi allerede på: CLI-en rett ut av boksen, den forrige sliden. Nivå én er prose: du skriver tekst som styrer agenten, altså instructions og skills. Nivå to er programmatisk: du skriver kode som håndhever ting, hooks. Forskjellen mellom dem er den som betyr noe: prose er forslag, kode er garantier.</aside>
     </section>
 
     <!-- 5 ------------------------------------------------------------ -->
@@ -481,7 +467,6 @@
         </div>
         <p class="foot">Leses automatisk hver session, fra git root og cwd &#183; path-spesifikke regler: <span class="mono">.github/instructions/*.instructions.md</span> med <span class="mono">applyTo</span>-glob &#183; leser også <span class="mono">CLAUDE.md</span></p>
       </div>
-      <aside class="notes" data-time="~55 sek" data-cue="AGENTS.md i rota, leses hver session. Alt du sier til nye utviklere. Path-spesifikke regler finnes. Leser også CLAUDE.md. Ti minutters jobb, best ROI.">Nivå én, laveste terskel: en markdown-fil i roten av repoet. AGENTS.md. Copilot CLI leser den automatisk i hver session. Der skriver dere det dere ellers må si til hver nye utvikler: hvordan kjøre testene, hvor ting ligger, hvilke mønstre dere bruker, hva man ikke skal røre. Omtrent som denne. Trenger dere mer presisjon finnes path-spesifikke instructions, egne regler som bare gjelder for eksempel frontend-koden. Og en fin detalj: Copilot leser også CLAUDE.md, så har dere en fra før, gjelder den allerede. Dette er ti minutters jobb, og sannsynligvis den beste ROI-en i hele denne presentasjonen.</aside>
     </section>
 
     <!-- 6 ------------------------------------------------------------ -->
@@ -505,7 +490,6 @@
           <li class="grey">Samme gate: custom agents (<span class="mono">.agent.md</span>, subagent med eget context window og begrensede tools)</li>
         </ul>
       </div>
-      <aside class="notes" data-time="~60 sek" data-cue="Instructions er alltid med, koster context. Skills lastes on demand: bare navn og beskrivelse. Eksempler: deploy, internrammeverk, migrasjon. Pluss custom agents: security-reviewer.">Men instructions har en kostnad: de er alltid med, i hver eneste prompt. Context window er begrenset, og alt dere dytter inn der konkurrerer om modellens oppmerksomhet. Ting den ikke trenger akkurat nå er støy. Skills løser det. En skill er en mappe med en SKILL.md, pluss eventuelt scripts og ressurser. Agenten ser bare navnet og beskrivelsen, og laster resten først når det er relevant for oppgaven. Kunnskap on demand. Typiske skills: deploy-rutinen deres, konvensjoner for internrammeverket, hvordan skrive en migrasjon. I samme gate finner dere custom agents: spesialiserte agenter med et avgrenset oppdrag og egne rettigheter, som en security-reviewer dere kaller på ved behov.</aside>
     </section>
 
     <!-- 7 ------------------------------------------------------------ -->
@@ -549,7 +533,6 @@
           <div class="ev">permissionRequest</div>
         </div>
       </div>
-      <aside class="notes" data-time="~1 min 15 sek" data-cue="Tre grunner. Én: prose drukner i lange sessions. To: prose koster context, hooks koster null. 35 millisekunder. Tre: garantier, ikke 99 prosent. Krasj blokkerer, timeout slipper gjennom. Pre tool use: allow, deny, ask. Prose for skjønn, kode for aldri.">Alt til nå har vært prose, og prose har tre begrensninger. Én: modellen er probabilistisk, og i lange sessions begynner den å glemme regler. Jo mer context, jo lettere drukner de. To: prose koster context, det var derfor skills lastes on demand. En hook koster null context: den kjører utenfor modellen og fyrer hver gang, uansett hvor lang sessionen er blitt. Og den er billig, målt til rundt 35 millisekunder for en enkel hook. Tre: noen ting skal ikke være sannsynlige. For farlige kommandoer holder det ikke med 99 prosent etterlevelse. Siden dette er kode, hører feilmodusen med: krasjer hooken, blokkeres kallet. Timer den ut, slipper det gjennom. Så sett en timeout, og hold den rask. Mekanikken er enkel: en hook kjører på events i agent-loopen, og den viktigste er preToolUse. Den ser hvert tool call før det kjører, og svarer allow, deny eller ask. Tommelfingerregelen min: prose for det som krever skjønn, kode for det som aldri skal skje.</aside>
     </section>
 
     <!-- 8 ------------------------------------------------------------ -->
@@ -597,7 +580,6 @@ IN=$(cat)
         </div>
       </div>
       <p class="debugfoot">debug: /env viser lastede hooks &#183; stdout &#8594; ~/.copilot/logs/ &#183; lastes ved session-start &#183; Windows: egne bash- og powershell-nøkler</p>
-      <aside class="notes" data-time="~1 min 10 sek" data-cue="Testet på vår versjon. JSON peker på seks linjer bash. Pek på outputen: denied. Mer enn guardrails: formatter, tester, session start. Trusted repo. Policy sentralt på enterprise.">Sånn ser det ut i praksis, og dette er testet på versjonen vi faktisk kjører. Én JSON-fil som sier: før hvert tool call, kjør dette scriptet, fem sekunders timeout. Og scriptet er seks linjer bash: les input, sjekk etter rm minus rf, svar deny med en begrunnelse. Det er alt. Nederst ser dere hva som skjer når agenten prøver seg: den får beskjed, med begrunnelsen vår. Samme mekanikk brukes til mer enn guardrails: kjør formatter og tester etter hver edit, eller injecter git status ved session start så agenten starter orientert. Og to ting til de sikkerhetsbevisste: repo-hooks kjører først når mappa er trusted, så et fremmed repo dere kloner får ikke kjøre shell hos dere automatisk. Og på enterprise kan policyer legges sentralt, de kan ikke skrus av av brukeren.</aside>
     </section>
 
     <!-- 9 ------------------------------------------------------------ -->
@@ -635,7 +617,6 @@ deny <span class="ts">"no explicit model on this dispatch -- tier it and re-issu
           </div>
         </div>
       </div>
-      <aside class="notes" data-time="~45 sek · KUTTBAR: går tiden, dropp hele sliden (slide 10 refererer den ikke)" data-cue="Mine to. Tiering-guard: deny med regelen i meldinga, agenten retter seg selv. Budget-advisor: varsler på 50 og 75 prosent. Vanlige shell-scripts. Bare feltnavnene må matche.">To fra mitt eget oppsett, i Claude Code, samme konsept. Den første denier alle subagent-kall som ikke har valgt modell eksplisitt. Det fine er at deny-meldingen inneholder selve regelen. Agenten leser den, retter seg og prøver igjen. Ingen spør meg om noe, den oppdrar seg selv. Den andre leser context-forbruket ved hver stopp, og ber agenten runde av eller ta handoff når vi passerer 50 og 75 prosent av vinduet. Begge er vanlige shell-scripts som JSON-en peker på. Skulle jeg flytte dem til Copilot, gjenbruker jeg scriptene som de er. Det som må matche er feltnavnene inn og ut, ikke koden.</aside>
     </section>
 
     <!-- 10 ----------------------------------------------------------- -->
@@ -660,7 +641,6 @@ deny <span class="ts">"no explicit model on this dispatch -- tier it and re-issu
       </div>
       <div class="landing">Dårlig output er ofte en manglende sensor.</div>
       </div>
-      <aside class="notes" data-time="~50 sek" data-cue="Feedback loops, fra definisjonen i starten. Tester, lint, typecheck er øynene. Guides før: prose. Sensors etter: hooks. Dårlig output er ofte en manglende sensor.">Helt i starten definerte vi harness med feedback loops på lista. Det er den siste brikken. En agent er bare så god som feedbacken den får: tester, linter, typecheck, build-output er øynene dens. Uten dem gjetter den, med dem retter den seg selv. Birgitta Böckeler hos Thoughtworks kaller det guides og sensors, og det mapper rett på trappa vår. Guides styrer agenten før den handler: instructions og skills, prose-nivået. Sensors fanger opp feil etterpå: for eksempel hooks som kjører testene og dytter resultatet tilbake. Neste gang agenten leverer noe dårlig, sjekk om den hadde mulighet til å oppdage feilen selv. Som regel hadde den ikke det. Da er det ikke modellen det står på, det er en sensor som mangler.</aside>
     </section>
 
     <!-- 11 ----------------------------------------------------------- -->
@@ -676,7 +656,6 @@ deny <span class="ts">"no explicit model on this dispatch -- tier it and re-issu
       <p class="std">Åpen standard, aug 2026: Agent Plugins 1.0 &#183; AWS &#183; Anysphere &#183; Microsoft &#183; OpenAI &#183; Vercel</p>
       <div class="eq">agent = modell + <span style="color:var(--amber)">harness</span></div>
       <div class="q">Spørsmål?</div>
-      <aside class="notes" data-time="~35 sek + Q&amp;A" data-cue="Alt er filer i repoet. Én bygger, alle får nytte. Åpen standard i august. Modellene blir bedre av seg selv, harnessen bare hvis noen bygger den. Spørsmål.">For å samle det: alt dere har sett er filer i repoet. En markdown-fil, en mappe med skills, en JSON med hooks. De versjoneres og deles som all annen kode, så én person bygger og alle får nytte. Og formatet ble i august en åpen standard, så det dere lager flytter med dere på tvers av verktøy. Modellene blir bedre av seg selv, det ordner andre. Harnessen blir bare bedre hvis noen bygger den. Det var det jeg hadde. Spørsmål?</aside>
     </section>
 
   </div>
@@ -684,7 +663,6 @@ deny <span class="ts">"no explicit model on this dispatch -- tier it and re-issu
 
 <div id="pagenum"></div>
 <div id="progress"></div>
-<div id="notes"><div class="nhead"></div><div class="nbody"></div></div>
 
 <script>
 (function () {
@@ -692,9 +670,6 @@ deny <span class="ts">"no explicit model on this dispatch -- tier it and re-issu
   var stage = document.getElementById('stage');
   var pagenum = document.getElementById('pagenum');
   var progress = document.getElementById('progress');
-  var notes = document.getElementById('notes');
-  var nhead = notes.querySelector('.nhead');
-  var nbody = notes.querySelector('.nbody');
   var idx = 0;
 
   function clamp(n) { return Math.max(0, Math.min(slides.length - 1, n)); }
@@ -706,66 +681,10 @@ deny <span class="ts">"no explicit model on this dispatch -- tier it and re-issu
     if (location.hash !== '#' + (idx + 1)) {
       history.replaceState(null, '', '#' + (idx + 1));
     }
-    var aside = slides[idx].querySelector('aside.notes');
-    if (aside) {
-      nhead.textContent = 'SLIDE ' + (idx + 1) + ' · ' + (aside.getAttribute('data-time') || '');
-      nbody.textContent = aside.textContent;
-    } else {
-      nhead.textContent = 'SLIDE ' + (idx + 1);
-      nbody.textContent = '';
-    }
   }
 
   function go(n) {
-    var next = clamp(n);
-    if (next !== idx) speakStop();
-    idx = next; render();
-  }
-
-  /* ---- tale (T): les notatene for gjeldende slide høyt ---- */
-  var speaking = false;
-  var voiceNb = null;
-  function pickVoice() {
-    try {
-      var vs = speechSynthesis.getVoices();
-      voiceNb = null;
-      for (var i = 0; i < vs.length; i++) {
-        if (/^(nb|nn|no)([-_]|$)/i.test(vs[i].lang)) { voiceNb = vs[i]; break; }
-      }
-    } catch (e) {}
-  }
-  if ('speechSynthesis' in window) {
-    pickVoice();
-    speechSynthesis.onvoiceschanged = pickVoice;
-  }
-  function speakStop() {
-    if (!('speechSynthesis' in window)) return;
-    speechSynthesis.cancel();
-    speaking = false;
-    pagenum.classList.remove('speaking');
-  }
-  function speakNotes() {
-    if (!('speechSynthesis' in window)) return;
-    if (speaking) { speakStop(); return; }
-    var aside = slides[idx].querySelector('aside.notes');
-    if (!aside) return;
-    var text = (aside.getAttribute('data-cue') || aside.textContent).replace(/\s+/g, ' ').trim();
-    if (!text) return;
-    speechSynthesis.cancel();
-    // setningsvis kø: gjør stopp responsiv og unngår Chrome-kutt på lange utterances
-    var parts = text.match(/[^.!?]+[.!?]+\s*/g) || [text];
-    speaking = true;
-    pagenum.classList.add('speaking');
-    parts.forEach(function (p, i) {
-      var u = new SpeechSynthesisUtterance(p.trim());
-      u.lang = 'nb-NO';
-      if (voiceNb) u.voice = voiceNb;
-      u.rate = 1.25;
-      if (i === parts.length - 1) {
-        u.onend = function () { speaking = false; pagenum.classList.remove('speaking'); };
-      }
-      speechSynthesis.speak(u);
-    });
+    idx = clamp(n); render();
   }
 
   function fit() {
@@ -786,18 +705,14 @@ deny <span class="ts">"no explicit model on this dispatch -- tier it and re-issu
         if (document.fullscreenElement) { document.exitFullscreen(); }
         else { document.documentElement.requestFullscreen(); }
         break;
-      case 'n': case 'N':
-        notes.classList.toggle('open'); break;
-      case 't': case 'T':
-        speakNotes(); break;
       case 'Escape':
-        speakStop(); break;
+        if (document.fullscreenElement) { document.exitFullscreen(); }
+        break;
     }
   });
 
   // click zones: outer 12% edges = prev/next
   document.addEventListener('click', function (e) {
-    if (notes.contains(e.target)) return;
     var x = e.clientX / window.innerWidth;
     if (x > 0.88) go(idx + 1);
     else if (x < 0.12) go(idx - 1);

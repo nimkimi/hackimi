@@ -9,7 +9,7 @@ import JsonLd from '@/components/seo/JsonLd';
 export const metadata = buildPageMetadata({
   title: 'About',
   description:
-    'Nima Hakimi — developer and AI engineer with a designer’s eye, building accessible, expressive web interfaces. Experience, education, and skills.',
+    'Nima Hakimi, developer and AI engineer with a designer’s eye, building accessible, expressive interfaces. Experience, education, and skills.',
   path: '/about',
 });
 
@@ -40,7 +40,7 @@ export default function AboutPage() {
           style={{ fontSize: 'clamp(2.25rem, 6.5vw, 4.5rem)' }}
         >
           <span className="block overflow-hidden">
-            <Reveal>I’m a frontend developer</Reveal>
+            <Reveal>I’m a developer and AI&nbsp;engineer</Reveal>
           </span>
           <span className="block overflow-hidden">
             <Reveal delay={0.06}>
@@ -52,7 +52,7 @@ export default function AboutPage() {
         <Reveal delay={0.12} className="mt-[clamp(1.5rem,5vh,2.5rem)]">
           <p className="measure text-[clamp(1rem,2vw,1.25rem)] leading-relaxed text-muted">
             I build <span className="text-ink">accessible</span>, <span className="text-ink">expressive</span>{' '}
-            interfaces with React, TypeScript and Kotlin. Engineering comes first — but a feel for typography, motion
+            interfaces with React, TypeScript, and Kotlin. Engineering comes first. But a feel for typography, motion,
             and detail is the edge that makes the work land. Currently building platform frontend at{' '}
             <span className="text-ink">NAV</span>, based in {about.location}.
           </p>
@@ -184,22 +184,6 @@ export default function AboutPage() {
         </div>
 
         <div>
-          <SectionLabel>Strengths</SectionLabel>
-          <Reveal delay={0.04}>
-            <ul className="mt-6 flex flex-wrap gap-2">
-              {about.skills.personal.map((skill) => (
-                <li
-                  key={skill}
-                  className="rounded-full border border-white/10 px-3 py-1.5 font-mono text-xs text-muted transition-colors hover:border-accent/40 hover:text-ink"
-                >
-                  {skill}
-                </li>
-              ))}
-            </ul>
-          </Reveal>
-        </div>
-
-        <div>
           <SectionLabel>Languages</SectionLabel>
           <div className="mt-6 border-t border-white/10">
             {about.languages.map((language, i) => (
@@ -244,9 +228,9 @@ export default function AboutPage() {
       <section className="mt-[clamp(4rem,12vh,7rem)] border-t border-white/10 pt-12">
         <Reveal>
           <p className="measure text-lg leading-relaxed text-muted sm:text-xl sm:leading-7">
-            Want to know more about my work, or talk about a role?{' '}
+            If a role or a project fits,{' '}
             <UnderlineLink href="/contact" className="text-ink">
-              Send me a message
+              send me a message
             </UnderlineLink>{' '}
             or email{' '}
             <UnderlineLink href={`mailto:${SITE_EMAIL}`} className="text-ink">

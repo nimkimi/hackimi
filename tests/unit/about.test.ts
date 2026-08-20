@@ -33,10 +33,6 @@ describe('about data — required arrays are non-empty', () => {
     expect(Array.isArray(about.skills.technical)).toBe(true);
     expect(about.skills.technical.length).toBeGreaterThan(0);
   });
-  it('skills.personal is a non-empty array', () => {
-    expect(Array.isArray(about.skills.personal)).toBe(true);
-    expect(about.skills.personal.length).toBeGreaterThan(0);
-  });
   it('interests is a non-empty array', () => {
     expect(Array.isArray(about.interests)).toBe(true);
     expect(about.interests.length).toBeGreaterThan(0);

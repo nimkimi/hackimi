@@ -5,7 +5,7 @@ export const runtime = 'nodejs';
 
 export const metadata = buildPageMetadata({
   title: 'Contact',
-  description: 'Send a message to Nima Hakimi through a secure contact form powered by reCAPTCHA.',
+  description: 'Send Nima Hakimi a message. He reads everything and replies.',
   path: '/contact',
 });
 

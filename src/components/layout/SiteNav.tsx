@@ -12,7 +12,6 @@ type NavItem = { label: string; href: string };
 const NAV_ITEMS: NavItem[] = [
   { label: 'Work', href: '/work' },
   { label: 'About', href: '/about' },
-  { label: 'Playground', href: '/#playground' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -74,7 +73,7 @@ export default function SiteNav() {
           </ul>
           <MagneticButton href="/contact" className="mono-label text-dark!">
             <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-dark" />
-            Let&apos;s talk
+            Let&rsquo;s talk
           </MagneticButton>
         </div>
 
@@ -84,7 +83,7 @@ export default function SiteNav() {
             href="/contact"
             className="mono-label inline-flex min-h-11 items-center rounded-full bg-accent px-4 py-2.5 text-dark! focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-accent/60 focus-visible:ring-offset-2 focus-visible:ring-offset-dark"
           >
-            Let&apos;s talk
+            Let&rsquo;s talk
           </Link>
           <button
             type="button"

@@ -60,7 +60,7 @@ function toastForResult(state: ContactFormState): ToastState {
     return { type: 'success', title: 'Message sent', desc: state.message ?? 'Thanks! I’ll get back to you soon.' };
   }
   if (state.status === 'error' && state.message) {
-    return { type: 'error', title: 'Something went wrong', desc: state.message };
+    return { type: 'error', title: 'Message not sent', desc: state.message };
   }
   return null;
 }
@@ -139,8 +139,8 @@ export default function ContactClient({ siteKey }: Props) {
 
           <Reveal delay={0.12} className="mt-[clamp(1.5rem,5vh,2.5rem)]">
             <p className="measure text-[clamp(1rem,2vw,1.1875rem)] leading-relaxed text-muted">
-              Open to frontend roles and collaborations. Have a question about my work, or a team I’d be a fit for? Drop
-              a line — I read everything and reply.
+              Open to new roles and collaborations. Have a question about my work, or a team I’d be a fit for? Drop a
+              line. I read everything and reply.
             </p>
           </Reveal>
         </header>
@@ -243,7 +243,9 @@ export default function ContactClient({ siteKey }: Props) {
                   <div className="g-recaptcha" data-sitekey={siteKey} />
                 </div>
               ) : (
-                <div className="text-sm text-red-400">reCAPTCHA is not configured.</div>
+                <div className="text-sm text-red-400">
+                  The form is unavailable right now. Email me at nima@hackimi.dev instead.
+                </div>
               )}
 
               <SubmitButton />
