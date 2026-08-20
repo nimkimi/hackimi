@@ -176,7 +176,7 @@ describe('ContactClient — top-level error message', () => {
     // error to assistive tech — exactly one role="alert" on the page now.
     const alerts = screen.getAllByRole('alert');
     expect(alerts).toHaveLength(1);
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+    expect(screen.getByText('Message not sent')).toBeInTheDocument();
   });
 });
 
@@ -259,7 +259,9 @@ describe('ContactClient — reCAPTCHA widget', () => {
     expect(script).toHaveAttribute('data-src', 'https://www.google.com/recaptcha/api.js');
 
     // The "not configured" fallback is absent when a key exists.
-    expect(screen.queryByText('reCAPTCHA is not configured.')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('The form is unavailable right now. Email me at nima@hackimi.dev instead.')
+    ).not.toBeInTheDocument();
   });
 
   it('skips the widget/script and shows a not-configured notice when site key is empty', () => {
@@ -268,7 +270,9 @@ describe('ContactClient — reCAPTCHA widget', () => {
 
     expect(container.querySelector('.g-recaptcha')).toBeNull();
     expect(screen.queryByTestId('next-script')).not.toBeInTheDocument();
-    expect(screen.getByText('reCAPTCHA is not configured.')).toBeInTheDocument();
+    expect(
+      screen.getByText('The form is unavailable right now. Email me at nima@hackimi.dev instead.')
+    ).toBeInTheDocument();
   });
 });
 
@@ -289,7 +293,7 @@ describe('ContactClient — toast across successive submissions', () => {
     setState({ status: 'error', message: 'Could not send your message right now. Please try again.' });
     rerender(<ContactClient siteKey="test-site-key" />);
 
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+    expect(screen.getByText('Message not sent')).toBeInTheDocument();
     expect(screen.queryByText('Message sent')).not.toBeInTheDocument();
     expect(screen.getByRole('alert')).toHaveAttribute('aria-live', 'assertive');
     expect(screen.queryByRole('status')).not.toBeInTheDocument();

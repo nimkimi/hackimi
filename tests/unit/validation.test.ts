@@ -107,3 +107,33 @@ describe('contactSchema', () => {
     }
   });
 });
+
+describe('error messages are human-written, never zod defaults', () => {
+  it('empty name explains itself', () => {
+    const result = contactSchema.safeParse({ ...validInput, name: '' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.name?.[0]).toBe('Add your name.');
+    }
+  });
+
+  it('a bad email explains itself', () => {
+    const result = contactSchema.safeParse({ ...validInput, email: 'not-an-email' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error.flatten().fieldErrors.email?.[0]).toBe('Enter a valid email address.');
+    }
+  });
+
+  it('no field error ever leaks zod default phrasing', () => {
+    const result = contactSchema.safeParse({ name: '', email: 'x', subject: '', message: '' });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const all = Object.values(result.error.flatten().fieldErrors).flat();
+      expect(all.length).toBeGreaterThan(0);
+      for (const message of all) {
+        expect(message).not.toMatch(/too small|expected string|invalid input|invalid string/i);
+      }
+    }
+  });
+});

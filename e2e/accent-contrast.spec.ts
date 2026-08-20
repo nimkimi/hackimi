@@ -61,7 +61,7 @@ async function assertDarkOnLime(el: Locator, label: string) {
 // the accent-button case for that component.
 test('nav "Let\'s talk" CTA renders dark text on lime', async ({ page }) => {
   await page.goto('/');
-  await assertDarkOnLime(page.getByRole('link', { name: "Let's talk" }).first(), "nav Let's talk CTA");
+  await assertDarkOnLime(page.getByRole('link', { name: 'Let’s talk' }).first(), "nav Let's talk CTA");
 });
 
 // The playground's segmented control (this spec's original second target) was

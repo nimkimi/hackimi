@@ -52,7 +52,7 @@ export default function AboutPage() {
         <Reveal delay={0.12} className="mt-[clamp(1.5rem,5vh,2.5rem)]">
           <p className="measure text-[clamp(1rem,2vw,1.25rem)] leading-relaxed text-muted">
             I build <span className="text-ink">accessible</span>, <span className="text-ink">expressive</span>{' '}
-            interfaces with React, TypeScript and Kotlin. Engineering comes first — but a feel for typography, motion
+            interfaces with React, TypeScript, and Kotlin. Engineering comes first — but a feel for typography, motion,
             and detail is the edge that makes the work land. Currently building platform frontend at{' '}
             <span className="text-ink">NAV</span>, based in {about.location}.
           </p>

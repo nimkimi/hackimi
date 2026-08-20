@@ -5,7 +5,7 @@ export const runtime = 'nodejs';
 
 export const metadata = buildPageMetadata({
   title: 'Contact',
-  description: 'Send a message to Nima Hakimi. I read everything and reply.',
+  description: 'Send Nima Hakimi a message. He reads everything and replies.',
   path: '/contact',
 });
 

@@ -51,7 +51,7 @@ describe('submitContact', () => {
     const result = await submitContact(initialContactState, fd);
 
     expect(result.status).toBe('error');
-    expect(result.message).toBe('Please confirm you are not a robot and try again.');
+    expect(result.message).toBe('Confirm you’re not a robot and try again.');
     expect(result.values).toEqual(VALID);
     expect(sendMailMock).not.toHaveBeenCalled();
   });
@@ -67,7 +67,7 @@ describe('submitContact', () => {
     expect(result.fieldErrors).toBeDefined();
     expect(Object.keys(result.fieldErrors ?? {}).sort()).toEqual(['email', 'message', 'name', 'subject']);
     // No formErrors for these field-level issues -> falls back to default message.
-    expect(result.message).toBe('Please correct the highlighted fields and resend your message.');
+    expect(result.message).toBe('Fix the highlighted fields and send again.');
     expect(result.values).toEqual({ name: '', email: '', subject: '', message: '' });
     expect(sendMailMock).not.toHaveBeenCalled();
   });
@@ -95,6 +95,23 @@ describe('submitContact', () => {
     expect(result.message?.startsWith('Thanks!')).toBe(true);
     expect(result.values).toEqual({ name: '', email: '', subject: '', message: '' });
     expect(sendMailMock).toHaveBeenCalledTimes(2);
+  });
+
+  it('sends the visitor auto-reply in English, in the site voice', async () => {
+    verifyRecaptchaMock.mockResolvedValue(true);
+    sendMailMock.mockResolvedValue(undefined as unknown as void);
+
+    await submitContact(initialContactState, buildFormData(VALID));
+
+    // The auto-reply is the sendMail call addressed to the visitor.
+    const autoReply = sendMailMock.mock.calls.find(([, to]) => to === VALID.email);
+    expect(autoReply).toBeTruthy();
+    const [subject, , body] = autoReply as [string, string, string];
+    expect(subject).toBe('Thanks for your message');
+    expect(body).toContain('Hi Ada Lovelace,');
+    // No Norwegian may leak into anything a visitor receives (the auto-reply
+    // shipped in Norwegian on an otherwise all-English site until 2026-08).
+    expect(`${subject} ${body}`).not.toMatch(/Hei |Takk |vennlig|Svar til/);
   });
 
   it('falls back to recaptchaToken when g-recaptcha-response is absent', async () => {

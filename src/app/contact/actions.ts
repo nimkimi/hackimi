@@ -33,17 +33,13 @@ export async function submitContact(_: ContactFormState, formData: FormData): Pr
 
   const isHuman = await verifyRecaptcha(token);
   if (!isHuman) {
-    return errorState('Please confirm you are not a robot and try again.', values);
+    return errorState('Confirm you’re not a robot and try again.', values);
   }
 
   const parsed = contactSchema.safeParse(values);
   if (!parsed.success) {
     const { fieldErrors, formErrors } = parsed.error.flatten();
-    return errorState(
-      formErrors[0] ?? 'Please correct the highlighted fields and resend your message.',
-      values,
-      fieldErrors
-    );
+    return errorState(formErrors[0] ?? 'Fix the highlighted fields and send again.', values, fieldErrors);
   }
 
   const { name, email, subject, message } = parsed.data;
@@ -51,11 +47,11 @@ export async function submitContact(_: ContactFormState, formData: FormData): Pr
 
   try {
     await sendMail(
-      `Svar til ${name}`,
+      'Thanks for your message',
       email,
-      `Hei ${name},\n\nTakk for din henvendelse. Jeg vil svare deg så snart som mulig.\n\nMed vennlig hilsen,\nNima Hakimi`
+      `Hi ${name},\n\nThanks for reaching out. I’ll get back to you as soon as I can.\n\nNima Hakimi`
     );
-    await sendMail(subject || 'Kontakt via hackimi.dev', 'nima@hackimi.dev', body);
+    await sendMail(subject || 'Contact via hackimi.dev', 'nima@hackimi.dev', body);
   } catch (error) {
     console.error('Contact form sendMail failed', error);
     return errorState('Could not send your message right now. Please try again.', values);

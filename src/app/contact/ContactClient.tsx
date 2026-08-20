@@ -60,7 +60,7 @@ function toastForResult(state: ContactFormState): ToastState {
     return { type: 'success', title: 'Message sent', desc: state.message ?? 'Thanks! I’ll get back to you soon.' };
   }
   if (state.status === 'error' && state.message) {
-    return { type: 'error', title: 'Something went wrong', desc: state.message };
+    return { type: 'error', title: 'Message not sent', desc: state.message };
   }
   return null;
 }
@@ -243,7 +243,9 @@ export default function ContactClient({ siteKey }: Props) {
                   <div className="g-recaptcha" data-sitekey={siteKey} />
                 </div>
               ) : (
-                <div className="text-sm text-red-400">reCAPTCHA is not configured.</div>
+                <div className="text-sm text-red-400">
+                  The form is unavailable right now. Email me at nima@hackimi.dev instead.
+                </div>
               )}
 
               <SubmitButton />
