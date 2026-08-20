@@ -17,7 +17,6 @@ vi.mock('next/navigation', () => ({
 const NAV_ITEMS = [
   { label: 'Work', href: '/work' },
   { label: 'About', href: '/about' },
-  { label: 'Playground', href: '/#playground' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -43,6 +42,11 @@ describe('SiteNav', () => {
       const link = utils.getByRole('link', { name: item.label });
       expect(link).toHaveAttribute('href', item.href);
     }
+  });
+
+  it('does not render a Playground link (section removed 2026-08)', () => {
+    render(<SiteNav />);
+    expect(screen.queryByRole('link', { name: 'Playground' })).toBeNull();
   });
 
   it('renders the mobile-panel nav links with correct hrefs once opened', async () => {

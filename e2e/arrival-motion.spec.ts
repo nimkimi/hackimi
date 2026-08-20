@@ -10,7 +10,7 @@ import { test, expect } from '@playwright/test';
  *    reduced motion the stylesheet hides it before first paint and the unmount
  *    follows on a microtask.
  *  - Hero <h1> renders "Nima Hakimi" (the period rides on the same line).
- *  - "Selected Work" / "Playground" / "Contact" headings live further down,
+ *  - "Selected Work" / "Contact" headings live further down,
  *    each gated by a masked scroll Reveal (inline transform: translateY(...)).
  */
 
@@ -86,12 +86,7 @@ test.describe('scroll reveal', () => {
     // Let the arrival settle and the hero appear.
     await expect(page.getByRole('heading', { name: 'Nima Hakimi' })).toBeVisible({ timeout: 3000 });
 
-    // Playground heading lives well below the fold behind a Reveal.
-    const playground = page.getByRole('heading', { name: /playground/i });
-    await playground.scrollIntoViewIfNeeded();
-    await expect(playground).toBeVisible({ timeout: 3000 });
-
-    // Contact closing moment, even further down.
+    // Contact closing moment, well below the fold behind a Reveal.
     const contact = page.getByRole('heading', {
       name: /open to frontend roles/i,
     });

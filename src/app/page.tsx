@@ -3,7 +3,6 @@ import Reveal from '@/components/motion/Reveal';
 import MagneticButton from '@/components/motion/MagneticButton';
 import UnderlineLink from '@/components/motion/UnderlineLink';
 import WorkRow from '@/components/work/WorkRow';
-import PlaygroundSection from '@/components/playground/PlaygroundSection';
 import work from '@/data/work';
 import { SITE_EMAIL, SITE_SOCIAL_LINKS } from '@/lib/site';
 
@@ -83,11 +82,6 @@ export default function Home() {
             All work →
           </UnderlineLink>
         </div>
-      </section>
-
-      {/* Playground — live interactive component demos */}
-      <section id="playground" className="scroll-mt-24 py-24">
-        <PlaygroundSection />
       </section>
 
       {/* Contact — big-type closing moment */}

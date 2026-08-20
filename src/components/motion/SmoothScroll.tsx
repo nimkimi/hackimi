@@ -24,7 +24,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
       id = requestAnimationFrame(raf);
     });
 
-    // Smooth in-page anchor navigation (`/#work`, `#playground`, `#contact`).
+    // Smooth in-page anchor navigation (`/#work`, `#contact`).
     // We intercept clicks on links whose target is a same-page hash and hand
     // the scroll to Lenis. Anything that isn't a resolvable in-page target is
     // left to the browser (native jump still works, the CSS import above fixes

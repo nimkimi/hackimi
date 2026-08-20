@@ -16,8 +16,8 @@ import { SITE_AUTHOR } from '@/lib/site';
  *   const ui = await CasePage({ params: Promise.resolve({ slug }) });
  *   render(ui);
  *
- * The pages pull in client islands (Reveal, MagneticButton, the Playground
- * demos, WorkRow). These use `motion/react` + IntersectionObserver/matchMedia,
+ * The pages pull in client islands (Reveal, MagneticButton, WorkRow). These
+ * use `motion/react` + IntersectionObserver/matchMedia,
  * all of which the jsdom setup (tests/setup/jsdom-setup.ts) already stubs, so
  * the trees render in full under jsdom without extra mocking. The only mock
  * required is `next/navigation`'s `notFound`, which we make a throwing spy so
