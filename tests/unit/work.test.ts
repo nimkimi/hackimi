@@ -2,9 +2,21 @@ import { describe, it, expect } from 'vitest';
 import work, { type CaseStudy } from '../../src/data/work';
 
 describe('work data', () => {
-  it('has the four flagship slugs in display order', () => {
+  it('has the five flagship slugs in display order', () => {
     // Order is deliberate: newest, strongest signal first (WorkRow numbers rows).
-    expect(work.map((w) => w.slug)).toEqual(['sonari', 'syncward', 'concert-radar', 'nav-event-registration']);
+    expect(work.map((w) => w.slug)).toEqual([
+      'sonari',
+      'syncward',
+      'dovetail',
+      'concert-radar',
+      'nav-event-registration',
+    ]);
+  });
+
+  it('dovetail is a private personal tool: no outbound links', () => {
+    const dovetail = work.find((w) => w.slug === 'dovetail');
+    expect(dovetail).toBeDefined();
+    expect(dovetail?.links ?? []).toEqual([]);
   });
 
   it('syncward is private pre-release: no outbound links, flagged in progress', () => {

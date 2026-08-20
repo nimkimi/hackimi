@@ -87,6 +87,37 @@ const work: CaseStudy[] = [
     ],
   },
   {
+    slug: 'dovetail',
+    title: 'dovetail',
+    summary:
+      'Catches the quality shortcuts an AI coding agent takes, in the seconds before the code lands. Two advisory hooks for Claude Code that can only advise: no blocking, no auto-edits, no network.',
+    year: '2026',
+    role: 'Solo: design and engineering',
+    tech: ['Python (stdlib only)', 'Claude Code hooks', 'pytest', 'JSONL telemetry'],
+    sections: [
+      {
+        heading: 'Context',
+        body: 'Written rules decay: instructions loaded at session start get buried as the context grows, and review tools only speak after the code exists. In my own sessions the agent would settle on the first solution that worked, not the best-integrated one. dovetail is a Claude Code plugin that raises the right concern at the moment code is written: that a guard is about to be shortened, that something two files over already does this, that a new dependency needs vetting.',
+      },
+      {
+        heading: 'My role',
+        body: 'One call shaped everything: the hooks advise and do nothing else, so the worst case is an ignorable line of text rather than a broken session. I am also the entire user base. dovetail runs in every one of my Claude Code sessions, so a bad decision turns into noise in my own workflow the same day, and the tuning loop runs on that: build a change, live with it, adjust against the telemetry.',
+      },
+      {
+        heading: 'Problem',
+        body: 'The first failure mode is banner blindness: a block repeated on every edit becomes wallpaper, and on day one dovetail spoke on 71 percent of the edits it evaluated. The opposite failure is silence, the default for a hook that is only allowed to advise: one hook had been dead in production for weeks, because real session transcripts had a different shape than every test fixture assumed. Neither failure is visible without measurement.',
+      },
+      {
+        heading: 'Approach',
+        body: 'dovetail is two Python hooks, standard library only, and they exit 0 on every path, so a crash in a hook can never take a session down with it. The author-time cue is proportional: silent on cosmetic and out-of-lane changes, a full teaching block once per fresh context, a one-line stand-in on repeats. The finish check fires only when the agent’s reply changed source files, and it names them. Every firing writes a metadata-only telemetry record, and a weekly job reads the log and flags drift on its own.',
+      },
+      {
+        heading: 'Result',
+        body: 'The first month of telemetry, 8,953 firings, showed that one cue in ten was a reuse nudge on a file that already existed, right where it helped least; that cue now fires only on new files. The dead-hook incident became regression tests derived from real transcripts, and the suite is 115 tests now. The cues also reach the sub-sessions I hand implementation work to, which is where most of the code in a big change gets written; I verified that path live. The repo stays private; it is tooling for my own setup.',
+      },
+    ],
+  },
+  {
     slug: 'concert-radar',
     title: 'Concert Radar',
     summary:
