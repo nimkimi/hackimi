@@ -64,7 +64,13 @@ test.describe('structured data', () => {
     await page.goto('/about');
     expect((await ldTypes(page)).sort()).toEqual(['Person', 'ProfilePage', 'WebSite']);
 
-    await page.goto('/work/be-my-guide');
+    await page.goto('/work/sonari');
     expect((await ldTypes(page)).sort()).toEqual(['BreadcrumbList', 'Person', 'WebSite']);
+  });
+
+  test('the removed be-my-guide case 308s to /work instead of 404ing', async ({ page }) => {
+    const resp = await page.request.get('/work/be-my-guide', { maxRedirects: 0 });
+    expect(resp.status()).toBe(308);
+    expect(resp.headers()['location']).toBe('/work');
   });
 });

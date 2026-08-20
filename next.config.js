@@ -6,6 +6,9 @@ const nextConfig = {
       // for "Nima Hakimi developer"); the redesign renamed it to /work.
       { source: '/projects', destination: '/work', permanent: true },
       { source: '/projects/:path*', destination: '/work', permanent: true },
+      // Case study removed 2026-08 after being deployed in the sitemap — keep
+      // the indexed URL alive rather than 404 it (the /projects lesson).
+      { source: '/work/be-my-guide', destination: '/work', permanent: true },
       // Exact-host only: preview deployments on *.vercel.app must stay untouched.
       {
         source: '/:path*',

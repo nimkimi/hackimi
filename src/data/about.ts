@@ -43,7 +43,7 @@ const about: AboutData = {
   location: 'Oslo, Norway',
   photo: '/bigSmile.JPEG',
   summary:
-    'I am a developer with experience from NAV IT and TV 2 Skole, with a focus on accessibility and user experience. I work with modern technologies such as React, TypeScript and Kotlin to develop responsive and user-friendly applications. My background in software development and design provides a solid foundation for delivering holistic solutions with the user in focus.',
+    'I am a developer with experience from NAV IT and TV 2 Skole, focused on accessibility and user experience. I work mostly in TypeScript and React, with Kotlin and Python where a project calls for them, and I design what I build as well as engineering it.',
 
   experience: [
     {
@@ -76,7 +76,7 @@ const about: AboutData = {
       details: [
         'Advisor for Elevkanalen, identified and implemented measures in line with WCAG/EN301549.',
         'Participated in planning and carried out user and accessibility testing for external clients, including DNB and Designit.',
-        'This experience strengthened my competence in test design, analysis, and concrete recommendations.',
+        'I designed accessibility tests, ran them with users, and turned the findings into concrete recommendations.',
       ],
     },
     {
@@ -86,7 +86,7 @@ const about: AboutData = {
       period: 'Jan 2018 — Aug 2021',
       details: [
         'Musikkom is a committee in the EMIL student association for Energy and Environment. Its purpose is to provide students interested in music with opportunities to further develop their interest alongside their studies.',
-        'As leader, I learned the importance of collaboration and communication, and what it means to take responsibility.',
+        'Leading it taught me collaboration and communication, and what it means to take responsibility for a group.',
       ],
     },
   ],

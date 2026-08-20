@@ -210,12 +210,12 @@ describe('entity graph builders', () => {
   });
 
   it('BreadcrumbList walks Home → Work → case', () => {
-    const ld = buildBreadcrumbJsonLd('Be My Guide', 'be-my-guide');
+    const ld = buildBreadcrumbJsonLd('Sonari', 'sonari');
     expect(ld['@type']).toBe('BreadcrumbList');
     expect(ld.itemListElement).toEqual([
       { '@type': 'ListItem', 'position': 1, 'name': 'Home', 'item': SITE_URL },
       { '@type': 'ListItem', 'position': 2, 'name': 'Work', 'item': `${SITE_URL}/work` },
-      { '@type': 'ListItem', 'position': 3, 'name': 'Be My Guide', 'item': `${SITE_URL}/work/be-my-guide` },
+      { '@type': 'ListItem', 'position': 3, 'name': 'Sonari', 'item': `${SITE_URL}/work/sonari` },
     ]);
   });
 });

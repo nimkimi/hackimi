@@ -99,7 +99,9 @@ describe('WorkRow', () => {
   it('works with a real case from data/work', () => {
     const real = work[0];
     render(<WorkRow c={real} index={0} />);
-    expect(screen.getByText(real.title)).toBeInTheDocument();
+    // Image-less cases render the title twice: the row name plus the
+    // gradient-tile watermark. At least one is enough here.
+    expect(screen.getAllByText(real.title).length).toBeGreaterThanOrEqual(1);
     const link = screen.getByRole('link', { name: `View case study: ${real.title}` });
     expect(link).toHaveAttribute('href', `/work/${real.slug}`);
   });
