@@ -40,7 +40,7 @@ export default function AboutPage() {
           style={{ fontSize: 'clamp(2.25rem, 6.5vw, 4.5rem)' }}
         >
           <span className="block overflow-hidden">
-            <Reveal>I’m a developer and AI engineer</Reveal>
+            <Reveal>I’m a developer and AI&nbsp;engineer</Reveal>
           </span>
           <span className="block overflow-hidden">
             <Reveal delay={0.06}>
@@ -230,7 +230,7 @@ export default function AboutPage() {
           <p className="measure text-lg leading-relaxed text-muted sm:text-xl sm:leading-7">
             If a role or a project fits,{' '}
             <UnderlineLink href="/contact" className="text-ink">
-              Send me a message
+              send me a message
             </UnderlineLink>{' '}
             or email{' '}
             <UnderlineLink href={`mailto:${SITE_EMAIL}`} className="text-ink">
