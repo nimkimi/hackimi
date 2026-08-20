@@ -4,7 +4,8 @@
 
 - Production domains: `hackimi.dev` (apex) and `www.hackimi.dev`.
 - **Canonical host: apex `https://hackimi.dev`** — every canonical tag, sitemap URL, robots Sitemap line, and JSON-LD url in this repo uses apex.
-- Redirect direction: `www` → 308 → apex. (Flipped 2026-08-\_\_ by Nima; before that the dashboard had apex → www, contradicting the code's canonicals.)
+- Redirect direction: `www` → 308 → apex. (Flipped 2026-08-20. Before that it ran apex → www, which did more than contradict the code's canonicals: `sitemap.xml` fed Google the apex, the apex redirected to `www`, and `www` served a page whose canonical pointed back at the apex — so every submitted URL redirected away from itself onto a page pointing back at the redirector.)
+- That direction is a per-project domain setting, and `vercel domains` has no subcommand for it — it is API-only: `PATCH /v9/projects/{projectId}/domains/{domain}?teamId=…` with `{"redirect", "redirectStatusCode"}`. Clear the old redirect before adding the new one; setting the new one first leaves the two hosts pointing at each other. DNS is not involved — apex `A 76.76.21.21` and `www CNAME → apex` already serve both, and the nameservers are Hostinger's.
 - `hackimi.vercel.app` additionally 308s to apex via `next.config.js` (exact-host rule — preview URLs on \*.vercel.app are deliberately not matched).
 
 ## Deployments
