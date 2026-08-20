@@ -13,10 +13,9 @@ describe('work data', () => {
     ]);
   });
 
-  it('dovetail is a private personal tool: no outbound links', () => {
+  it('dovetail links to its public GitHub repo', () => {
     const dovetail = work.find((w) => w.slug === 'dovetail');
-    expect(dovetail).toBeDefined();
-    expect(dovetail?.links ?? []).toEqual([]);
+    expect(dovetail?.links?.map((l) => l.href)).toContain('https://github.com/nimkimi/dovetail');
   });
 
   it('syncward is private pre-release: no outbound links, flagged in progress', () => {

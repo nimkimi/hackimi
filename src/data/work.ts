@@ -94,6 +94,7 @@ const work: CaseStudy[] = [
     year: '2026',
     role: 'Solo: design and engineering',
     tech: ['Python (stdlib only)', 'Claude Code hooks', 'pytest', 'JSONL telemetry'],
+    links: [{ label: 'GitHub', href: 'https://github.com/nimkimi/dovetail' }],
     sections: [
       {
         heading: 'Context',
@@ -113,7 +114,7 @@ const work: CaseStudy[] = [
       },
       {
         heading: 'Result',
-        body: 'The first month of telemetry, 8,953 firings, showed that one cue in ten was a reuse nudge on a file that already existed, right where it helped least; that cue now fires only on new files. The dead-hook incident became regression tests derived from real transcripts, and the suite is 115 tests now. The cues also reach the sub-sessions I hand implementation work to, which is where most of the code in a big change gets written; I verified that path live. The repo stays private; it is tooling for my own setup.',
+        body: 'The first month of telemetry, 8,953 firings, showed that one cue in ten was a reuse nudge on a file that already existed, right where it helped least; that cue now fires only on new files. The dead-hook incident became regression tests derived from real transcripts, and the suite is 115 tests now. The cues also reach the sub-sessions I hand implementation work to, which is where most of the code in a big change gets written; I verified that path live. The code is public and installs as a Claude Code plugin, though it stays tooling for my own setup first.',
       },
     ],
   },
